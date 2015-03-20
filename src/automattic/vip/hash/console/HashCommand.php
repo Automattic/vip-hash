@@ -23,6 +23,10 @@ class HashCommand extends Command {
 		$file = $input->getArgument( 'file' );
 		$data = new DataModel();
 		$hash = $data->hashFile( $file );
+		if ( !$hash ) {
+			$output->writeln( '<error>File not found</error>' );
+			return;
+		}
 		$output->writeln( $hash );
 	}
 } 

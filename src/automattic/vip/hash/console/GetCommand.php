@@ -33,10 +33,17 @@ class GetCommand extends Command {
 		}
 		if ( $username = $input->getArgument('username') ) {
 			$status = $data->getHashStatusByUser( $hash, $username );
-			$output->writeln( $status );
+			if ( !$status ) {
+				$output->writeln( '<error>Not implemented</error>' );
+			} else {
+				$output->writeln( $status );
+			}
 		} else {
 			$statuses = $data->getHashStatusAllUsers( $hash );
-			$output->writeln('wip');
+			if ( empty( $statuses ) ) {
+				$output->writeln( '<error>Not implemented</error>' );
+				return;
+			}
 		}
 	}
 }

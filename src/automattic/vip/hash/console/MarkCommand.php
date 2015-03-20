@@ -33,7 +33,9 @@ class MarkCommand extends Command {
 		$status = $input->getArgument( 'status' );
 		$data = new DataModel();
 		$hash = $data->hashFile( $file );
-		$data->markHash( $hash, $username, $status );
-		//$output->writeln( $hash );
+		$result = $data->markHash( $hash, $username, $status );
+		if ( !$result ) {
+			$output->writeln( '<error>Not implemented</error>' );
+		}
 	}
 }
