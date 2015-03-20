@@ -15,7 +15,7 @@ class MarkCommand extends Command {
 			->addArgument(
 				'file',
 				InputArgument::REQUIRED,
-				'The file to be hashed'
+				'The file or hash to be marked'
 			)->addArgument(
 				'username',
 				InputArgument::REQUIRED,
@@ -32,7 +32,10 @@ class MarkCommand extends Command {
 		$username = $input->getArgument( 'username' );
 		$status = $input->getArgument( 'status' );
 		$data = new DataModel();
-		$hash = $data->hashFile( $file );
+		$hash = $file;
+		if ( file_exists( $file ) ) {
+			$hash = $data->hashFile( $file );
+		}
 		$result = $data->markHash( $hash, $username, $status );
 		if ( !$result ) {
 			$output->writeln( '<error>Not implemented</error>' );
