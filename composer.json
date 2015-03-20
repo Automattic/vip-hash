@@ -1,0 +1,21 @@
+{
+	"name"             : "automattic/viphash",
+	"description"      : "Hashing tool for helping with reviews",
+	"minimum-stability": "dev",
+	"license"          : "GPLV2",
+	"authors"          : [
+		{
+			"name" : "Tom J Nowell",
+			"email": "contact@tomjn.com"
+		}
+	],
+	"require" : {
+		"php": ">=5.4",
+		"symfony/console": "@stable"
+	},
+	"autoload"    : {
+		"classmap": [
+			""
+		]
+	}
+}
