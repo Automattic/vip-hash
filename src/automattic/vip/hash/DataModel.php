@@ -15,11 +15,11 @@ class DataModel {
 		return $hash;
 	}
 
-	public function getHashByUser( $hash, $username ) {
+	public function getHashStatusByUser( $hash, $username ) {
 		return 'wip';
 	}
 
-	public function getHashAllUsers( $hash ) {
+	public function getHashStatusAllUsers( $hash ) {
 		return 'wip';
 	}
 } 

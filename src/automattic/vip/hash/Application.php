@@ -2,6 +2,7 @@
 
 namespace automattic\vip\hash;
 
+use automattic\vip\hash\console\GetCommand;
 use automattic\vip\hash\console\HashCommand;
 use automattic\vip\hash\console\MarkCommand;
 use Symfony\Component\Console\Application as BaseApplication;
@@ -40,6 +41,7 @@ class Application extends BaseApplication {
 
 		$defaultCommands[] = new HashCommand();
 		$defaultCommands[] = new MarkCommand();
+		$defaultCommands[] = new GetCommand();
 
 		return $defaultCommands;
 	}
