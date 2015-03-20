@@ -2,11 +2,9 @@
 
 namespace automattic\vip\hash;
 
+use automattic\vip\hash\console\HashCommand;
 use Symfony\Component\Console\Application as BaseApplication;
-
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Formatter\OutputFormatter;
@@ -22,8 +20,7 @@ class Application extends BaseApplication {
 	 */
 	public function run( InputInterface $input = null, OutputInterface $output = null ) {
 		if ( null === $output ) {
-			//$styles = Factory::createAdditionalStyles();
-			$formatter = new OutputFormatter( null );//, $styles );
+			$formatter = new OutputFormatter( null );
 			$output = new ConsoleOutput( ConsoleOutput::VERBOSITY_NORMAL, null, $formatter );
 		}
 
@@ -40,20 +37,9 @@ class Application extends BaseApplication {
 		// which is used when using the --help option
 		$defaultCommands = parent::getDefaultCommands();
 
-		//$defaultCommands[] = new ConvertCommand();
+		$defaultCommands[] = new HashCommand();
 
 		return $defaultCommands;
 	}
 
-	/**
-	 * Overridden so that the application doesn't expect the command
-	 * name to be the first argument.
-	 */
-	public function getDefinition() {
-		$inputDefinition = parent::getDefinition();
-		// clear out the normal first argument, which is the command name
-		$inputDefinition->setArguments();
-
-		return $inputDefinition;
-	}
 }
