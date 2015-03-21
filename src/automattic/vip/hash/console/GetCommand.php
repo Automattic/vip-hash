@@ -44,6 +44,15 @@ class GetCommand extends Command {
 				$output->writeln( '<error>Not implemented</error>' );
 				return;
 			}
+
+			foreach( $statuses as $status ) {
+				$result = file_get_contents( $data->getDBDir().$status );
+				if ( $result == 'good' ) {
+					$output->writeln( '<info>'.$status.' '.$result.'</info>' );
+				} else {
+					$output->writeln( '<error>'.$status.' '.$result.'</error>' );
+				}
+			}
 		}
 	}
 }

@@ -7,7 +7,7 @@ namespace automattic\vip\hash;
 class DataModel {
 
 	public function markHash( $hash, $username, $value ) {
-		$file = $this->getDBDir().$hash.'-'.$username.'.dat';
+		$file = $this->getDBDir().$hash.'-'.$username;
 		if ( file_exists( $file ) ) {
 			// it already exists! we don't edit/update records, we only add and retrieve them
 			return false;
@@ -30,7 +30,7 @@ class DataModel {
 	}
 
 	public function getHashStatusByUser( $hash, $username ) {
-		$file = $this->getDBDir().$hash.'-'.$username.'.dat';
+		$file = $this->getDBDir().$hash.'-'.$username;
 		if ( file_exists( $file ) ) {
 			return file_get_contents( $file );
 		}
@@ -38,13 +38,25 @@ class DataModel {
 	}
 
 	public function getHashStatusAllUsers( $hash ) {
-		return array();
+		$files = scandir( $this->getDBDir() );
+
+		if ( !$files ) {
+			return false;
+		}
+
+		$results = array();
+		foreach ( $files as $file ) {
+			if ( substr( $file, 0, strlen( $hash ) ) == $hash ) {
+				$results[] = $file;
+			}
+		}
+		return $results;
 	}
 
 	/**
 	 * @return string the folder containing hash records with a trailing slash
 	 */
-	protected function getDBDir() {
+	public function getDBDir() {
 		return $_SERVER['HOME'].'/.viphash/';
 	}
 } 
