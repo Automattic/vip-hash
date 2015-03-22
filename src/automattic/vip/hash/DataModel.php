@@ -15,7 +15,7 @@ class DataModel {
 		touch( $file );
 		$result = file_put_contents( $file, $value );
 		if ( !$result ) {
-			return false;
+			throw new \Exception( "Failed to save hash", 1 );
 		}
 		return true;
 	}
@@ -23,7 +23,7 @@ class DataModel {
 	public function hashFile( $file ) {
 		$code = php_strip_whitespace( $file );
 		if ( empty( $code ) ) {
-			return false;
+			throw new \Exception( "Empty file contents cannot be hashed", 2 );
 		}
 		$hash = sha1( $code );
 		return $hash;
@@ -34,7 +34,7 @@ class DataModel {
 		if ( file_exists( $file ) ) {
 			return file_get_contents( $file );
 		}
-		return false;
+		throw new \Exception( "Hash not found", 3 );
 	}
 
 	public function getHashStatusAllUsers( $hash ) {
