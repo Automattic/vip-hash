@@ -32,20 +32,26 @@ class GetCommand extends Command {
 			$hash = $data->hashFile( $file );
 		}
 		if ( $username = $input->getArgument('username') ) {
-			$status = $data->getHashStatusByUser( $hash, $username );
-			if ( !$status ) {
-				$output->writeln( '<error>Not implemented</error>' );
-			} else {
+			try {
+				$status = $data->getHashStatusByUser( $hash, $username );
 				$output->writeln( $status );
+			} catch ( \Exception $e ) {
+				$output->writeln( '<error>'.$e->getCode().' - '.$e->getMessage().'</error>' );
+				return;
 			}
 		} else {
-			$statuses = $data->getHashStatusAllUsers( $hash );
-			if ( empty( $statuses ) ) {
-				$output->writeln( '<error>Not implemented</error>' );
+			try {
+				$statuses = $data->getHashStatusAllUsers( $hash );
+				if ( empty( $statuses ) ) {
+					$output->writeln( '<error>No hashes found</error>' );
+					return;
+				}
+			} catch ( \Exception $e ) {
+				$output->writeln( '<error>'.$e->getCode().' - '.$e->getMessage().'</error>' );
 				return;
 			}
 
-			foreach( $statuses as $status ) {
+			foreach ( $statuses as $status ) {
 				$result = file_get_contents( $data->getDBDir().$status );
 				if ( $result == 'good' ) {
 					$output->writeln( '<info>'.$status.' '.$result.'</info>' );
