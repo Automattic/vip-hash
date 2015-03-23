@@ -6,6 +6,14 @@ namespace automattic\vip\hash;
 
 class DataModel {
 
+	/**
+	 * @param $hash
+	 * @param $username
+	 * @param $value
+	 *
+	 * @return bool
+	 * @throws \Exception
+	 */
 	public function markHash( $hash, $username, $value ) {
 		$file = $this->getDBDir().$hash.'-'.$username;
 		if ( file_exists( $file ) ) {
@@ -20,6 +28,12 @@ class DataModel {
 		return true;
 	}
 
+	/**
+	 * @param $file
+	 *
+	 * @return string
+	 * @throws \Exception
+	 */
 	public function hashFile( $file ) {
 		$code = php_strip_whitespace( $file );
 		if ( empty( $code ) ) {
@@ -29,6 +43,13 @@ class DataModel {
 		return $hash;
 	}
 
+	/**
+	 * @param $hash
+	 * @param $username
+	 *
+	 * @return string
+	 * @throws \Exception
+	 */
 	public function getHashStatusByUser( $hash, $username ) {
 		$file = $this->getDBDir().$hash.'-'.$username;
 		if ( file_exists( $file ) ) {
@@ -37,6 +58,11 @@ class DataModel {
 		throw new \Exception( "Hash not found", 3 );
 	}
 
+	/**
+	 * @param $hash
+	 *
+	 * @return array
+	 */
 	public function getHashStatusAllUsers( $hash ) {
 		$files = scandir( $this->getDBDir() );
 
