@@ -59,6 +59,7 @@ class DataModel {
 	/**
 	 * @param $hash
 	 *
+	 * @throws \Exception
 	 * @return array
 	 */
 	public function getHashStatusAllUsers( $hash ) {
