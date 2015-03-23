@@ -1,6 +1,6 @@
 <?php
 
-namespace automattic\vip\hash;
+namespace automattic\vip\hash;g
 
 class DataModel {
 
@@ -65,7 +65,7 @@ class DataModel {
 		$files = scandir( $this->getDBDir() );
 
 		if ( !$files ) {
-			return false;
+			throw new \Exception( "No hashes found", 4 );
 		}
 
 		$results = array();
