@@ -2,8 +2,6 @@
 
 namespace automattic\vip\hash;
 
-// @TODO: we should use error objects or exceptions here instead of just returning false
-
 class DataModel {
 
 	/**
