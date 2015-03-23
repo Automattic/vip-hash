@@ -8,7 +8,14 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * {@inheritDoc}
+ */
 class MarkCommand extends Command {
+
+	/**
+	 * {@inheritDoc}
+	 */
 	protected function configure() {
 		$this->setName( 'mark' )
 			->setDescription( 'take a file and mark it as <info>good</info> or <error>bad</error>' )
@@ -27,18 +34,22 @@ class MarkCommand extends Command {
 			);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	protected function execute( InputInterface $input, OutputInterface $output ) {
 		$file = $input->getArgument( 'file' );
 		$username = $input->getArgument( 'username' );
 		$status = $input->getArgument( 'status' );
 		$data = new DataModel();
 		$hash = $file;
-		if ( file_exists( $file ) ) {
-			$hash = $data->hashFile( $file );
-		}
-		$result = $data->markHash( $hash, $username, $status );
-		if ( !$result ) {
-			$output->writeln( '<error>Not implemented</error>' );
+		try {
+			if ( file_exists( $file ) ) {
+				$hash = $data->hashFile( $file );
+			}
+			$result = $data->markHash( $hash, $username, $status );
+		} catch ( \Exception $e ) {
+			$output->writeln( '<error>'.$e->getCode().' - '.$e->getMessage().'</error>' );
 		}
 	}
 }
