@@ -22,11 +22,11 @@ class HashCommand extends Command {
 	protected function execute( InputInterface $input, OutputInterface $output ) {
 		$file = $input->getArgument( 'file' );
 		$data = new DataModel();
-		$hash = $data->hashFile( $file );
-		if ( !$hash ) {
-			$output->writeln( '<error>File not found</error>' );
-			return;
+		try {
+			$hash = $data->hashFile( $file );
+			$output->writeln( $hash );
+		} catch ( \Exception $e ) {
+			$output->writeln( '<error>'.$e->getCode().' - '.$e->getMessage().'</error>' );
 		}
-		$output->writeln( $hash );
 	}
 } 
