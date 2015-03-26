@@ -1,8 +1,12 @@
 <?php
 
-namespace automattic\vip\hash;g
+namespace automattic\vip\hash;
 
 class DataModel {
+
+	function __construct() {
+		//
+	}
 
 	/**
 	 * @param $hash
