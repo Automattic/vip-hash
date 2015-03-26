@@ -15,25 +15,6 @@ class HashRecord {
 
 	private $data;
 
-	private $date='';
-
-	/**
-	 * @var bool
-	 */
-	private $status = false;
-
-	/**
-	 * @var string
-	 */
-	private $username;
-
-	/**
-	 * @var string
-	 */
-	private $hash;
-
-	private $note = '';
-
 	function __construct() {
 		$this->data = array(
 			'date' => time(),
@@ -67,14 +48,14 @@ class HashRecord {
 	 * @return string
 	 */
 	public function getNote() {
-		return $this->note;
+		return $this->data['note'];
 	}
 
 	/**
 	 * @param string $note
 	 */
 	public function setNote( $note ) {
-		$this->note = $note;
+		$this->data['note'] = $note;
 	}
 
 	/**
