@@ -11,6 +11,8 @@ namespace automattic\vip\hash;
 
 class HashRecord {
 
+	private $loaded_from_file = false;
+
 	private $date='';
 
 	/**
@@ -23,6 +25,27 @@ class HashRecord {
 	 */
 	private $username;
 
+	/**
+	 * @var string
+	 */
+	private $hash;
+
+	private $note = '';
+
+	/**
+	 * @return string
+	 */
+	public function getNote() {
+		return $this->note;
+	}
+
+	/**
+	 * @param string $note
+	 */
+	public function setNote( $note ) {
+		$this->note = $note;
+	}
+
 	function __construct() {
 		$this->date = 'the time';
 	}
@@ -30,8 +53,8 @@ class HashRecord {
 	/**
 	 * @param $file string a file path to load
 	 */
-	function load( $file ) {
-		//
+	function loadFile( $file ) {
+		$this->loaded_from_file = true;
 	}
 
 	/**
@@ -44,6 +67,22 @@ class HashRecord {
 	function setDate( $date ) {
 		$this->date = $date;
 	}
+
+	/**
+	 * @return string
+	 */
+	public function getHash() {
+		return $this->hash;
+	}
+
+	/**
+	 * @param string $hash
+	 */
+	public function setHash( $hash ) {
+		$this->hash = $hash;
+	}
+
+
 
 	/**
 	 * @return bool
@@ -68,9 +107,43 @@ class HashRecord {
 	}
 
 	/**
-	 * @param $file
+	 * Saves this record
+	 *
+	 * @param $folder string the location of the hash database with a trailing slash
 	 */
-	function save( $file ) {
-		//
+	function save( $folder ) {
+		$file = $this->generateFileName();
+		$full_path = $folder . $file;
+
+		$data = array();
+		if ( !empty( $this->note ) ) {
+			$data['note'] = $this->getNote();
+		}
+		if ( !empty( $this->status ) ) {
+			$data['status'] = $this->getStatus();
+		}
+		if ( !empty( $this->username ) ) {
+			$data['username'] = $this->getUsername();
+		}
+		if ( !empty( $this->hash ) ) {
+			$data['hash'] = $this->getHash();
+		}
+		if ( !empty( $this->date ) ) {
+			$data['date'] = $this->getDate();
+		}
+		$contents = json_encode( $data );
+
+		// save contents to file
+		file_put_contents( $file, $contents );
+	}
+
+	/**
+	 * @return string filename to be appended to the hash folder
+	 */
+	private function generateFileName() {
+		$file = $this->getHash().'/';
+		$file .= $this->getUsername().'/';
+		$file .= $this->getDate();
+		return $file;
 	}
 }
