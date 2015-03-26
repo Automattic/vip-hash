@@ -26,6 +26,24 @@ class HashRecord {
 	}
 
 	/**
+	 * Does this hash already exist in the database?
+	 *
+	 * @param $folder
+	 *
+	 * @return bool
+	 */
+	function exists( $folder ) {
+		if ( $this->loaded_from_file ) {
+			return true;
+		}
+
+		$file = $this->generateFileName();
+		$full_path = $folder . $file;
+
+		return file_exists( $full_path );
+	}
+
+	/**
 	 * @param $file string a file path to load
 	 *
 	 * @throws \Exception
