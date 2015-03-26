@@ -13,6 +13,8 @@ class HashRecord {
 
 	private $loaded_from_file = false;
 
+	private $data;
+
 	private $date='';
 
 	/**
@@ -32,6 +34,35 @@ class HashRecord {
 
 	private $note = '';
 
+	function __construct() {
+		$this->data = array(
+			'date' => time(),
+			'username' => '',
+			'status' => false,
+			'hash' => '',
+			'notes' => ''
+		);
+	}
+
+	/**
+	 * @param $file string a file path to load
+	 *
+	 * @throws \Exception
+	 */
+	function loadFile( $file ) {
+		$this->loaded_from_file = true;
+
+		if ( !file_exists( $file ) ) {
+			throw new \Exception( "File does not exist, cannot load record", 8 );
+		}
+		$contents = file_get_contents( $file );
+		$json_data = json_decode( $contents );
+
+		foreach ( $this->data as $key => $value ) {
+			$this->data[ $key ] = $json_data[ $key ];
+		}
+	}
+
 	/**
 	 * @return string
 	 */
@@ -46,95 +77,68 @@ class HashRecord {
 		$this->note = $note;
 	}
 
-	function __construct() {
-		$this->date = 'the time';
-	}
-
-	/**
-	 * @param $file string a file path to load
-	 */
-	function loadFile( $file ) {
-		$this->loaded_from_file = true;
-	}
-
 	/**
 	 * The date this record was made
 	 */
 	function getDate() {
-		return $this->date;
+		return $this->data['date'];
 	}
 
 	function setDate( $date ) {
-		$this->date = $date;
+		$this->data['date'] = $date;
 	}
 
 	/**
 	 * @return string
 	 */
 	public function getHash() {
-		return $this->hash;
+		return $this->data['hash'];
 	}
 
 	/**
 	 * @param string $hash
 	 */
 	public function setHash( $hash ) {
-		$this->hash = $hash;
+		$this->data['hash'] = $hash;
 	}
-
-
 
 	/**
 	 * @return bool
 	 */
 	function getStatus() {
-		return $this->status;
+		return $this->data['status'];
 	}
 
 	/**
 	 * @param bool $status
 	 */
-	function setStatus( $status=false ) {
-		$this->status = $status;
+	function setStatus( $status ) {
+		$this->data['status'] = $status;
 	}
 
 	function setUsername( $username) {
-		$this->username = $username;
+		$this->data['username'] = $username;
 	}
 
 	function getUsername() {
-		return $this->username;
+		return $this->data['username'];
 	}
 
 	/**
 	 * Saves this record
 	 *
 	 * @param $folder string the location of the hash database with a trailing slash
+	 *
+	 * @throws \Exception
 	 */
 	function save( $folder ) {
 		$file = $this->generateFileName();
 		$full_path = $folder . $file;
 
-		$data = array();
-		if ( !empty( $this->note ) ) {
-			$data['note'] = $this->getNote();
-		}
-		if ( !empty( $this->status ) ) {
-			$data['status'] = $this->getStatus();
-		}
-		if ( !empty( $this->username ) ) {
-			$data['username'] = $this->getUsername();
-		}
-		if ( !empty( $this->hash ) ) {
-			$data['hash'] = $this->getHash();
-		}
-		if ( !empty( $this->date ) ) {
-			$data['date'] = $this->getDate();
-		}
-		$contents = json_encode( $data );
+		$contents = json_encode( $this->data );
 
 		// save contents to file
-		file_put_contents( $file, $contents );
+		file_put_contents( $full_path, $contents );
 	}
 
 	/**
