@@ -51,8 +51,12 @@ class DataModel {
 	 * @throws \Exception
 	 */
 	public function getHashStatusByUser( $hash, $username ) {
-		$folder = $this->getDBDir().$hash.'/'.$username.'/';
-		$files = array_diff( scandir( $folder ), array( '..', '.' ) );
+		$hash_folder = $this->getDBDir().$hash;
+		if ( !file_exists( $hash_folder ) ) {
+			throw new \Exception( "No entries exist for this hash" );
+		}
+		$user_folder = $hash_folder.'/'.$username.'/';
+		$files = array_diff( scandir( $user_folder ), array( '..', '.' ) );
 		if ( empty( $files ) ) {
 			throw new \Exception( "Hash or User Not found" );
 		}
@@ -73,6 +77,9 @@ class DataModel {
 	 */
 	public function getHashStatusAllUsers( $hash ) {
 		$hash_folder = $this->getDBDir().$hash;
+		if ( !file_exists( $hash_folder ) ) {
+			throw new \Exception( "No entries exist for this hash" );
+		}
 		$folders = array_diff( scandir( $hash_folder ), array( '..', '.' ) );
 		if ( empty( $folders ) ) {
 			throw new \Exception( "Hash Not found" );
