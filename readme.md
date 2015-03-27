@@ -1,6 +1,6 @@
 # VIP Hash tool
 
-This tool allows WordPress.com users to hash files and mark those files as good or bad. It's intended to help with reviewing code
+This tool allows WordPress.com users to hash files and mark those files as ready or not ready for VIP. It's intended to help with reviewing code, and preventing duplication of work
 
 ## Commands
 
@@ -20,12 +20,12 @@ This command takes 3 parameters:
 
  - A hash to mark, or a file to hash and mark
  - A WordPress.com username
- - The status of the file, good or bad
+ - Does this file meet VIP standards? true or false
  
- Usage:
- 
-     php bin/viphash.php mark file.php tarendai good
- 
+Usage:
+
+    php bin/viphash.php mark file.php tarendai true
+
  
 ## get
 
