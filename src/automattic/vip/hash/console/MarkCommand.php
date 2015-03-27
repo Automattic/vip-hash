@@ -44,13 +44,9 @@ class MarkCommand extends Command {
 		$status = $input->getArgument( 'status' );
 		$data = new DataModel();
 		$hash = $file;
-		try {
-			if ( file_exists( $file ) ) {
-				$hash = $data->hashFile( $file );
-			}
-			$data->markHash( $hash, $username, $status );
-		} catch ( \Exception $e ) {
-			$output->writeln( '<error>'.$e->getCode().' - '.$e->getMessage().'</error>' );
+		if ( file_exists( $file ) ) {
+			$hash = $data->hashFile( $file );
 		}
+		$data->markHash( $hash, $username, $status );
 	}
 }
