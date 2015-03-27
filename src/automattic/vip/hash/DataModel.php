@@ -86,7 +86,7 @@ class DataModel {
 			}
 			foreach ( $files as $file ) {
 				$record = new HashRecord();
-				$record->loadFile( $file );
+				$record->loadFile( $user_folder.'/'.$file );
 				$output_data[] = $record->getData();
 			}
 
