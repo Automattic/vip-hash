@@ -17,7 +17,7 @@ class Application extends BaseApplication {
 	 * {@inheritDoc}
 	 */
 	function __construct() {
-		parent::__construct('viphash', '1');
+		parent::__construct('viphash', '2');
 	}
 
 	/**
