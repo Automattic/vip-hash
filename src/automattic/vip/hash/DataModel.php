@@ -32,6 +32,7 @@ class DataModel {
 		$process->run();
 
 		if ( !$process->isSuccessful() ) {
+			chdir( $cwd );
 			throw new \RuntimeException( $process->getErrorOutput() );
 		}
 
