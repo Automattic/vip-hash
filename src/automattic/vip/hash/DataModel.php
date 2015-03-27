@@ -64,7 +64,7 @@ class DataModel {
 		if ( !file_exists( $hash_folder ) ) {
 			throw new \Exception( "No entries exist for this hash" );
 		}
-		$user_folder = $hash_folder.'/'.$username.'/';
+		$user_folder = $hash_folder.DIRECTORY_SEPARATOR.$username.DIRECTORY_SEPARATOR;
 		if ( !file_exists( $user_folder ) ) {
 			throw new \Exception( "No entries exist for this user and hash" );
 		}
@@ -75,7 +75,7 @@ class DataModel {
 		$output_data = array();
 		foreach ( $files as $file ) {
 			$record = new HashRecord();
-			$record->loadFile( $user_folder.'/'.$file );
+			$record->loadFile( $user_folder.DIRECTORY_SEPARATOR.$file );
 			$output_data[] = $record->getData();
 		}
 		return $output_data;
@@ -98,14 +98,14 @@ class DataModel {
 		}
 		$output_data = array();
 		foreach ( $folders as $folder ) {
-			$user_folder = $hash_folder.'/'.$folder.'/';
+			$user_folder = $hash_folder.DIRECTORY_SEPARATOR.$folder.DIRECTORY_SEPARATOR;
 			$files = array_diff( scandir( $user_folder ), array( '..', '.' ) );
 			if ( empty( $files ) ) {
 				continue;
 			}
 			foreach ( $files as $file ) {
 				$record = new HashRecord();
-				$record->loadFile( $user_folder.'/'.$file );
+				$record->loadFile( $user_folder.DIRECTORY_SEPARATOR.$file );
 				$output_data[] = $record->getData();
 			}
 
@@ -117,6 +117,6 @@ class DataModel {
 	 * @return string the folder containing hash records with a trailing slash
 	 */
 	public function getDBDir() {
-		return $_SERVER['HOME'].'/.viphash/';
+		return $_SERVER['HOME'].DIRECTORY_SEPARATOR.'.viphash'.DIRECTORY_SEPARATOR;
 	}
 } 
