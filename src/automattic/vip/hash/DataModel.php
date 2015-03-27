@@ -47,15 +47,22 @@ class DataModel {
 	 * @param $hash
 	 * @param $username
 	 *
-	 * @return string
+	 * @return array
 	 * @throws \Exception
 	 */
 	public function getHashStatusByUser( $hash, $username ) {
-		$file = $this->getDBDir().$hash.'-'.$username;
-		if ( file_exists( $file ) ) {
-			return file_get_contents( $file );
+		$folder = $this->getDBDir().$hash.'/'.$username.'/';
+		$files = array_diff( scandir( $folder ), array( '..', '.' ) );
+		if ( empty( $files ) ) {
+			throw new \Exception( "Hash or User Not found" );
 		}
-		throw new \Exception( "Hash not found", 3 );
+		$output_data = array();
+		foreach ( $files as $file ) {
+			$record = new HashRecord();
+			$record->loadFile( $file );
+			$output_data[] = $record->getData();
+		}
+		return $output_data;
 	}
 
 	/**
@@ -65,19 +72,26 @@ class DataModel {
 	 * @return array
 	 */
 	public function getHashStatusAllUsers( $hash ) {
-		$files = scandir( $this->getDBDir() );
-
-		if ( !$files ) {
-			throw new \Exception( "No hashes found", 4 );
+		$hash_folder = $this->getDBDir().$hash;
+		$folders = array_diff( scandir( $hash_folder ), array( '..', '.' ) );
+		if ( empty( $folders ) ) {
+			throw new \Exception( "Hash Not found" );
 		}
-
-		$results = array();
-		foreach ( $files as $file ) {
-			if ( substr( $file, 0, strlen( $hash ) ) == $hash ) {
-				$results[] = $file;
+		$output_data = array();
+		foreach ( $folders as $folder ) {
+			$user_folder = $hash_folder.'/'.$folder.'/';
+			$files = array_diff( scandir( $user_folder ), array( '..', '.' ) );
+			if ( empty( $files ) ) {
+				continue;
 			}
+			foreach ( $files as $file ) {
+				$record = new HashRecord();
+				$record->loadFile( $file );
+				$output_data[] = $record->getData();
+			}
+
 		}
-		return $results;
+		return $output_data;
 	}
 
 	/**
