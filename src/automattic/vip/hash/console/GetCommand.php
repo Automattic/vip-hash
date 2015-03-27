@@ -33,31 +33,25 @@ class GetCommand extends Command {
 		}
 		if ( $username = $input->getArgument('username') ) {
 			try {
-				$status = $data->getHashStatusByUser( $hash, $username );
-				$output->writeln( $status );
+				$result = $data->getHashStatusByUser( $hash, $username );
+				$json = json_encode( $result, JSON_PRETTY_PRINT );
+				$output->writeln( $json );
 			} catch ( \Exception $e ) {
 				$output->writeln( '<error>'.$e->getCode().' - '.$e->getMessage().'</error>' );
 				return;
 			}
 		} else {
 			try {
-				$statuses = $data->getHashStatusAllUsers( $hash );
+				$result = $data->getHashStatusAllUsers( $hash );
 				if ( empty( $statuses ) ) {
 					$output->writeln( '<error>No hashes found</error>' );
 					return;
 				}
+				$json = json_encode( $result, JSON_PRETTY_PRINT );
+				$output->writeln( $json );
 			} catch ( \Exception $e ) {
 				$output->writeln( '<error>'.$e->getCode().' - '.$e->getMessage().'</error>' );
 				return;
-			}
-
-			foreach ( $statuses as $status ) {
-				$result = file_get_contents( $data->getDBDir().$status );
-				if ( $result == 'good' ) {
-					$output->writeln( '<info>'.$status.' '.$result.'</info>' );
-				} else {
-					$output->writeln( '<error>'.$status.' '.$result.'</error>' );
-				}
 			}
 		}
 	}
