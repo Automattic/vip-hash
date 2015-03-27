@@ -32,27 +32,16 @@ class GetCommand extends Command {
 			$hash = $data->hashFile( $file );
 		}
 		if ( $username = $input->getArgument('username') ) {
-			try {
-				$result = $data->getHashStatusByUser( $hash, $username );
-				$json = json_encode( $result, JSON_PRETTY_PRINT );
-				$output->writeln( $json );
-			} catch ( \Exception $e ) {
-				$output->writeln( '<error>'.$e->getCode().' - '.$e->getMessage().'</error>' );
-				return;
-			}
+			$result = $data->getHashStatusByUser( $hash, $username );
+			$json = json_encode( $result, JSON_PRETTY_PRINT );
+			$output->writeln( $json );
 		} else {
-			try {
-				$result = $data->getHashStatusAllUsers( $hash );
-				if ( empty( $result ) ) {
-					$output->writeln( '<error>No hashes found</error>' );
-					return;
-				}
-				$json = json_encode( $result, JSON_PRETTY_PRINT );
-				$output->writeln( $json );
-			} catch ( \Exception $e ) {
-				$output->writeln( '<error>'.$e->getCode().' - '.$e->getMessage().'</error>' );
-				return;
+			$result = $data->getHashStatusAllUsers( $hash );
+			if ( empty( $result ) ) {
+				throw new \Exception('No Hashes found' );
 			}
+			$json = json_encode( $result, JSON_PRETTY_PRINT );
+			$output->writeln( $json );
 		}
 	}
 }
