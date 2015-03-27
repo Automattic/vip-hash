@@ -165,7 +165,7 @@ class HashRecord {
 	 * @return string filename to be appended to the hash folder
 	 */
 	private function generateFileName() {
-		$file .= $this->generateFolderName().'/';
+		$file = $this->generateFolderName().'/';
 		$file .= $this->getDate();
 		return $file;
 	}
