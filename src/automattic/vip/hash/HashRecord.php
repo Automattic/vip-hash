@@ -150,7 +150,7 @@ class HashRecord {
 
 		chdir( $folder );
 
-		$process = new Process( 'git add . && git commit -am "saved new hashes from '.$this->getUsername().'"' );
+		$process = new Process( 'git add '.$file.' && git commit -m "saved new hashes from '.$this->getUsername().'"' );
 		$process->run();
 
 		if ( !$process->isSuccessful() ) {
