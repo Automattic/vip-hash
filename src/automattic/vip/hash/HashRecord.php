@@ -1,13 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: tomnowell
- * Date: 23/03/15
- * Time: 13:48
- */
 
 namespace automattic\vip\hash;
 
+
+use Symfony\Component\Process\Process;
 
 class HashRecord {
 
@@ -148,6 +144,22 @@ class HashRecord {
 		// save contents to file
 		touch( $full_path );
 		file_put_contents( $full_path, $contents );
+
+		// save the current working directory
+		$cwd = getcwd();
+
+		chdir( $folder );
+
+		$process = new Process( 'git add . && git commit -am "saved new hashes from '.$this->getUsername().'"' );
+		$process->run();
+
+		if ( !$process->isSuccessful() ) {
+			chdir( $cwd );
+			throw new \RuntimeException( $process->getErrorOutput() );
+		}
+
+		// return to the original working directory
+		chdir( $cwd );
 	}
 
 	/**
