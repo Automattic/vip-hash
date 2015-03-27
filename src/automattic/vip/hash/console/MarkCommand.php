@@ -51,6 +51,9 @@ class MarkCommand extends Command {
 		if ( empty( $status ) ) {
 			throw new \Exception( 'Empty status parameter' );
 		}
+		if ( $status != 'true' && $status != 'false' ) {
+			throw new \Exception( 'Hash status must be true or false' );
+		}
 		$data = new DataModel();
 		$hash = $file;
 		if ( file_exists( $file ) ) {
