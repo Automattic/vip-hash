@@ -55,7 +55,7 @@ class HashRecord {
 			throw new \Exception( "File does not exist, cannot load record", 8 );
 		}
 		$contents = file_get_contents( $file );
-		$json_data = json_decode( $contents );
+		$json_data = json_decode( $contents, true );
 
 		foreach ( $this->data as $key => $value ) {
 			$this->data[ $key ] = $json_data[ $key ];
