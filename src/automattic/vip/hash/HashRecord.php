@@ -131,7 +131,14 @@ class HashRecord {
 	 * @throws \Exception
 	 */
 	function save( $folder ) {
+		if ( $this->exists( $folder ) ) {
+			throw new \Exception( "Cannot save record, it already exists!", 9 );
+		}
+
 		$file = $this->generateFileName();
+		$file_folder = $this->generateFolderName();
+		mkdir( $folder.$file_folder, 0777, true );
+
 		$full_path = $folder . $file;
 
 		$contents = json_encode( $this->data );
@@ -141,12 +148,17 @@ class HashRecord {
 		file_put_contents( $full_path, $contents );
 	}
 
+	private function generateFolderName() {
+		$file = $this->getHash().'/';
+		$file .= $this->getUsername();
+		return $file;
+	}
+
 	/**
 	 * @return string filename to be appended to the hash folder
 	 */
 	private function generateFileName() {
-		$file = $this->getHash().'/';
-		$file .= $this->getUsername().'/';
+		$file .= $this->generateFolderName().'/';
 		$file .= $this->getDate();
 		return $file;
 	}
