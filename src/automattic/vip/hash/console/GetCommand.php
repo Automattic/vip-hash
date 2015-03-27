@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class GetCommand extends Command {
 	protected function configure() {
 		$this->setName( 'get' )
-			->setDescription( 'take a file and mark it as <info>good</info> or <error>bad</error>' )
+			->setDescription( 'take a file and/or username, and retrieve all records for it' )
 			->addArgument(
 				'file',
 				InputArgument::REQUIRED,
