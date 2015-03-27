@@ -2,10 +2,41 @@
 
 namespace automattic\vip\hash;
 
+use Symfony\Component\Process\Process;
+
 class DataModel {
 
-	function __construct() {
-		//
+	public function __construct() {
+		$this->initVCS();
+	}
+
+	/**
+	 * Set up VCS if it isn't already set up
+	 */
+	public function initVCS () {
+		$git_path = $this->getDBDir().DIRECTORY_SEPARATOR.'.git';
+
+		// return if a .git directory already exists
+		if ( file_exists( $git_path ) ) {
+			return;
+		}
+
+		// create a process object and initialise the git repository
+
+		// save the current working directory
+		$cwd = getcwd();
+
+		chdir( $this->getDBDir() );
+
+		$process = new Process( 'git init' );
+		$process->run();
+
+		if ( !$process->isSuccessful() ) {
+			throw new \RuntimeException( $process->getErrorOutput() );
+		}
+
+		// return to the original working directory
+		chdir( $cwd );
 	}
 
 	/**
