@@ -26,6 +26,9 @@ class GetCommand extends Command {
 	protected function execute( InputInterface $input, OutputInterface $output ) {
 
 		$file = $input->getArgument( 'file' );
+		if ( empty( $file ) ) {
+			throw new \Exception( 'Empty file parameter' );
+		}
 		$data = new DataModel();
 		$hash = $file;
 		if ( file_exists( $file ) ) {
