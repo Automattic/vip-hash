@@ -11,22 +11,20 @@ class DataModel {
 	/**
 	 * @param $hash
 	 * @param $username
-	 * @param $value
+	 * @param bool $value
 	 *
 	 * @return bool
 	 * @throws \Exception
 	 */
 	public function markHash( $hash, $username, $value ) {
-		$file = $this->getDBDir().$hash.'-'.$username;
-		if ( file_exists( $file ) ) {
-			// it already exists! we don't edit/update records, we only add and retrieve them
-			return false;
-		}
-		touch( $file );
-		$result = file_put_contents( $file, $value );
-		if ( !$result ) {
-			throw new \Exception( "Failed to save hash", 1 );
-		}
+
+		$record = new HashRecord();
+		$record->setHash( $hash );
+		$record->setUsername( $username );
+		$record->setStatus( $value );
+
+		$folder = $this->getDBDir();
+		$record->save( $folder );
 		return true;
 	}
 
