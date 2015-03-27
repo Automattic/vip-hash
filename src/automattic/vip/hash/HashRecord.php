@@ -137,6 +137,7 @@ class HashRecord {
 		$contents = json_encode( $this->data );
 
 		// save contents to file
+		touch( $full_path );
 		file_put_contents( $full_path, $contents );
 	}
 
