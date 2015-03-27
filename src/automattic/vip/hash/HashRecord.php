@@ -137,7 +137,9 @@ class HashRecord {
 
 		$file = $this->generateFileName();
 		$file_folder = $this->generateFolderName();
-		mkdir( $folder.$file_folder, 0777, true );
+		if ( !file_exists( $folder.$file_folder ) ) {
+			mkdir( $folder . $file_folder, 0777, true );
+		}
 
 		$full_path = $folder . $file;
 
