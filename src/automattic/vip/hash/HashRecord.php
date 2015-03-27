@@ -148,6 +148,13 @@ class HashRecord {
 		file_put_contents( $full_path, $contents );
 	}
 
+	/**
+	 * @return array
+	 */
+	public function getData() {
+		return $this->data;
+	}
+
 	private function generateFolderName() {
 		$file = $this->getHash().'/';
 		$file .= $this->getUsername();
