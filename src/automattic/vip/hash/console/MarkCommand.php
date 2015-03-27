@@ -3,6 +3,7 @@
 namespace automattic\vip\hash\console;
 
 use automattic\vip\hash\DataModel;
+use automattic\vip\hash\HashRecord;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -47,7 +48,7 @@ class MarkCommand extends Command {
 			if ( file_exists( $file ) ) {
 				$hash = $data->hashFile( $file );
 			}
-			$result = $data->markHash( $hash, $username, $status );
+			$data->markHash( $hash, $username, $status );
 		} catch ( \Exception $e ) {
 			$output->writeln( '<error>'.$e->getCode().' - '.$e->getMessage().'</error>' );
 		}
