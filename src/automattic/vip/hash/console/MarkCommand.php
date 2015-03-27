@@ -19,7 +19,7 @@ class MarkCommand extends Command {
 	 */
 	protected function configure() {
 		$this->setName( 'mark' )
-			->setDescription( 'take a file and mark it as <info>good</info> or <error>bad</error>' )
+			->setDescription( 'take a file and mark it\'s VIP worthiness as <info>true</info> or <error>false</error>' )
 			->addArgument(
 				'file',
 				InputArgument::REQUIRED,
@@ -31,7 +31,7 @@ class MarkCommand extends Command {
 			)->addArgument(
 				'status',
 				InputArgument::REQUIRED,
-				'"good" or "bad"'
+				'"true" or "false"'
 			);
 	}
 
