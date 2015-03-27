@@ -43,7 +43,7 @@ class GetCommand extends Command {
 		} else {
 			try {
 				$result = $data->getHashStatusAllUsers( $hash );
-				if ( empty( $statuses ) ) {
+				if ( empty( $result ) ) {
 					$output->writeln( '<error>No hashes found</error>' );
 					return;
 				}
