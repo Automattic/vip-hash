@@ -41,6 +41,9 @@ class DataModel {
 		if ( is_dir( $file ) ) {
 			throw new \Exception( "You cannot hash a folder" );
 		}
+		if ( !is_file( $file ) ) {
+			throw new \Exception( "Only files can be hashed" );
+		}
 		$code = php_strip_whitespace( $file );
 		if ( empty( $code ) ) {
 			throw new \Exception( "Empty file contents cannot be hashed" );
