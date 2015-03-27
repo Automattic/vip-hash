@@ -56,7 +56,7 @@ class DataModel {
 			throw new \Exception( "No entries exist for this hash" );
 		}
 		$user_folder = $hash_folder.'/'.$username.'/';
-		if ( !file_exists( $hash_folder ) ) {
+		if ( !file_exists( $user_folder ) ) {
 			throw new \Exception( "No entries exist for this user and hash" );
 		}
 		$files = array_diff( scandir( $user_folder ), array( '..', '.' ) );
