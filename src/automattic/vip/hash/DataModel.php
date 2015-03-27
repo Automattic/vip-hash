@@ -38,6 +38,9 @@ class DataModel {
 		if ( !file_exists( $file ) ) {
 			throw new \Exception( "File does not exist" );
 		}
+		if ( is_dir( $file ) ) {
+			throw new \Exception( "You cannot hash a folder" );
+		}
 		$code = php_strip_whitespace( $file );
 		if ( empty( $code ) ) {
 			throw new \Exception( "Empty file contents cannot be hashed" );
