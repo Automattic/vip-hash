@@ -35,9 +35,12 @@ class DataModel {
 	 * @throws \Exception
 	 */
 	public function hashFile( $file ) {
+		if ( !file_exists( $file ) ) {
+			throw new \Exception( "File does not exist" );
+		}
 		$code = php_strip_whitespace( $file );
 		if ( empty( $code ) ) {
-			throw new \Exception( "Empty file contents cannot be hashed", 2 );
+			throw new \Exception( "Empty file contents cannot be hashed" );
 		}
 		$hash = sha1( $code );
 		return $hash;
