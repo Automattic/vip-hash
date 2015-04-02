@@ -20,7 +20,9 @@ class ScanCommand extends Command {
 		$this->allowed_file_types = array(
 			'php',
 			'php5',
-			'js'
+			'js',
+			'html',
+			'htm'
 		);
 		$this->setName( 'scan' )
 			->setDescription( 'take a folder and generate a json response detailing the files inside' )
@@ -88,8 +90,10 @@ class ScanCommand extends Command {
 		} else {
 			// only process the file types we're interested in
 			$info = pathinfo( $file );
-			if ( !in_array( $info['extension'], $this->allowed_file_types ) ) {
-				return null;
+			if ( isset( $info['extension'] ) ) {
+				if ( !in_array( $info['extension'], $this->allowed_file_types ) ) {
+					return null;
+				}
 			}
 			$data_model = new DataModel();
 			try {
