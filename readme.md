@@ -4,7 +4,7 @@ This tool allows WordPress.com users to hash files and mark those files as ready
 
 ## Commands
 
-There are 3 commands:
+The tool has the following commands:
 
 ### hash
 
