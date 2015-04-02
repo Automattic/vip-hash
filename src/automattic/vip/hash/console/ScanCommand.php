@@ -14,7 +14,14 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ScanCommand extends Command {
 
+	private $allowed_file_types;
+
 	protected function configure() {
+		$this->allowed_file_types = array(
+			'php',
+			'php5',
+			'js'
+		);
 		$this->setName( 'scan' )
 			->setDescription( 'take a folder and generate a json response detailing the files inside' )
 			->addArgument(
@@ -33,22 +40,6 @@ class ScanCommand extends Command {
 		$json = json_encode( $data, JSON_PRETTY_PRINT );
 		$output->writeln( $json );
 		return;
-
-		$hash = $file;
-		if ( file_exists( $file ) ) {
-			$hash = $data->hashFile( $file );
-		}
-		if ( $username = $input->getArgument('username') ) {
-			$result = $data->getHashStatusByUser( $hash, $username );
-			$json = json_encode( $result, JSON_PRETTY_PRINT );
-			$output->writeln( $json );
-		} else {
-			$result = $data->getHashStatusAllUsers( $hash );
-			if ( empty( $result ) ) {
-				throw new \Exception('No Hashes found' );
-			}
-
-		}
 	}
 
 	/**
@@ -58,6 +49,25 @@ class ScanCommand extends Command {
 	 * @throws \Exception
 	 */
 	private function ProcessFile( $file ) {
+		// don't process the vendor folder
+		if ( substr( $file, -6) === 'vendor' ){
+			return null;
+		}
+
+		// don't process the .git folder
+		if ( substr( $file, -4) === '.git' ){
+			return null;
+		}
+
+		// don't process the .svn folder
+		if ( substr( $file, -4) === '.svn' ){
+			return null;
+		}
+		// don't process the .svn folder
+		if ( substr( $file, -5) === '.idea' ){
+			return null;
+		}
+
 		$data = array();
 		if ( is_dir( $file ) ) {
 			$folders = array_diff( scandir( $file ), array( '..', '.' ) );
@@ -65,10 +75,22 @@ class ScanCommand extends Command {
 				return $data;
 			}
 			foreach ( $folders as $found_file ) {
-				$data[] = $this->ProcessFile( $file.DIRECTORY_SEPARATOR.$found_file  );
+				$result =  $this->ProcessFile( $file . DIRECTORY_SEPARATOR . $found_file );
+				if ( !empty( $result ) ) {
+					$data[] = $result;
+				}
 			}
+			$data = array(
+				'folder' => $file,
+				'contents' => $data
+			);
 
 		} else {
+			// only process the file types we're interested in
+			$info = pathinfo( $file );
+			if ( !in_array( $info['extension'], $this->allowed_file_types ) ) {
+				return null;
+			}
 			$data_model = new DataModel();
 			try {
 				$hash = $data_model->hashFile( $file );
