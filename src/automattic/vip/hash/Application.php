@@ -5,6 +5,7 @@ namespace automattic\vip\hash;
 use automattic\vip\hash\console\GetCommand;
 use automattic\vip\hash\console\HashCommand;
 use automattic\vip\hash\console\MarkCommand;
+use automattic\vip\hash\console\ScanCommand;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -45,6 +46,7 @@ class Application extends BaseApplication {
 		$defaultCommands[] = new HashCommand();
 		$defaultCommands[] = new MarkCommand();
 		$defaultCommands[] = new GetCommand();
+		$defaultCommands[] = new ScanCommand();
 
 		return $defaultCommands;
 	}

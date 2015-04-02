@@ -15,7 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ScanCommand extends Command {
 
 	protected function configure() {
-		$this->setName( 'get' )
+		$this->setName( 'scan' )
 			->setDescription( 'take a folder and generate a json response detailing the files inside' )
 			->addArgument(
 				'folder',
@@ -29,7 +29,11 @@ class ScanCommand extends Command {
 		if ( empty( $folder ) ) {
 			throw new \Exception( 'Empty folder parameter' );
 		}
-		$data = new DataModel();
+		$data = $this->ProcessFile( $folder );
+		$json = json_encode( $data, JSON_PRETTY_PRINT );
+		$output->writeln( $json );
+		return;
+
 		$hash = $file;
 		if ( file_exists( $file ) ) {
 			$hash = $data->hashFile( $file );
@@ -43,8 +47,7 @@ class ScanCommand extends Command {
 			if ( empty( $result ) ) {
 				throw new \Exception('No Hashes found' );
 			}
-			$json = json_encode( $result, JSON_PRETTY_PRINT );
-			$output->writeln( $json );
+
 		}
 	}
 
@@ -67,9 +70,26 @@ class ScanCommand extends Command {
 
 		} else {
 			$data_model = new DataModel();
-			$hash = $data_model->hashFile( $file );
+			try {
+				$hash = $data_model->hashFile( $file );
+			} catch ( \Exception $e ) {
+				$data = array(
+					'hash' => 'empty',
+					'status' => 'unknown',
+					'file' => $file
+				);
+				return $data;
+			}
+			try {
+				$data = $data_model->getHashStatusAllUsers( $hash );
+			} catch ( \Exception $e ) {
+				$data = array(
+					'hash' => $hash,
+					'status' => 'unknown',
+					'file' => $file
+				);
+			}
 
-			$data = $data_model->getHashStatusAllUsers( $hash );
 		}
 		return $data;
 	}
