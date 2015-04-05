@@ -35,7 +35,7 @@ class MarkCommand extends Command {
 			)->addArgument(
 				'note',
 				InputArgument::OPTIONAL,
-				'notes, perhaps a line number and code with some text'
+				'the offending item if marking as bad'
 			);
 	}
 
