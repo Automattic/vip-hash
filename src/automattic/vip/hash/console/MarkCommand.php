@@ -32,6 +32,10 @@ class MarkCommand extends Command {
 				'status',
 				InputArgument::REQUIRED,
 				'"true" or "false"'
+			)->addArgument(
+				'note',
+				InputArgument::OPTIONAL,
+				'notes, perhaps a line number and code with some text'
 			);
 	}
 
