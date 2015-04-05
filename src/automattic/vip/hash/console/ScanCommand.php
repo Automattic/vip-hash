@@ -72,19 +72,21 @@ class ScanCommand extends Command {
 
 		$data = array();
 		if ( is_dir( $file ) ) {
-			$folders = array_diff( scandir( $file ), array( '..', '.' ) );
+			$unfiltered_folders = scandir( $file );
+			$folders = array_diff( $unfiltered_folders, array( '..', '.' ) );
 			if ( empty( $folders ) ) {
-				return $data;
+				return null;
 			}
+			$contents = array();
 			foreach ( $folders as $found_file ) {
 				$result =  $this->ProcessFile( $file . DIRECTORY_SEPARATOR . $found_file );
-				if ( !empty( $result ) ) {
-					$data[] = $result;
+				if ( !empty( $result ) && ( $result != null ) ) {
+					$contents[] = $result;
 				}
 			}
 			$data = array(
-				'folder' => $file,
-				'contents' => $data
+				'folder'   => $file,
+				'contents' => $contents
 			);
 
 		} else {
@@ -108,6 +110,13 @@ class ScanCommand extends Command {
 			}
 			try {
 				$data = $data_model->getHashStatusAllUsers( $hash );
+				if ( empty( $data ) ) {
+					$data = array(
+						'hash' => $hash,
+						'status' => 'unknown',
+						'file' => $file
+					);
+				}
 			} catch ( \Exception $e ) {
 				$data = array(
 					'hash' => $hash,
