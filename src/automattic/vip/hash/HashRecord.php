@@ -2,12 +2,7 @@
 
 namespace automattic\vip\hash;
 
-
-use Symfony\Component\Process\Process;
-
 class HashRecord {
-
-	private $loaded_from_file = false;
 
 	private $data;
 
@@ -24,38 +19,10 @@ class HashRecord {
 	/**
 	 * Does this hash already exist in the database?
 	 *
-	 * @param $folder
-	 *
 	 * @return bool
 	 */
-	function exists( $folder ) {
-		if ( $this->loaded_from_file ) {
-			return true;
-		}
-
-		$file = $this->generateFileName();
-		$full_path = $folder . $file;
-
-		return file_exists( $full_path );
-	}
-
-	/**
-	 * @param $file string a file path to load
-	 *
-	 * @throws \Exception
-	 */
-	function loadFile( $file ) {
-		$this->loaded_from_file = true;
-
-		if ( !file_exists( $file ) ) {
-			throw new \Exception( "File does not exist, cannot load record", 8 );
-		}
-		$contents = file_get_contents( $file );
-		$json_data = json_decode( $contents, true );
-
-		foreach ( $this->data as $key => $value ) {
-			$this->data[ $key ] = $json_data[ $key ];
-		}
+	function exists() {
+		return false;
 	}
 
 	/**
@@ -122,44 +89,31 @@ class HashRecord {
 	/**
 	 * Saves this record
 	 *
-	 * @param $folder string the location of the hash database with a trailing slash
+	 * @param DataModel $model
 	 *
 	 * @throws \Exception
+	 * @internal param string $folder the location of the hash database with a trailing slash
+	 *
 	 */
-	function save( $folder ) {
-		if ( $this->exists( $folder ) ) {
-			throw new \Exception( "Cannot save record, it already exists!", 9 );
+	function save( DataModel $model ) {
+
+		$pdo = $model->getPDO();
+
+		$username = $this->getUsername();
+		$hash = $this->getHash();
+		$date = $this->getDate();
+		$seen = time();
+		$status = $this->getStatus();
+		$notes = '';
+
+		$identifier = $hash.'-'.$username.'-'.$date;
+
+		$result = $pdo->query( "INSERT INTO wpcom_vip_hashes VALUES ( null, \"$identifier\", \"$username\", \"$hash\", \"$date\", \"$seen\", \"$status\", \"$notes\" )" );
+
+		if ( !$result ) {
+			$error_info = print_r( $pdo->errorInfo(), true );
+			throw new \Exception( $error_info );
 		}
-
-		$file = $this->generateFileName();
-		$file_folder = $this->generateFolderName();
-		if ( !file_exists( $folder.$file_folder ) ) {
-			mkdir( $folder . $file_folder, 0777, true );
-		}
-
-		$full_path = $folder . $file;
-
-		$contents = json_encode( $this->data );
-
-		// save contents to file
-		touch( $full_path );
-		file_put_contents( $full_path, $contents );
-
-		// save the current working directory
-		$cwd = getcwd();
-
-		chdir( $folder );
-
-		$process = new Process( 'git add '.$file.' && git commit -m "saved new hashes from '.$this->getUsername().'"' );
-		$process->run();
-
-		if ( !$process->isSuccessful() ) {
-			chdir( $cwd );
-			throw new \RuntimeException( $process->getErrorOutput() );
-		}
-
-		// return to the original working directory
-		chdir( $cwd );
 	}
 
 	/**
@@ -169,18 +123,7 @@ class HashRecord {
 		return $this->data;
 	}
 
-	private function generateFolderName() {
-		$file = $this->getHash().'/';
-		$file .= $this->getUsername();
-		return $file;
-	}
-
-	/**
-	 * @return string filename to be appended to the hash folder
-	 */
-	private function generateFileName() {
-		$file = $this->generateFolderName().DIRECTORY_SEPARATOR;
-		$file .= $this->getDate();
-		return $file;
+	public function setData( $data ) {
+		$this->data = $data;
 	}
 }

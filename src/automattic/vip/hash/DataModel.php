@@ -2,42 +2,40 @@
 
 namespace automattic\vip\hash;
 
-use Symfony\Component\Process\Process;
+use PDO;
 
 class DataModel {
 
+	/**
+	 * @var \PDO
+	 */
+	private $pdo = null;
+
 	public function __construct() {
-		$this->initVCS();
+		$this->init();
+	}
+
+	public function init() {
+		if ( !$this->pdo ) {
+			$this->pdo = new PDO( 'sqlite:' . $this->getDBDir() . 'db.sqlite' );
+			$this->pdo->query( 'CREATE TABLE IF NOT EXISTS wpcom_vip_hashes (
+				id INTEGER PRIMARY KEY AUTOINCREMENT,
+				identifier CHAR(50) NOT NULL,
+				user CHAR(30) NOT NULL,
+				hash CHAR(30) NOT NULL,
+				date INT NOT NULL,
+				seen INT NOT NULL,
+				status INT NOT NULL,
+				notes TEXT
+			)' );
+		}
 	}
 
 	/**
-	 * Set up VCS if it isn't already set up
+	 * @return \PDO
 	 */
-	public function initVCS () {
-		$git_path = $this->getDBDir().DIRECTORY_SEPARATOR.'.git';
-
-		// return if a .git directory already exists
-		if ( file_exists( $git_path ) ) {
-			return;
-		}
-
-		// create a process object and initialise the git repository
-
-		// save the current working directory
-		$cwd = getcwd();
-
-		chdir( $this->getDBDir() );
-
-		$process = new Process( 'git init' );
-		$process->run();
-
-		if ( !$process->isSuccessful() ) {
-			chdir( $cwd );
-			throw new \RuntimeException( $process->getErrorOutput() );
-		}
-
-		// return to the original working directory
-		chdir( $cwd );
+	public function getPDO() {
+		return $this->pdo;
 	}
 
 	/**
@@ -50,13 +48,12 @@ class DataModel {
 	 */
 	public function markHash( $hash, $username, $value ) {
 
-		$record = new HashRecord();
+		$record = new HashRecord( $this );
 		$record->setHash( $hash );
 		$record->setUsername( $username );
 		$record->setStatus( $value );
 
-		$folder = $this->getDBDir();
-		$record->save( $folder );
+		$record->save( $this );
 		return true;
 	}
 
@@ -89,23 +86,17 @@ class DataModel {
 	 * @throws \Exception
 	 */
 	public function getHashStatusByUser( $hash, $username ) {
-		$hash_folder = $this->getDBDir().$hash;
-		if ( !file_exists( $hash_folder ) ) {
-			throw new \Exception( "No entries exist for this hash" );
+		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hashes WHERE hash = '$hash' AND user = '$username'" );
+
+		if ( !$results ) {
+			$error_info = print_r( $this->pdo->errorInfo(), true );
+			throw new \Exception( $error_info, $this->pdo->errorCode() );
 		}
-		$user_folder = $hash_folder.DIRECTORY_SEPARATOR.$username.DIRECTORY_SEPARATOR;
-		if ( !file_exists( $user_folder ) ) {
-			throw new \Exception( "No entries exist for this user and hash" );
-		}
-		$files = array_diff( scandir( $user_folder ), array( '..', '.' ) );
-		if ( empty( $files ) ) {
-			throw new \Exception( "Hash or User Not found" );
-		}
+
 		$output_data = array();
-		foreach ( $files as $file ) {
-			$record = new HashRecord();
-			$record->loadFile( $user_folder.DIRECTORY_SEPARATOR.$file );
-			$output_data[] = $record->getData();
+		while ( $row = $results->fetch( PDO::FETCH_ASSOC ) ) {
+			unset( $row['id'] );
+			$output_data[] = $row;
 		}
 		return $output_data;
 	}
@@ -117,27 +108,17 @@ class DataModel {
 	 * @return array
 	 */
 	public function getHashStatusAllUsers( $hash ) {
-		$hash_folder = $this->getDBDir().$hash;
-		if ( !file_exists( $hash_folder ) ) {
-			throw new \Exception( "No entries exist for this hash" );
-		}
-		$folders = array_diff( scandir( $hash_folder ), array( '..', '.' ) );
-		if ( empty( $folders ) ) {
-			throw new \Exception( "Hash Not found" );
-		}
-		$output_data = array();
-		foreach ( $folders as $folder ) {
-			$user_folder = $hash_folder.DIRECTORY_SEPARATOR.$folder.DIRECTORY_SEPARATOR;
-			$files = array_diff( scandir( $user_folder ), array( '..', '.' ) );
-			if ( empty( $files ) ) {
-				continue;
-			}
-			foreach ( $files as $file ) {
-				$record = new HashRecord();
-				$record->loadFile( $user_folder.DIRECTORY_SEPARATOR.$file );
-				$output_data[] = $record->getData();
-			}
+		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hashes WHERE hash = '$hash'" );
 
+		if ( !$results ) {
+			$error_info = print_r( $this->pdo->errorInfo(), true );
+			throw new \Exception( $error_info, $this->pdo->errorCode() );
+		}
+
+		$output_data = array();
+		while ( $row = $results->fetch( PDO::FETCH_ASSOC ) ) {
+			unset( $row['id'] );
+			$output_data[] = $row;
 		}
 		return $output_data;
 	}
