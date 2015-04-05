@@ -112,7 +112,7 @@ class DataModel {
 
 		if ( !$results ) {
 			$error_info = print_r( $this->pdo->errorInfo(), true );
-			throw new \Exception( $error_info, $this->pdo->errorCode() );
+			throw new \Exception( $error_info  );
 		}
 
 		$output_data = array();
