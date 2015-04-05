@@ -58,11 +58,13 @@ class MarkCommand extends Command {
 		if ( $status != 'true' && $status != 'false' ) {
 			throw new \Exception( 'Hash status must be true or false' );
 		}
+
+		$note = $input->getArgument( 'note' );
 		$data = new DataModel();
 		$hash = $file;
 		if ( file_exists( $file ) ) {
 			$hash = $data->hashFile( $file );
 		}
-		$data->markHash( $hash, $username, $status );
+		$data->markHash( $hash, $username, $status, $note );
 	}
 }
