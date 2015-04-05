@@ -39,19 +39,22 @@ class DataModel {
 	}
 
 	/**
-	 * @param $hash
-	 * @param $username
-	 * @param bool $value
+	 * @param        $hash
+	 * @param        $username
+	 * @param bool   $value
 	 *
-	 * @return bool
+	 * @param string $note
+	 *
 	 * @throws \Exception
+	 * @return bool
 	 */
-	public function markHash( $hash, $username, $value ) {
+	public function markHash( $hash, $username, $value, $note = '' ) {
 
 		$record = new HashRecord( $this );
 		$record->setHash( $hash );
 		$record->setUsername( $username );
 		$record->setStatus( $value );
+		$record->setNote( $note );
 
 		$record->save( $this );
 		return true;
