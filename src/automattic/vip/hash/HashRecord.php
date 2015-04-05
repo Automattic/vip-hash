@@ -104,7 +104,7 @@ class HashRecord {
 		$date = $this->getDate();
 		$seen = time();
 		$status = $this->getStatus();
-		$notes = '';
+		$notes = $this->getNote();
 
 		$identifier = $hash.'-'.$username.'-'.$date;
 
