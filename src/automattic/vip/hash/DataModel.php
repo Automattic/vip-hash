@@ -130,6 +130,14 @@ class DataModel {
 	 * @return string the folder containing hash records with a trailing slash
 	 */
 	public function getDBDir() {
-		return $_SERVER['HOME'].DIRECTORY_SEPARATOR.'.viphash'.DIRECTORY_SEPARATOR;
+		$folder = $_SERVER['HOME'].DIRECTORY_SEPARATOR.'.viphash'.DIRECTORY_SEPARATOR;
+		if ( !is_writable( $folder ) ) {
+			$folder = '';
+		} else {
+			if ( !file_exists( $folder ) ) {
+				mkdir( $folder, 0777, true );
+			}
+		}
+		return $folder;
 	}
 } 
