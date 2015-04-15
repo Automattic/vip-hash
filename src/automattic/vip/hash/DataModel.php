@@ -28,6 +28,12 @@ class DataModel {
 				status INT NOT NULL,
 				notes TEXT
 			)' );
+			$this->pdo->query( 'CREATE TABLE IF NOT EXISTS wpcom_vip_hash_remotes (
+				id INTEGER PRIMARY KEY AUTOINCREMENT,
+				name CHAR(50) NOT NULL,
+				uri CHAR(30) NOT NULL,
+				latest_seen INT NOT NULL
+			)' );
 		}
 	}
 
@@ -181,6 +187,46 @@ class DataModel {
 	public function getHashesSeenAfter( $date ) {
 		$date = intval( $date );
 		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hashes WHERE seen > $date ORDER BY seen ASC" );
+		if ( !$results ) {
+			$error_info = print_r( $this->pdo->errorInfo(), true );
+			throw new \Exception( $error_info  );
+		}
+
+		$output_data = array();
+		while ( $row = $results->fetch( PDO::FETCH_ASSOC ) ) {
+			unset( $row['id'] );
+			$output_data[] = $row;
+		}
+		return $output_data;
+	}
+
+
+	public function addRemote( $name, $uri ) {
+		$pdo = $this->getPDO();
+
+		$query = "INSERT INTO wpcom_vip_hash_remotes VALUES
+		( :id, :name, :uri, :latest_seen )";
+		$sth   = $pdo->prepare( $query );
+		if ( $sth ) {
+			$result = $sth->execute( array(
+				':id'          => null,
+				':name'        => $name,
+				':username'    => $uri,
+				':latest_seen' => 0
+			) );
+
+			if ( !$result ) {
+				$error_info = print_r( $pdo->errorInfo(), true );
+				throw new \Exception( $error_info );
+			}
+			return true;
+		}
+
+		return false;
+	}
+
+	public function getRemotes() {
+		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hashe_remotes" );
 		if ( !$results ) {
 			$error_info = print_r( $this->pdo->errorInfo(), true );
 			throw new \Exception( $error_info  );
