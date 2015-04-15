@@ -91,6 +91,7 @@ class HashRecord {
 	 *
 	 * @param DataModel $model
 	 *
+	 * @return bool
 	 * @throws \Exception
 	 * @internal param string $folder the location of the hash database with a trailing slash
 	 *
@@ -122,7 +123,7 @@ class HashRecord {
 				':status'     => $status,
 				':notes'      => $notes
 			) );
-			
+
 			if ( !$result ) {
 				//$error_info = print_r( $pdo->errorInfo(), true );
 				//throw new \Exception( $error_info );
@@ -130,6 +131,7 @@ class HashRecord {
 			}
 			return true;
 		}
+		return false;
 	}
 
 	/**
