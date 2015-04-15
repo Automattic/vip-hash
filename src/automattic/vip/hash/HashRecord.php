@@ -129,8 +129,6 @@ class HashRecord {
 				throw new \Exception( $error_info );
 			}
 			return true;
-		} else {
-			echo $query;
 		}
 
 		return false;
