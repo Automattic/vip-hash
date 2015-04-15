@@ -140,4 +140,19 @@ class DataModel {
 		}
 		return $folder;
 	}
+
+	public function getNewestSeenHash() {
+		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hashes ORDER BY seen DESC LIMIT 1" );
+		if ( !$results ) {
+			$error_info = print_r( $this->pdo->errorInfo(), true );
+			throw new \Exception( $error_info  );
+		}
+
+		$output_data = array();
+		while ( $row = $results->fetch( PDO::FETCH_ASSOC ) ) {
+			unset( $row['id'] );
+			return $row;
+		}
+		return $output_data;
+	}
 } 
