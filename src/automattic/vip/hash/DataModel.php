@@ -164,7 +164,7 @@ class DataModel {
 
 	public function getHashesAfter( $date ) {
 		$date = intval( $date );
-		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hashes WHERE date > $date ORDER BY date ASC LIMIT 1" );
+		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hashes WHERE date > $date ORDER BY date ASC" );
 		if ( !$results ) {
 			$error_info = print_r( $this->pdo->errorInfo(), true );
 			throw new \Exception( $error_info  );
@@ -180,7 +180,7 @@ class DataModel {
 
 	public function getHashesSeenAfter( $date ) {
 		$date = intval( $date );
-		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hashes WHERE seen > $date ORDER BY seen ASC LIMIT 1" );
+		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hashes WHERE seen > $date ORDER BY seen ASC" );
 		if ( !$results ) {
 			$error_info = print_r( $this->pdo->errorInfo(), true );
 			throw new \Exception( $error_info  );
