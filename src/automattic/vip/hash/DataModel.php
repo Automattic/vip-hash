@@ -37,7 +37,7 @@ class DataModel {
 	public function getPDO() {
 		return $this->pdo;
 	}
-
+	
 	/**
 	 * @param        $hash
 	 * @param        $username
@@ -45,16 +45,22 @@ class DataModel {
 	 *
 	 * @param string $note
 	 *
+	 * @param string $date
+	 *
 	 * @throws \Exception
 	 * @return bool
 	 */
-	public function markHash( $hash, $username, $value, $note = '' ) {
+	public function markHash( $hash, $username, $value, $note = '', $date = '' ) {
 
 		$record = new HashRecord( $this );
 		$record->setHash( $hash );
 		$record->setUsername( $username );
 		$record->setStatus( $value );
 		$record->setNote( $note );
+
+		if ( !empty( $date ) ) {
+			$record->setDate( $date );
+		}
 
 		$record->save( $this );
 		return true;
@@ -80,6 +86,7 @@ class DataModel {
 		$hash = sha1( $code );
 		return $hash;
 	}
+
 
 	/**
 	 * @param $hash
