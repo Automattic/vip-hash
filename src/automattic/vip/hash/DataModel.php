@@ -37,7 +37,7 @@ class DataModel {
 	public function getPDO() {
 		return $this->pdo;
 	}
-	
+
 	/**
 	 * @param        $hash
 	 * @param        $username
@@ -62,8 +62,7 @@ class DataModel {
 			$record->setDate( $date );
 		}
 
-		$record->save( $this );
-		return true;
+		return $record->save( $this );
 	}
 
 	/**

@@ -122,13 +122,13 @@ class HashRecord {
 				':status'     => $status,
 				':notes'      => $notes
 			) );
-
+			
 			if ( !$result ) {
-				$error_info = print_r( $pdo->errorInfo(), true );
-				throw new \Exception( $error_info );
+				//$error_info = print_r( $pdo->errorInfo(), true );
+				//throw new \Exception( $error_info );
+				return false;
 			}
-		} else {
-
+			return true;
 		}
 	}
 
