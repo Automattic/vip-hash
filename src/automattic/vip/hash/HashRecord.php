@@ -109,7 +109,7 @@ class HashRecord {
 
 		$identifier = $hash.'-'.$username.'-'.$date;
 
-		$query = "INSERT INTO * wpcom_vip_hashes VALUES
+		$query = "INSERT INTO wpcom_vip_hashes VALUES
 		( :id, :identifier, :username, :hash, :date, :seen, :status, :notes )";
 		$sth   = $pdo->prepare( $query );
 		if ( $sth ) {
@@ -125,12 +125,14 @@ class HashRecord {
 			) );
 
 			if ( !$result ) {
-				//$error_info = print_r( $pdo->errorInfo(), true );
-				//throw new \Exception( $error_info );
-				return false;
+				$error_info = print_r( $pdo->errorInfo(), true );
+				throw new \Exception( $error_info );
 			}
 			return true;
+		} else {
+			echo $query;
 		}
+
 		return false;
 	}
 
