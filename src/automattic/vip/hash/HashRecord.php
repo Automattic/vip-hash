@@ -141,6 +141,9 @@ class HashRecord {
 		return $this->data;
 	}
 
+	/**
+	 * @param $data
+	 */
 	public function setData( $data ) {
 		$this->data = $data;
 	}
