@@ -173,7 +173,7 @@ class DataModel {
 		$output_data = array();
 		while ( $row = $results->fetch( PDO::FETCH_ASSOC ) ) {
 			unset( $row['id'] );
-			return $row;
+			$output_data[] = $row;
 		}
 		return $output_data;
 	}
@@ -189,7 +189,7 @@ class DataModel {
 		$output_data = array();
 		while ( $row = $results->fetch( PDO::FETCH_ASSOC ) ) {
 			unset( $row['id'] );
-			return $row;
+			$output_data[] = $row;
 		}
 		return $output_data;
 	}
