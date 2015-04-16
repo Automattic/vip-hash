@@ -20,7 +20,7 @@ class DataModel {
 			$this->pdo = new PDO( 'sqlite:' . $this->getDBDir() . 'db.sqlite' );
 			$this->pdo->query( 'CREATE TABLE IF NOT EXISTS wpcom_vip_hashes (
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
-				identifier CHAR(50) NOT NULL,
+				identifier CHAR(50) NOT NULL UNIQUE,
 				user CHAR(30) NOT NULL,
 				hash CHAR(30) NOT NULL,
 				date INT NOT NULL,
@@ -30,7 +30,7 @@ class DataModel {
 			)' );
 			$this->pdo->query( 'CREATE TABLE IF NOT EXISTS wpcom_vip_hash_remotes (
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
-				name CHAR(50) NOT NULL,
+				name CHAR(50) NOT NULL UNIQUE,
 				uri CHAR(30) NOT NULL,
 				latest_seen INT NOT NULL
 			)' );
