@@ -32,7 +32,8 @@ class DataModel {
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
 				name CHAR(50) NOT NULL UNIQUE,
 				uri CHAR(30) NOT NULL,
-				latest_seen INT NOT NULL
+				latest_seen INT NOT NULL,
+				last_sent INT NOT NULL
 			)' );
 		}
 	}
