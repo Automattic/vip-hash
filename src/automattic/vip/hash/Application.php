@@ -7,6 +7,7 @@ use automattic\vip\hash\console\HashCommand;
 use automattic\vip\hash\console\MarkCommand;
 use automattic\vip\hash\console\RemotesCommand;
 use automattic\vip\hash\console\ScanCommand;
+use automattic\vip\hash\console\SyncCommand;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -49,6 +50,7 @@ class Application extends BaseApplication {
 		$defaultCommands[] = new GetCommand();
 		$defaultCommands[] = new ScanCommand();
 		$defaultCommands[] = new RemotesCommand();
+		$defaultCommands[] = new SyncCommand();
 
 		return $defaultCommands;
 	}
