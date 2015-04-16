@@ -211,7 +211,7 @@ class DataModel {
 			$result = $sth->execute( array(
 				':id'          => null,
 				':name'        => $name,
-				':username'    => $uri,
+				':uri'         => $uri,
 				':latest_seen' => 0
 			) );
 
@@ -226,7 +226,7 @@ class DataModel {
 	}
 
 	public function getRemotes() {
-		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hashe_remotes" );
+		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hash_remotes" );
 		if ( !$results ) {
 			$error_info = print_r( $this->pdo->errorInfo(), true );
 			throw new \Exception( $error_info  );
