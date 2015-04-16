@@ -258,7 +258,6 @@ class DataModel {
 			throw new \Exception( $error_info  );
 		}
 
-		$output_data = array();
 		while ( $row = $results->fetch( PDO::FETCH_ASSOC ) ) {
 			unset( $row['id'] );
 			return $row;
