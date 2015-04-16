@@ -206,14 +206,15 @@ class DataModel {
 		$pdo = $this->getPDO();
 
 		$query = "INSERT INTO wpcom_vip_hash_remotes VALUES
-		( :id, :name, :uri, :latest_seen )";
+		( :id, :name, :uri, :latest_seen, :last_sent )";
 		$sth   = $pdo->prepare( $query );
 		if ( $sth ) {
 			$result = $sth->execute( array(
 				':id'          => null,
 				':name'        => $name,
 				':uri'         => $uri,
-				':latest_seen' => 0
+				':latest_seen' => 0,
+				':last_sent'   => 0
 			) );
 
 			if ( !$result ) {
