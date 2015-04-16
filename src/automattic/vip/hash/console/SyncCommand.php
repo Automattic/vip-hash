@@ -7,6 +7,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use GuzzleHttp\Client;
 
 class SyncCommand extends Command {
 
@@ -36,6 +37,37 @@ class SyncCommand extends Command {
 		if ( !$remote ) {
 			throw new \Exception( 'There was an issue trying to get the remotes information, does this remote name exist?' );
 		}
+		$i_saw = $remote['last_seen'];
+		$they_saw = 0;
+
+		$i_sent = $remote['last_sent'];
+		$they_sent = 0;
+
+		$client = new Client();
+
+		$send_data = $data->getHashesSeenAfter( $i_sent );
+		$send_data = json_encode( $send_data );
+
+		/** @noinspection PhpVoidFunctionResultUsedInspection */
+		$response = $client->post(  $remote . 'hash/add', [
+			'body' => [
+				'data' => $send_data
+			]
+		]);
+		$json = $response->json();
+
+		/**
+		 * Finish by retrieving the data from the remote end that we don't have
+		 */
+
+		/** @noinspection PhpVoidFunctionResultUsedInspection */
+		$response = $client->get(  $remote . 'hash/seen/since/' . $i_saw );
+		$new_items = $response->json();
+
+		foreach ( $new_items as $item ) {
+			// process each item and save
+		}
+
 
 		$output->writeln( $remote['uri'] );
 
