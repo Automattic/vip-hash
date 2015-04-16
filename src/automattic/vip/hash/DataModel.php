@@ -226,6 +226,10 @@ class DataModel {
 		return false;
 	}
 
+	/**
+	 * @return array
+	 * @throws \Exception
+	 */
 	public function getRemotes() {
 		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hash_remotes" );
 		if ( !$results ) {
@@ -239,5 +243,26 @@ class DataModel {
 			$output_data[] = $row;
 		}
 		return $output_data;
+	}
+
+	/**
+	 * @param $name
+	 *
+	 * @throws \Exception
+	 * @return bool|mixed
+	 */
+	public function getRemote( $name ) {
+		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hash_remotes WHERE name = $name" );
+		if ( !$results ) {
+			$error_info = print_r( $this->pdo->errorInfo(), true );
+			throw new \Exception( $error_info  );
+		}
+
+		$output_data = array();
+		while ( $row = $results->fetch( PDO::FETCH_ASSOC ) ) {
+			unset( $row['id'] );
+			return $row;
+		}
+		return false;
 	}
 } 
