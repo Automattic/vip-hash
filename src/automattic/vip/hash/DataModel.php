@@ -252,7 +252,7 @@ class DataModel {
 	 * @return bool|mixed
 	 */
 	public function getRemote( $name ) {
-		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hash_remotes WHERE name = $name" );
+		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hash_remotes WHERE name = '$name'" );
 		if ( !$results ) {
 			$error_info = print_r( $this->pdo->errorInfo(), true );
 			throw new \Exception( $error_info  );
