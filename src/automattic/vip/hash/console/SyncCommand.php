@@ -37,11 +37,9 @@ class SyncCommand extends Command {
 		if ( !$remote ) {
 			throw new \Exception( 'There was an issue trying to get the remotes information, does this remote name exist?' );
 		}
-		$i_saw = $remote['last_seen'];
-		$they_saw = 0;
+		$i_saw = $remote['latest_seen'];
 
 		$i_sent = $remote['last_sent'];
-		$they_sent = 0;
 
 		$client = new Client();
 
@@ -49,7 +47,7 @@ class SyncCommand extends Command {
 		$send_data = json_encode( $send_data );
 
 		/** @noinspection PhpVoidFunctionResultUsedInspection */
-		$response = $client->post(  $remote . 'hash/add', [
+		$response = $client->post( $remote['uri'] . 'hash', [
 			'body' => [
 				'data' => $send_data
 			]
@@ -61,16 +59,16 @@ class SyncCommand extends Command {
 		 */
 
 		/** @noinspection PhpVoidFunctionResultUsedInspection */
-		$response = $client->get(  $remote . 'hash/seen/since/' . $i_saw );
+		$response = $client->get(  $remote['uri'] . 'hash/seen/since/' . $i_saw );
 		$new_items = $response->json();
 
 		foreach ( $new_items as $item ) {
 			// process each item and save
+
+			$data->markHash( $item['hash'], $item['user'], $item['status'],$item['notes'], $item['date'] );
 		}
 
 
 		$output->writeln( $remote['uri'] );
-
-		throw new \Exception( 'unimplemented');
 	}
 }
