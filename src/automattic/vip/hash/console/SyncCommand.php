@@ -37,7 +37,7 @@ class SyncCommand extends Command {
 		if ( !$remote ) {
 			throw new \Exception( 'There was an issue trying to get the remotes information, does this remote name exist?' );
 		}
-		
+
 		$this->sendHashes( $remote );
 		$this->fetchHashes( $remote );
 
@@ -46,9 +46,9 @@ class SyncCommand extends Command {
 
 	protected function sendHashes( $remote ) {
 		$i_saw = $remote['latest_seen'];
-		$i_sent = $remote['last_sent'];
 
 		$client = new Client();
+		$data = new DataModel();
 
 		/**
 		 * Finish by retrieving the data from the remote end that we don't have
@@ -69,6 +69,7 @@ class SyncCommand extends Command {
 		$i_sent = $remote['last_sent'];
 
 		$client = new Client();
+		$data = new DataModel();
 
 		$send_data = $data->getHashesSeenAfter( $i_sent );
 		$send_data = json_encode( $send_data );
