@@ -41,17 +41,18 @@ class SyncCommand extends Command {
 		$output->writeln( "Synchronising hashes with " . $remote['name'] . " - " . $remote['uri'] );
 
 		$output->writeln( "Sending hashes" );
-		$this->sendHashes( $remote );
+		$this->sendHashes( $remote, $output );
 		$output->writeln( "Fetching new hashes" );
-		$this->fetchHashes( $remote );
+		$this->fetchHashes( $remote, $output );
 
 		$output->writeln( "Synchronised hashes with " . $remote['name'] . " - " . $remote['uri'] );
 	}
 
 	/**
-	 * @param $remote
+	 * @param                 $remote
+	 * @param OutputInterface $output
 	 */
-	protected function sendHashes( $remote ) {
+	protected function fetchHashes( $remote, OutputInterface $output  ) {
 		$i_saw = $remote['latest_seen'];
 
 		$client = new Client();
@@ -65,32 +66,46 @@ class SyncCommand extends Command {
 		$response = $client->get(  $remote['uri'] . 'hash/seen/since/' . $i_saw );
 		$new_items = $response->json();
 
-		foreach ( $new_items as $item ) {
-			// process each item and save
-			$data->markHash( $item['hash'], $item['user'], $item['status'],$item['notes'], $item['date'] );
+		if ( !empty( $new_items ) ) {
+
+			$output->writeln( "Hashes recieved: " . count( $new_items ) );
+
+			foreach ( $new_items as $item ) {
+				// process each item and save
+				$data->markHash( $item['hash'], $item['user'], $item['status'], $item['notes'], $item['date'] );
+			}
+		} else {
+			$output->writeln( "No new hashes recieved" );
 		}
 	}
 
 	/**
-	 * @param $remote
+	 * @param                 $remote
+	 *
+	 * @param OutputInterface $output
 	 *
 	 * @throws \Exception
 	 */
-	protected function fetchHashes( $remote ) {
+	protected function sendHashes( $remote, OutputInterface $output  ) {
 		$i_sent = $remote['last_sent'];
 
 		$client = new Client();
 		$data = new DataModel();
 
 		$send_data = $data->getHashesSeenAfter( $i_sent );
-		$send_data = json_encode( $send_data );
+		if ( !empty( $send_data ) ) {
+			$output->writeln( "Hashes to send: ". count( $send_data ) );
+			$send_data = json_encode( $send_data );
 
-		/** @noinspection PhpVoidFunctionResultUsedInspection */
-		$response = $client->post( $remote['uri'] . 'hash', [
-			'body' => [
-				'data' => $send_data
-			]
-		]);
-		$json = $response->json();
+			/** @noinspection PhpVoidFunctionResultUsedInspection */
+			$response = $client->post( $remote['uri'] . 'hash', [
+				'body' => [
+					'data' => $send_data
+				]
+			] );
+			$json     = $response->json();
+		} else {
+			$output->writeln( "No hashes to send" );
+		}
 	}
 }
