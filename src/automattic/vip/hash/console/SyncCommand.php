@@ -38,12 +38,19 @@ class SyncCommand extends Command {
 			throw new \Exception( 'There was an issue trying to get the remotes information, does this remote name exist?' );
 		}
 
+		$output->writeln( "Synchronising hashes with " . $remote['name'] . " - " . $remote['uri'] );
+
+		$output->writeln( "Sending hashes" );
 		$this->sendHashes( $remote );
+		$output->writeln( "Fetching new hashes" );
 		$this->fetchHashes( $remote );
 
-		$output->writeln( $remote['uri'] );
+		$output->writeln( "Synchronised hashes with " . $remote['name'] . " - " . $remote['uri'] );
 	}
 
+	/**
+	 * @param $remote
+	 */
 	protected function sendHashes( $remote ) {
 		$i_saw = $remote['latest_seen'];
 
@@ -60,11 +67,15 @@ class SyncCommand extends Command {
 
 		foreach ( $new_items as $item ) {
 			// process each item and save
-
 			$data->markHash( $item['hash'], $item['user'], $item['status'],$item['notes'], $item['date'] );
 		}
 	}
 
+	/**
+	 * @param $remote
+	 *
+	 * @throws \Exception
+	 */
 	protected function fetchHashes( $remote ) {
 		$i_sent = $remote['last_sent'];
 
