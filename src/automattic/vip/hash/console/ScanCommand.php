@@ -30,18 +30,59 @@ class ScanCommand extends Command {
 				'folder',
 				InputArgument::REQUIRED,
 				'A file hash to find, or a file to be hashed. Assumes hash if the given value is not a locatable file'
+			)->addArgument(
+				'format',
+				InputArgument::OPTIONAL,
+				'The format to output, json by default, can additionally specify markdown'
 			);
 	}
 
 	protected function execute( InputInterface $input, OutputInterface $output ) {
 		$folder = $input->getArgument( 'folder' );
+		$format = $input->getArgument( 'format' );
 		if ( empty( $folder ) ) {
 			throw new \Exception( 'Empty folder parameter' );
 		}
+		if ( empty( $format ) ) {
+			$format = 'json';
+		}
+		if ( !in_array( $format, array( 'json', 'markdown' ) ) ) {
+			throw new \Exception( 'Unknown format' );
+		}
 		$data = $this->ProcessFile( $folder );
-		$json = json_encode( $data, JSON_PRETTY_PRINT );
-		$output->writeln( $json );
+		if ( $format == 'json' ) {
+			$json = json_encode( $data, JSON_PRETTY_PRINT );
+			$output->writeln( $json );
+		} else if ( $format == 'markdown' ) {
+			$markdown = '';
+
+			//foreach ( $data as $node ) {
+				$markdown .= $this->displayMarkdown( $data );
+			//}
+
+			$output->writeln( $markdown );
+		}
 		return;
+	}
+
+	private function displayMarkdown( array $node ) {
+		$md = '';
+		if ( !empty( $node['contents'] ) ) {
+			foreach ( $node['contents'] as $subnode ) {
+				$md .= $this->displayMarkdown( $subnode );
+			}
+		} else if ( !empty( $node['identifier'] ) ) {
+			$md .= 'hash';
+		} else if ( !empty( $node['file'] ) ) {
+			$md .= '--'.$node['file'];
+		} else {
+			$md .= '?';
+			$md .= print_r( $node, true );
+		}
+		if ( !empty( $md ) ) {
+			$md .= PHP_EOL;
+		}
+		return $md;
 	}
 
 	/**
@@ -81,7 +122,11 @@ class ScanCommand extends Command {
 			foreach ( $folders as $found_file ) {
 				$result =  $this->ProcessFile( $file . DIRECTORY_SEPARATOR . $found_file );
 				if ( !empty( $result ) && ( $result != null ) ) {
-					$contents[] = $result;
+					$f = array(
+						'file' => $file . DIRECTORY_SEPARATOR . $found_file,
+						'hashes' => $result
+					);
+					$contents[] = $f;
 				}
 			}
 			$data = array(
