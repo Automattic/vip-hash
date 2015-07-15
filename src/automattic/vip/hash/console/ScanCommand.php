@@ -55,29 +55,36 @@ class ScanCommand extends Command {
 			$output->writeln( $json );
 		} else if ( $format == 'markdown' ) {
 			$markdown = '';
-
-			//foreach ( $data as $node ) {
-				$markdown .= $this->displayMarkdown( $data );
-			//}
+			$markdown .= $this->displayMarkdown( $data );
 
 			$output->writeln( $markdown );
 		}
-		return;
 	}
 
 	private function displayMarkdown( array $node ) {
 		$md = '';
-		if ( !empty( $node['contents'] ) ) {
-			foreach ( $node['contents'] as $subnode ) {
-				$md .= $this->displayMarkdown( $subnode );
+		if ( !empty( $node['folder'] ) ) {
+			$md .= $node['folder'];
+			if ( !empty( $node['contents'] ) ) {
+				foreach ( $node['contents'] as $subnode ) {
+					$md .= $this->displayMarkdown( $subnode );
+				}
 			}
-		} else if ( !empty( $node['identifier'] ) ) {
-			$md .= 'hash';
 		} else if ( !empty( $node['file'] ) ) {
-			$md .= '--'.$node['file'];
+			$notes = '';
+			if ( !empty( $node['hashes'] ) ) {
+				foreach ( $node['hashes'] as $hash ) {
+					if ( $hash['status'] == 'false' ) {
+						$notes .= PHP_EOL.'Notes';
+						$notes .= PHP_EOL.PHP_EOL.'```'.PHP_EOL.$hash['notes'].PHP_EOL.'```'.PHP_EOL;
+					}
+				}
+			}
+			if ( !empty( $notes ) ) {
+				$md .= '## '.$node['file'].PHP_EOL.$notes;
+			}
 		} else {
-			$md .= '?';
-			$md .= print_r( $node, true );
+			$md .= '? unknown entry in data structure'.PHP_EOL;
 		}
 		if ( !empty( $md ) ) {
 			$md .= PHP_EOL;
@@ -147,9 +154,11 @@ class ScanCommand extends Command {
 				$hash = $data_model->hashFile( $file );
 			} catch ( \Exception $e ) {
 				$data = array(
-					'hash' => 'empty',
-					'status' => 'unknown',
-					'file' => $file
+					array(
+						'hash' => 'empty',
+						'status' => 'unknown',
+						'file' => $file
+					)
 				);
 				return $data;
 			}
@@ -157,16 +166,20 @@ class ScanCommand extends Command {
 				$data = $data_model->getHashStatusAllUsers( $hash );
 				if ( empty( $data ) ) {
 					$data = array(
-						'hash' => $hash,
-						'status' => 'unknown',
-						'file' => $file
+						array(
+							'hash' => $hash,
+							'status' => 'unknown',
+							'file' => $file
+						)
 					);
 				}
 			} catch ( \Exception $e ) {
 				$data = array(
-					'hash' => $hash,
-					'status' => 'unknown',
-					'file' => $file
+					array(
+						'hash' => $hash,
+						'status' => 'unknown',
+						'file' => $file
+					)
 				);
 			}
 
