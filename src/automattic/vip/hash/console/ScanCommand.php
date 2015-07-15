@@ -64,7 +64,6 @@ class ScanCommand extends Command {
 	private function displayMarkdown( array $node ) {
 		$md = '';
 		if ( !empty( $node['folder'] ) ) {
-			$md .= $node['folder'];
 			if ( !empty( $node['contents'] ) ) {
 				foreach ( $node['contents'] as $subnode ) {
 					$md .= $this->displayMarkdown( $subnode );
