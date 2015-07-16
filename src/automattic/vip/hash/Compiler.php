@@ -154,7 +154,7 @@ class Compiler
     private function addFile($phar, $file, $strip = true)
     {
         $path = strtr(str_replace(dirname(dirname(dirname(dirname(__DIR__)))).DIRECTORY_SEPARATOR, '', $file->getRealPath()), '\\', '/');
-        echo $file.PHP_EOL;
+
         $content = file_get_contents($file);
         if ($strip) {
             $content = $this->stripWhitespace($content);
@@ -218,7 +218,7 @@ class Compiler
 #!/usr/bin/env php
 <?php
 /*
- * This file is part of Composer.
+ * This file is part of viphash, based on a file from Composer.
  *
  * (c) Nils Adermann <naderman@naderman.de>
  *     Jordi Boggiano <j.boggiano@seld.be>
@@ -232,7 +232,7 @@ if (extension_loaded('apc') && ini_get('apc.enable_cli') && ini_get('apc.cache_b
     if (version_compare(phpversion('apc'), '3.0.12', '>=')) {
         ini_set('apc.cache_by_default', 0);
     } else {
-        fwrite(STDERR, 'Warning: APC <= 3.0.12 may cause fatal errors when running composer commands.'.PHP_EOL);
+        fwrite(STDERR, 'Warning: APC <= 3.0.12 may cause fatal errors when running viphash commands.'.PHP_EOL);
         fwrite(STDERR, 'Update APC, or set apc.enable_cli or apc.cache_by_default to 0 in your php.ini.'.PHP_EOL);
     }
 }
