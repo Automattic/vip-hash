@@ -16,11 +16,15 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
 
 class Application extends BaseApplication {
 
+    const VERSION = '@package_version@';
+    const BRANCH_ALIAS_VERSION = '@package_branch_alias_version@';
+    const RELEASE_DATE = '@release_date@';
+
 	/**
 	 * {@inheritDoc}
 	 */
 	function __construct() {
-		parent::__construct('viphash', '3');
+		parent::__construct('viphash', self::VERSION);
 	}
 
 	/**
