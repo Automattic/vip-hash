@@ -128,11 +128,15 @@ class ScanCommand extends Command {
 			foreach ( $folders as $found_file ) {
 				$result =  $this->ProcessFile( $file . DIRECTORY_SEPARATOR . $found_file );
 				if ( !empty( $result ) && ( $result != null ) ) {
-					$f = array(
-						'file' => $file . DIRECTORY_SEPARATOR . $found_file,
-						'hashes' => $result
-					);
-					$contents[] = $f;
+					if ( is_dir( $file . DIRECTORY_SEPARATOR . $found_file ) ) {
+						$contents[] = $result;
+					} else {
+						$f = array(
+							'file' => $file . DIRECTORY_SEPARATOR . $found_file,
+							'hashes' => $result
+						);
+						$contents[] = $f;
+					}
 				}
 			}
 			$data = array(
