@@ -2,6 +2,10 @@
 
 This tool allows WordPress.com users to hash files and mark those files as ready or not ready for VIP. It's intended to help with reviewing code, and preventing duplication of work
 
+## Building and Installing
+
+Run `php bin/compile` to build the `viphash.phar` file, rename to `viphash`, flag as executable, and place somewhere you can access it from anywhere. Be sure to repeat this process with newer versions of the tool.
+
 ## Commands
 
 The tool has the following commands:
