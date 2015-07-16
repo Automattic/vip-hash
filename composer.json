@@ -11,8 +11,11 @@
 	],
 	"require" : {
 		"php": ">=5.4",
-		"symfony/console": "@stable",
-		"guzzlehttp/guzzle": "~5.0"
+		"symfony/console": "~2.5",
+		"symfony/finder": "~2.2",
+        "symfony/process": "~2.1",
+		"guzzlehttp/guzzle": "~5.0",
+		"seld/phar-utils": "~1.0"
 	},
 	"autoload"    : {
 		"classmap": [
