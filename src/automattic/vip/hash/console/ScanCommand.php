@@ -167,24 +167,16 @@ class ScanCommand extends Command {
 			}
 			try {
 				$data = $data_model->getHashStatusAllUsers( $hash );
-				if ( empty( $data ) ) {
-					$data = array(
-						array(
-							'hash' => $hash,
-							'status' => 'unknown',
-							'file' => $file
-						)
-					);
-				}
 			} catch ( \Exception $e ) {
-				$data = array(
-					array(
-						'hash' => $hash,
-						'status' => 'unknown',
-						'file' => $file
-					)
-				);
+				//
 			}
+			$data = array(
+				array(
+					'hash' => $hash,
+					'status' => 'unknown',
+					'file' => $file
+				)
+			);
 
 		}
 		return $data;
