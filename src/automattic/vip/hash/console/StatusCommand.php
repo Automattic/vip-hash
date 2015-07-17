@@ -53,22 +53,31 @@ class StatusCommand extends Command {
 		}
 	}
 
-	private function displayTree( array $node, $depth=-1 ) {
+	private function displayTree( array $node, $depth=-1, $last=false ) {
 		$lines = [];
 		$md = '';
 		if ( $depth > 0 ) {
-			$md .= '| ';
+			$md .= '|   ';
 		} else {
-			$md .= '└─';
+			if ( $last ) {
+				$md .= '└───';
+			} else {
+				$md .= '├───';
+			}
+		}
+		$branch = '├';
+		if ( $last ) {
+			$branch = '└';
 		}
 		if ( $depth > 0 ) {
-			$md .= str_repeat(' ', $depth*2 -1 ).'└─';
+			$md .= str_repeat('|   ', $depth -2 ).$branch.'───';
 		}
 		if ( !empty( $node['folder'] ) ) {
-			$lines[] = $md . ' '.$node['folder'];
+			$lines[] = $md . ''.$node['folder'];
 			if ( !empty( $node['contents'] ) ) {
+				$i = 1;
 				foreach ( $node['contents'] as $subnode ) {
-					$newlines  = $this->displayTree( $subnode, $depth + 1 );
+					$newlines  = $this->displayTree( $subnode, $depth + 1, $i++ == count( $node['contents'] ) );
 					$lines = array_merge( $lines, $newlines );
 				}
 			}
@@ -82,7 +91,7 @@ class StatusCommand extends Command {
 				$statuses[] = 'unknown';
 			}
 			if ( !empty( $statuses ) ) {
-				$lines[] = $md . ' '.$node['file'].' - '.implode(', ', $statuses );
+				$lines[] = $md . ''.$node['file'].' - '.implode(', ', $statuses );
 			}
 		} else {
 			$lines[] = '? unknown entry in data structure'.PHP_EOL;
