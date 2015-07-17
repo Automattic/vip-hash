@@ -170,13 +170,15 @@ class ScanCommand extends Command {
 			} catch ( \Exception $e ) {
 				//
 			}
-			$data = array(
-				array(
-					'hash' => $hash,
-					'status' => 'unknown',
-					'file' => $file
-				)
-			);
+			if ( empty( $data ) ) {
+				$data = array(
+					array(
+						'hash' => $hash,
+						'status' => 'unknown',
+						'file' => $file
+					)
+				);
+			}
 
 		}
 		return $data;
