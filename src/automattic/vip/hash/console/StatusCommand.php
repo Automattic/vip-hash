@@ -69,7 +69,7 @@ class StatusCommand extends Command {
 		if ( $last ) {
 			$branch = '└';
 		}
-		if ( $depth > 0 ) {
+		if ( $depth -2 > 0 ) {
 			$md .= str_repeat('|   ', $depth -2 ).$branch.'───';
 		}
 		if ( !empty( $node['folder'] ) ) {
