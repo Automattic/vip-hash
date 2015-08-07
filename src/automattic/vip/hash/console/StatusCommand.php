@@ -60,7 +60,7 @@ class StatusCommand extends Command {
 		}
 		$total = $good + $bad + $unknown;
 		$percentage = ( ( $good + $bad )/ $total ) * 100;
-		$final = "<info>".$good." good</info>, <error>".$bad." bad</error>, <comment>".$unknown." unknown</comment>, ".$percentage."% seen";
+		$final = "<info>".$good." good</info>, <error>".$bad." bad</error>, <comment>".$unknown." unknown</comment>, ".number_format( $percentage, 2 )."% seen";
 		$output->writeln( $final );
 	}
 
