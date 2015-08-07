@@ -84,13 +84,17 @@ class StatusCommand extends Command {
 			$md .= str_repeat('|   ', $depth -2 ).$branch.'───';
 		}
 		if ( !empty( $node['folder'] ) ) {
-			$lines[] = $md . '├ '.$node['folder'];
+			$folderlines = array();
 			if ( !empty( $node['contents'] ) ) {
 				$i = 1;
 				foreach ( $node['contents'] as $subnode ) {
 					$newlines  = $this->displayTree( $subnode, $depth + 1, $i++ == count( $node['contents'] ) );
-					$lines = array_merge( $lines, $newlines );
+					$folderlines = array_merge( $folderlines, $newlines );
 				}
+			}
+			if ( !empty( $folderlines ) ) {
+				$lines[] = $md . '├ '.$node['folder'];
+				$lines = array_merge( $lines, $folderlines );
 			}
 		} else if ( !empty( $node['file'] ) ) {
 			$statuses = [];
