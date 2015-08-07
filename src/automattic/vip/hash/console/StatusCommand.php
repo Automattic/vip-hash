@@ -66,6 +66,7 @@ class StatusCommand extends Command {
 
 	private function displayTree( array $node, $depth=-1, $last=false ) {
 		$lines = [];
+		$status = '  ';
 		$md = '';
 		if ( $depth > 0 ) {
 			$md .= '|   ';
@@ -93,20 +94,36 @@ class StatusCommand extends Command {
 				}
 			}
 			if ( !empty( $folderlines ) ) {
-				$lines[] = $md . '├ '.$node['folder'];
+				$lines[] = $status.$md . '├ '.$node['folder'];
 				$lines = array_merge( $lines, $folderlines );
 			}
 		} else if ( !empty( $node['file'] ) ) {
 			$statuses = [];
+			$status = '? ';
+			$status_set = false;
 			if ( !empty( $node['hashes'] ) ) {
 				foreach ( $node['hashes'] as $hash ) {
 					$statuses[] = $hash['status'];
+					if ( !$status_set ) {
+						if ( $hash['status'] == 'true' ) {
+							$status = '✓ ';
+						} else if ( $hash['status'] == 'false' ) {
+							$status = 'x ';
+						}
+						$status_set = true;
+					} else {
+						if ( $status == '✓ ' ) {
+							if ( $hash['status'] == 'false' ) {
+								$status = '~ ';
+							}
+						}
+					}
 				}
 			} else {
 				$statuses[] = 'unknown';
 			}
 			if ( !empty( $statuses ) ) {
-				$lines[] = $md . ''.basename( $node['file'] ).' - '.implode(', ', $statuses );
+				$lines[] = $status.$md . ''.basename( $node['file'] ).' - '.implode(', ', $statuses );
 			}
 		} else {
 			$lines[] = '? unknown entry in data structure'.PHP_EOL;
