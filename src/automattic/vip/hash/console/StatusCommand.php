@@ -22,7 +22,8 @@ class StatusCommand extends Command {
 			'php5',
 			'js',
 			'html',
-			'htm'
+			'htm',
+			'twig'
 		);
 		$this->setName( 'status' )
 			->setDescription( 'take a folder and generates a status report of good bad and unknown file hashes' )

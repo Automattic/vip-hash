@@ -22,7 +22,8 @@ class ScanCommand extends Command {
 			'php5',
 			'js',
 			'html',
-			'htm'
+			'htm',
+			'twig'
 		);
 		$this->setName( 'scan' )
 			->setDescription( 'take a folder and generate a json response detailing the files inside' )
