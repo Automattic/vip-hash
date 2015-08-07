@@ -40,17 +40,28 @@ class StatusCommand extends Command {
 		}
 		$data = $this->ProcessFile( $folder );
 		$tree = $this->displayTree( $data );
+		$good = 0;
+		$bad = 0;
+		$unknown = 0;
 		foreach ($tree as $key => $line ) {
+			$line = str_replace( $folder, '', $line );
 			if (strpos($line, 'false') !== FALSE ) {
 				$output->writeln( '<error>'.$line.'</error>' );
+				$bad++;
 			} else if (strpos($line, 'true') !== FALSE ) {
 				$output->writeln( '<info>'.$line.'</info>' );
+				$good++;
 			} else if (strpos($line, 'unknown') !== FALSE ) {
 				$output->writeln( '<comment>'.$line.'</comment>' );
+				$unknown++;
 			} else {
 				$output->writeln( $line );
 			}
 		}
+		$total = $good + $bad + $unknown;
+		$percentage = ( ( $good + $bad )/ $total ) * 100;
+		$final = "<info>".$good." good</info>, <error>".$bad." bad</error>, <comment>".$unknown." unknown</comment>, ".$percentage."% seen";
+		$output->writeln( $final );
 	}
 
 	private function displayTree( array $node, $depth=-1, $last=false ) {
