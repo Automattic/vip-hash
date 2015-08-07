@@ -84,7 +84,7 @@ class StatusCommand extends Command {
 			$md .= str_repeat('|   ', $depth -2 ).$branch.'───';
 		}
 		if ( !empty( $node['folder'] ) ) {
-			$lines[] = $md . ''.$node['folder'];
+			$lines[] = $md . '├ '.$node['folder'];
 			if ( !empty( $node['contents'] ) ) {
 				$i = 1;
 				foreach ( $node['contents'] as $subnode ) {
@@ -102,7 +102,7 @@ class StatusCommand extends Command {
 				$statuses[] = 'unknown';
 			}
 			if ( !empty( $statuses ) ) {
-				$lines[] = $md . ''.$node['file'].' - '.implode(', ', $statuses );
+				$lines[] = $md . ''.basename( $node['file'] ).' - '.implode(', ', $statuses );
 			}
 		} else {
 			$lines[] = '? unknown entry in data structure'.PHP_EOL;
