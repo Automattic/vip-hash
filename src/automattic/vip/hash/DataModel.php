@@ -11,6 +11,8 @@ class DataModel {
 	 */
 	private $pdo = null;
 
+	private $dbdir = '';
+
 	public function __construct() {
 		$this->init();
 	}
@@ -143,14 +145,39 @@ class DataModel {
 	 * @return string the folder containing hash records with a trailing slash
 	 */
 	public function getDBDir() {
-		$folder = $_SERVER['HOME'].DIRECTORY_SEPARATOR.'.viphash'.DIRECTORY_SEPARATOR;
-		if ( !is_writable( $folder ) ) {
-			$folder = '';
-		} else {
-			if ( !file_exists( $folder ) ) {
-				mkdir( $folder, 0777, true );
+
+		if ( !empty( $this->dbdir ) ) {
+			return $this->dbdir;
+		}
+		$folders = array();
+		if ( !empty ( $_SERVER['HOME'] ) ) {
+			$folders[] = $_SERVER['HOME'].DIRECTORY_SEPARATOR.'.viphash'.DIRECTORY_SEPARATOR;
+		}
+		if ( function_exists( 'posix_getpwuid' ) ) {
+			$shell_user = posix_getpwuid( posix_getuid() );
+			$shell_home = $shell_user['dir'];
+			$folders[] = $shell_home.DIRECTORY_SEPARATOR.'.viphash'.DIRECTORY_SEPARATOR;
+		}
+
+		// Windows
+		if ( !empty( $_SERVER['HOMEDRIVE'] ) && !empty( $_SERVER['HOMEPATH'] ) ) {
+			$folders[] = $_SERVER['HOMEDRIVE']. $_SERVER['HOMEPATH'].DIRECTORY_SEPARATOR.'.viphash'.DIRECTORY_SEPARATOR;
+		}
+
+		$folder = '';
+		$folders[] = '~'.DIRECTORY_SEPARATOR;
+		foreach ( $folders as $f ) {
+			if ( is_writable( $f ) ) {
+				if ( !file_exists( $f ) ) {
+					if ( ! mkdir( $f, 0777, true ) ) {
+						continue;
+					}
+				}
+				$folder = $f;
+				break;
 			}
 		}
+		$this->dbdir = $folder;
 		return $folder;
 	}
 
