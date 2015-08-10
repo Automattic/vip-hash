@@ -58,6 +58,9 @@ class ScanCommand extends Command {
 			$markdown = '';
 			$markdown .= $this->displayMarkdown( $data );
 
+			// use relative paths rather than full paths
+			$markdown = str_replace( $folder, '', $markdown );
+
 			$output->writeln( $markdown );
 		}
 	}
