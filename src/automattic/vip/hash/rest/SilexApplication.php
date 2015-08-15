@@ -9,6 +9,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SilexApplication {
 
+	private $dbdir='';
+
+	public function __construct( $dbdir ) {
+		$this->dbdir;
+	}
+
 	public function run() {
 		$app = new \Silex\Application();
 		$app['debug'] = true;
@@ -32,12 +38,12 @@ class SilexApplication {
 		});
 
 		$app->get( '/hash/seen/since/{timestamp}', function ( $timestamp ) use ( $app ) {
-			$model = new DataModel();
+			$model = new DataModel( $this->dbdir );
 			return $model->getHashesAfter( $timestamp );
 		});
 
 		$app->get( '/hash/{hash}', function ( $hash ) use ( $app ) {
-			$data = new DataModel();
+			$data = new DataModel( $this->dbdir );
 			try {
 				return $model->getHashStatusAllUsers( $hash );
 			} catch( \Exception $e ) {
@@ -47,7 +53,7 @@ class SilexApplication {
 
 		$app->post( '/hash', function ( Request $request ) {
 			$data = $request->get('data');
-			$model = new DataModel();
+			$model = new DataModel( $this->dbdir );
 			foreach ( $data as $record ) {
 				try {
 					$model->markHash( $data['hash'], $data['username'], $data['value'], $data['note'], $data['date'] );
