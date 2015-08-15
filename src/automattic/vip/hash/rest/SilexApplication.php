@@ -11,7 +11,7 @@ class SilexApplication {
 
 	public function run() {
 		$app = new \Silex\Application();
-
+		$app['debug'] = true;
 		$this->register_endpoints( $app );
 
 		$app->view( function ( array $controllerResult ) use ( $app ) {
