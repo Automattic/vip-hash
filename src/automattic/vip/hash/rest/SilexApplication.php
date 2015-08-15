@@ -52,7 +52,7 @@ class SilexApplication {
 	}
 
 	function get_hash( $hash ) {
-		$data = new DataModel( $this->dbdir );
+		$model = new DataModel( $this->dbdir );
 		try {
 			return $model->getHashStatusAllUsers( $hash );
 		} catch( \Exception $e ) {
