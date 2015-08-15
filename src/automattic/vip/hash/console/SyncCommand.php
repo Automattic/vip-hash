@@ -47,8 +47,8 @@ class SyncCommand extends Command {
 		$this->fetchHashes( $remote, $output );
 		$output->writeln( "Updating remote record" );
 		$latest_hash = $data->getNewestSeenHash();
-		$remote->setLatestSeen( $latest_hash->getDate() );
-		$remote->save();
+		$remote->setLatestSeen( $latest_hash['date'] );
+		$remote->save( $data );
 
 		$output->writeln( "Synchronised hashes with " . $remote->getName() . " - " . $remote->getUri() );
 	}
