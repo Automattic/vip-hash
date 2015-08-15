@@ -163,7 +163,7 @@ class DataModel {
 		if ( !empty( $_SERVER['HOMEDRIVE'] ) && !empty( $_SERVER['HOMEPATH'] ) ) {
 			$folders[] = $_SERVER['HOMEDRIVE']. $_SERVER['HOMEPATH'].DIRECTORY_SEPARATOR.'.viphash'.DIRECTORY_SEPARATOR;
 		}
-		$folder[] '.viphash'.DIRECTORY_SEPARATOR;
+		$folder[] = '.viphash'.DIRECTORY_SEPARATOR;
 
 		$folder = '';
 		foreach ( $folders as $f ) {
