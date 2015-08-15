@@ -63,7 +63,7 @@ class SilexApplication {
 	public function post_hash ( Request $request ) {
 		$json_data = $request->get('data');
 		$model = new DataModel( $this->dbdir );
-		$data = json_decode( $json_data );
+		$data = json_decode( $json_data, true );
 		foreach ( $data as $record ) {
 			try {
 				$model->markHash(
