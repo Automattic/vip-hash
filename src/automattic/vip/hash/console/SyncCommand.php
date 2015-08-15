@@ -104,11 +104,14 @@ class SyncCommand extends Command {
 						'data' => $send_data
 					]
 				] );
+				$json     = $response->json();
 			} catch (\GuzzleHttp\Exception\ServerException $e) {
 				$output->writeln( 'Guzzle ServerException: ' . $e->getResponse() );
 				return;
+			} catch ( \GuzzleHttp\Exception\ParseException $e ) {
+				$output->writeln( 'Guzzle JSON issue: ' . $response->getBody() );
+				return;
 			}
-			$json     = $response->json();
 		} else {
 			$output->writeln( "No hashes to send" );
 		}
