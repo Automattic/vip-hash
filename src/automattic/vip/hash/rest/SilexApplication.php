@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 class SilexApplication {
 
 	private $dbdir='';
+	private $app;
 
 	public function __construct( $dbdir ) {
 		$this->dbdir;
@@ -17,6 +18,7 @@ class SilexApplication {
 
 	public function run() {
 		$app = new \Silex\Application();
+		$this->app = $app;
 		$app['debug'] = true;
 		$this->register_endpoints( $app );
 
@@ -38,33 +40,36 @@ class SilexApplication {
 		});
 		$dbdir = $this->dbdir;
 
-		$app->get( '/hash/seen/since/{timestamp}', function ( $timestamp ) use ( $app, $dbdir ) {
-			$model = new DataModel( $dbdir );
-			return $model->getHashesAfter( $timestamp );
-		});
+		$app->get( '/hash/seen/since/{timestamp}', array( $this, 'hash_seen_since' ) );
+		$app->get( '/hash/{hash}', array( $this, 'get_hash' ) );
+		$app->post( '/hash', array( $this, 'post_hash' ) );
 
-		$app->get( '/hash/{hash}', function ( $hash ) use ( $app, $dbdir ) {
-			$data = new DataModel( $dbdir );
+	}
+
+	public function hash_seen_since ( $timestamp ) {
+		$model = new DataModel( $this->dbdir );
+		return $model->getHashesAfter( $timestamp );
+	}
+
+	function get_hash( $hash ) {
+		$data = new DataModel( $this->dbdir );
+		try {
+			return $model->getHashStatusAllUsers( $hash );
+		} catch( \Exception $e ) {
+			return array( 'error' => $e->getMessage() );
+		}
+	}
+
+	public function post_hash ( Request $request ) {
+		$data = $request->get('data');
+		$model = new DataModel( $this->dbdir );
+		foreach ( $data as $record ) {
 			try {
-				return $model->getHashStatusAllUsers( $hash );
-			} catch( \Exception $e ) {
+				$model->markHash( $data['hash'], $data['username'], $data['value'], $data['note'], $data['date'] );
+			} catch ( \Exception $e ) {
 				return array( 'error' => $e->getMessage() );
 			}
-		});
-
-		$app->post( '/hash', function ( Request $request ) use ( $dbdir ) {
-			$data = $request->get('data');
-			$model = new DataModel( $dbdir );
-			foreach ( $data as $record ) {
-				try {
-					$model->markHash( $data['hash'], $data['username'], $data['value'], $data['note'], $data['date'] );
-				} catch ( \Exception $e ) {
-					return array( 'error' => $e->getMessage() );
-				}
-			}
-			return "Success";
-		});
-
-
+		}
+		return "Success";
 	}
 }
