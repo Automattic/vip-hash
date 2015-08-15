@@ -60,11 +60,6 @@ class Remote {
 		$this->uri = $uri;
 	}
 
-
-	public function setLastSent( $last_sent ) {
-		$this->last_sent = $last_sent;
-	}
-
 	public function getLastSent() {
 		return $this->last_sent;
 	}
