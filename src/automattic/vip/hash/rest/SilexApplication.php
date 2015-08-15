@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class SilexApplication {
+
 	public function run() {
 		$app = new \Silex\Application();
 
@@ -26,16 +27,16 @@ class SilexApplication {
 		 * remote/hash/<hash> <- read
 		 * remote/hash/seen/since/<time> <- read
 		 */
-		$app->get ( '/', function() {
+		$app->get ( '/', function () {
 			return 'VIP Hash Database';
 		});
 
-		$app->get( '/hash/seen/since/{timestamp}', function( $timestamp ) use( $app ) {
+		$app->get( '/hash/seen/since/{timestamp}', function ( $timestamp ) use ( $app ) {
 			$model = new DataModel();
 			return $model->getHashesAfter( $timestamp );
 		});
 
-		$app->get( '/hash/{hash}', function( $hash ) use( $app ) {
+		$app->get( '/hash/{hash}', function ( $hash ) use ( $app ) {
 			$data = new DataModel();
 			try {
 				return $model->getHashStatusAllUsers( $hash );
