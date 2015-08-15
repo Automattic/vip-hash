@@ -66,7 +66,13 @@ class SilexApplication {
 		$data = json_decode( $json_data );
 		foreach ( $data as $record ) {
 			try {
-				$model->markHash( $data['hash'], $data['username'], $data['value'], $data['note'], $data['date'] );
+				$model->markHash(
+					$record['hash'],
+					$record['username'],
+					$record['value'],
+					$record['note'],
+					$record['date']
+				);
 			} catch ( \Exception $e ) {
 				return array( 'error' => $e->getMessage() );
 			}
