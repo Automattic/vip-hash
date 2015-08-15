@@ -69,7 +69,7 @@ class SilexApplication {
 				$model->markHash(
 					$record['hash'],
 					$record['user'],
-					$record['value'],
+					$record['status'],
 					$record['note'],
 					$record['date']
 				);
