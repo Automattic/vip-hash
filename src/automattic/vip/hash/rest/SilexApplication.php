@@ -51,7 +51,7 @@ class SilexApplication {
 			foreach ( $data as $record ) {
 				$model->markHash( $data['hash'], $data['username'], $data['value'], $data['note'], $data['date'] );
 			}
-			return 1;
+			return "Success";
 		});
 
 
