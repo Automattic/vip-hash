@@ -36,14 +36,15 @@ class SilexApplication {
 		$app->get ( '/', function () {
 			return 'VIP Hash Database';
 		});
+		$dbdir = $this->dbdir;
 
-		$app->get( '/hash/seen/since/{timestamp}', function ( $timestamp ) use ( $app ) {
-			$model = new DataModel( $this->dbdir );
+		$app->get( '/hash/seen/since/{timestamp}', function ( $timestamp ) use ( $app, $dbdir ) {
+			$model = new DataModel( $dbdir );
 			return $model->getHashesAfter( $timestamp );
 		});
 
-		$app->get( '/hash/{hash}', function ( $hash ) use ( $app ) {
-			$data = new DataModel( $this->dbdir );
+		$app->get( '/hash/{hash}', function ( $hash ) use ( $app, $dbdir ) {
+			$data = new DataModel( $dbdir );
 			try {
 				return $model->getHashStatusAllUsers( $hash );
 			} catch( \Exception $e ) {
@@ -51,9 +52,9 @@ class SilexApplication {
 			}
 		});
 
-		$app->post( '/hash', function ( Request $request ) {
+		$app->post( '/hash', function ( Request $request ) use ( $dbdir ) {
 			$data = $request->get('data');
-			$model = new DataModel( $this->dbdir );
+			$model = new DataModel( $dbdir );
 			foreach ( $data as $record ) {
 				try {
 					$model->markHash( $data['hash'], $data['username'], $data['value'], $data['note'], $data['date'] );
