@@ -24,6 +24,10 @@ class SilexApplication {
 		 * remote/hash/<hash> <- read
 		 * remote/hash/seen/since/<time> <- read
 		 */
+		$app->get ( '/', function() {
+			return 'VIP Hash Database';
+		});
+
 		$app->get( '/hash/seen/since/{timestamp}', function( $timestamp ) use( $app ) {
 			$model = new DataModel();
 			return $model->getHashesAfter( $timestamp );
