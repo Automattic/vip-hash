@@ -4,6 +4,8 @@ namespace automattic\vip\hash\rest;
 
 use automattic\vip\hash\DataModel;
 use automattic\vip\hash\HashRecord;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class SilexApplication {
 	public function run() {
@@ -40,6 +42,15 @@ class SilexApplication {
 			} catch( \Exception $e ) {
 				return array( 'error' => $e->getMessage() );
 			}
+		});
+
+		$app->post( '/hash', function ( Request $request ) {
+			$data = $request->get('data');
+			$model = new DataModel();
+			foreach ( $data as $record ) {
+				$model->markHash( $data['hash'], $data['username'], $data['value'], $data['note'], $data['date'] );
+			}
+			return 1;
 		});
 
 
