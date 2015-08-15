@@ -58,7 +58,7 @@ class SyncCommand extends Command {
 	 * @param OutputInterface $output
 	 */
 	protected function fetchHashes( Remote $remote, OutputInterface $output  ) {
-		$i_saw = $remote['latest_seen'];
+		$i_saw = $remote->getLatestSeen();
 
 		$client = new Client();
 		$data = new DataModel();
@@ -68,7 +68,7 @@ class SyncCommand extends Command {
 		 */
 
 		/** @noinspection PhpVoidFunctionResultUsedInspection */
-		$response = $client->get(  $remote['uri'] . 'hash/seen/since/' . $i_saw );
+		$response = $client->get(  $remote->getUri() . 'hash/seen/since/' . $i_saw );
 		$new_items = $response->json();
 
 		if ( !empty( $new_items ) ) {
