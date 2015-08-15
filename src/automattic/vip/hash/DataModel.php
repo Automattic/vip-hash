@@ -13,7 +13,8 @@ class DataModel {
 
 	private $dbdir = '';
 
-	public function __construct() {
+	public function __construct( $dbdir='' ) {
+		$this->dbdir = $dbdir;
 		$this->init();
 	}
 
