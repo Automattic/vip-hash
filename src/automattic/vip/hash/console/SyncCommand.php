@@ -39,7 +39,7 @@ class SyncCommand extends Command {
 			throw new \Exception( 'There was an issue trying to get the remotes information, does this remote name exist?' );
 		}
 
-		$output->writeln( "Synchronising hashes with " . $remote['name'] . " - " . $remote['uri'] );
+		$output->writeln( "Synchronising hashes with " . $remote->getName() . " - " . $remote->getUri() );
 
 		$output->writeln( "Sending hashes" );
 		$this->sendHashes( $remote, $output );
@@ -48,9 +48,10 @@ class SyncCommand extends Command {
 		$output->writeln( "Updating remote record" );
 		$latest_hash = $data->getNewestSeenHash();
 		$remote->setLatestSeen( $latest_hash->getDate() );
+		$remote->setLastSent( time() );
 		$remote->save();
 
-		$output->writeln( "Synchronised hashes with " . $remote['name'] . " - " . $remote['uri'] );
+		$output->writeln( "Synchronised hashes with " . $remote->getName() . " - " . $remote->getUri() );
 	}
 
 	/**
