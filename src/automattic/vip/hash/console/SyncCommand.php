@@ -3,6 +3,7 @@
 namespace automattic\vip\hash\console;
 
 use automattic\vip\hash\DataModel;
+use automattic\vip\hash\Remote;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -44,6 +45,10 @@ class SyncCommand extends Command {
 		$this->sendHashes( $remote, $output );
 		$output->writeln( "Fetching new hashes" );
 		$this->fetchHashes( $remote, $output );
+		$output->writeln( "Updating remote record" );
+		$latest_hash = $data->getNewestSeenHash();
+		$remote->setLatestSeen( $latest_hash->getDate() );
+		$remote->save();
 
 		$output->writeln( "Synchronised hashes with " . $remote['name'] . " - " . $remote['uri'] );
 	}
@@ -52,7 +57,7 @@ class SyncCommand extends Command {
 	 * @param                 $remote
 	 * @param OutputInterface $output
 	 */
-	protected function fetchHashes( $remote, OutputInterface $output  ) {
+	protected function fetchHashes( Remote $remote, OutputInterface $output  ) {
 		$i_saw = $remote['latest_seen'];
 
 		$client = new Client();
@@ -86,8 +91,8 @@ class SyncCommand extends Command {
 	 *
 	 * @throws \Exception
 	 */
-	protected function sendHashes( $remote, OutputInterface $output  ) {
-		$i_sent = $remote['last_sent'];
+	protected function sendHashes( Remote $remote, OutputInterface $output  ) {
+		$i_sent = $remote->lastSent();
 
 		$client = new Client();
 		$data = new DataModel();
@@ -99,12 +104,14 @@ class SyncCommand extends Command {
 
 			try {
 				/** @noinspection PhpVoidFunctionResultUsedInspection */
-				$response = $client->post( $remote['uri'] . 'hash', [
+				$response = $client->post( $remote->getUri() . 'hash', [
 					'body' => [
 						'data' => $send_data
 					]
 				] );
 				$json     = $response->json();
+				$remote->setLastSent( time() );
+				$remote->save( $data );
 			} catch (\GuzzleHttp\Exception\ServerException $e) {
 				$output->writeln( 'Guzzle ServerException: ' . $e->getResponse() );
 				return;

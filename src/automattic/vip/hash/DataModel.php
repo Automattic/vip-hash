@@ -233,26 +233,11 @@ class DataModel {
 	public function addRemote( $name, $uri ) {
 		$pdo = $this->getPDO();
 
-		$query = "INSERT INTO wpcom_vip_hash_remotes VALUES
-		( :id, :name, :uri, :latest_seen, :last_sent )";
-		$sth   = $pdo->prepare( $query );
-		if ( $sth ) {
-			$result = $sth->execute( array(
-				':id'          => null,
-				':name'        => $name,
-				':uri'         => $uri,
-				':latest_seen' => 0,
-				':last_sent'   => 0
-			) );
-
-			if ( !$result ) {
-				$error_info = print_r( $pdo->errorInfo(), true );
-				throw new \Exception( $error_info );
-			}
-			return true;
-		}
-
-		return false;
+		$remote = new Remote( array(
+			'name' => $name,
+			'uri' => $uri
+		) );
+		return $remote->save( $this );
 	}
 
 	/**
@@ -269,7 +254,7 @@ class DataModel {
 		$output_data = array();
 		while ( $row = $results->fetch( PDO::FETCH_ASSOC ) ) {
 			unset( $row['id'] );
-			$output_data[] = $row;
+			$output_data[] = new Remote( $row );
 		}
 		return $output_data;
 	}
@@ -278,7 +263,7 @@ class DataModel {
 	 * @param $name
 	 *
 	 * @throws \Exception
-	 * @return bool|mixed
+	 * @return bool|Remote
 	 */
 	public function getRemote( $name ) {
 		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hash_remotes WHERE name = '$name'" );
@@ -289,8 +274,8 @@ class DataModel {
 
 		while ( $row = $results->fetch( PDO::FETCH_ASSOC ) ) {
 			unset( $row['id'] );
-			return $row;
+			return new Remote( $row );
 		}
 		return false;
 	}
-} 
+}
