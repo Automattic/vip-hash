@@ -97,12 +97,17 @@ class SyncCommand extends Command {
 			$output->writeln( "Hashes to send: ". count( $send_data ) );
 			$send_data = json_encode( $send_data );
 
-			/** @noinspection PhpVoidFunctionResultUsedInspection */
-			$response = $client->post( $remote['uri'] . 'hash', [
-				'body' => [
-					'data' => $send_data
-				]
-			] );
+			try {
+				/** @noinspection PhpVoidFunctionResultUsedInspection */
+				$response = $client->post( $remote['uri'] . 'hash', [
+					'body' => [
+						'data' => $send_data
+					]
+				] );
+			} catch (\GuzzleHttp\Exception\ServerException $e) {
+				$output->writeln( 'Guzzle ServerException: ' . $e->getResponse() );
+				return;
+			}
 			$json     = $response->json();
 		} else {
 			$output->writeln( "No hashes to send" );
