@@ -13,7 +13,7 @@ class SilexApplication {
 	private $app;
 
 	public function __construct( $dbdir ) {
-		$this->dbdir;
+		$this->dbdir = $dbdir;
 	}
 
 	public function run() {
