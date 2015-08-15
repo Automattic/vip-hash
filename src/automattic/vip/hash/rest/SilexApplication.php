@@ -70,7 +70,7 @@ class SilexApplication {
 					$record['hash'],
 					$record['user'],
 					$record['status'],
-					$record['note'],
+					$record['notes'],
 					$record['date']
 				);
 			} catch ( \Exception $e ) {
