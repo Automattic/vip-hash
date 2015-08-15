@@ -48,7 +48,6 @@ class SyncCommand extends Command {
 		$output->writeln( "Updating remote record" );
 		$latest_hash = $data->getNewestSeenHash();
 		$remote->setLatestSeen( $latest_hash->getDate() );
-		$remote->setLastSent( time() );
 		$remote->save();
 
 		$output->writeln( "Synchronised hashes with " . $remote->getName() . " - " . $remote->getUri() );
@@ -93,7 +92,7 @@ class SyncCommand extends Command {
 	 * @throws \Exception
 	 */
 	protected function sendHashes( Remote $remote, OutputInterface $output  ) {
-		$i_sent = $remote->lastSent();
+		$i_sent = $remote->getLastSent();
 
 		$client = new Client();
 		$data = new DataModel();
@@ -112,7 +111,6 @@ class SyncCommand extends Command {
 				] );
 				$json     = $response->json();
 				$remote->setLastSent( time() );
-				$remote->save( $data );
 			} catch (\GuzzleHttp\Exception\ServerException $e) {
 				$output->writeln( 'Guzzle ServerException: ' . $e->getResponse() );
 				return;
