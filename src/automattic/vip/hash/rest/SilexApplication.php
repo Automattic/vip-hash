@@ -49,7 +49,11 @@ class SilexApplication {
 			$data = $request->get('data');
 			$model = new DataModel();
 			foreach ( $data as $record ) {
-				$model->markHash( $data['hash'], $data['username'], $data['value'], $data['note'], $data['date'] );
+				try {
+					$model->markHash( $data['hash'], $data['username'], $data['value'], $data['note'], $data['date'] );
+				} catch ( \Exception $e ) {
+					return array( 'error' => $e->getMessage() );
+				}
 			}
 			return "Success";
 		});
