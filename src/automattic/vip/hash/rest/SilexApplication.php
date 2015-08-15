@@ -7,7 +7,7 @@ use automattic\vip\hash\HashRecord;
 
 class SilexApplication {
 	public function run() {
-		$app = new Silex\Application();
+		$app = new \Silex\Application();
 
 		$this->register_endpoints( $app );
 
