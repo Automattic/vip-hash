@@ -54,7 +54,9 @@ class RemotesCommand extends Command {
 		foreach ( $remotes as $remote ) {
 			$result[] = array(
 				'name' => $remote->getName(),
-				'uri' => $remote->getUri()
+				'uri' => $remote->getUri(),
+				'latest_seen' => $remote->getLatestSeen(),
+				'last_sent' => $remote->getLastSent()
 			);
 		}
 		$json = json_encode( $result, JSON_PRETTY_PRINT );
