@@ -18,7 +18,7 @@ class SilexApplication {
 		$app->run();
 	}
 
-	public function register_endpoints( Silex\Application $app ) {
+	public function register_endpoints( \Silex\Application $app ) {
 		/**
 		 * remote/hash <- send
 		 * remote/hash/<hash> <- read
