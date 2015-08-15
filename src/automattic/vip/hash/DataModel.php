@@ -163,9 +163,9 @@ class DataModel {
 		if ( !empty( $_SERVER['HOMEDRIVE'] ) && !empty( $_SERVER['HOMEPATH'] ) ) {
 			$folders[] = $_SERVER['HOMEDRIVE']. $_SERVER['HOMEPATH'].DIRECTORY_SEPARATOR.'.viphash'.DIRECTORY_SEPARATOR;
 		}
+		$folder[] '.viphash'.DIRECTORY_SEPARATOR;
 
 		$folder = '';
-		$folders[] = '~'.DIRECTORY_SEPARATOR;
 		foreach ( $folders as $f ) {
 			if ( is_writable( $f ) ) {
 				if ( !file_exists( $f ) ) {
