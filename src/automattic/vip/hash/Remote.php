@@ -19,6 +19,7 @@ class Remote {
 	private $uri='';
 	private $last_sent=0;
 	private $latest_seen=0;
+	private $remote_lastest_seen=0;
 
 	/**
 	 * @param $data
@@ -29,6 +30,7 @@ class Remote {
 			$this->uri = $data['uri'];
 			$this->last_sent = $data['last_sent'];
 			$this->latest_seen = $data['latest_seen'];
+			$this->remote_lastest_seen = $data['remote_latest_seen'];
 		}
 	}
 
@@ -70,6 +72,14 @@ class Remote {
 
 	public function getLatestSeen() {
 		return $this->latest_seen;
+	}
+
+	public function setRemoteLatestSeen( $remote_latest_seen ) {
+		$this->remote_atest_seen = $remote_latest_seen;
+	}
+
+	public function getRemoteLatestSeen() {
+		return $this->remote_latest_seen;
 	}
 
 	/**
