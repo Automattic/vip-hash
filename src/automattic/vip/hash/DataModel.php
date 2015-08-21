@@ -36,6 +36,7 @@ class DataModel {
 				name CHAR(50) NOT NULL UNIQUE,
 				uri CHAR(30) NOT NULL,
 				latest_seen INT NOT NULL,
+				remote_last_seen INT NOT NULL,
 				last_sent INT NOT NULL
 			)' );
 		}
