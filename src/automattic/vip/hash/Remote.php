@@ -30,7 +30,9 @@ class Remote {
 			$this->uri = $data['uri'];
 			$this->last_sent = $data['last_sent'];
 			$this->latest_seen = $data['latest_seen'];
-			$this->remote_lastest_seen = $data['remote_latest_seen'];
+			if ( !empty( $data['remote_latest_seen'] ) ) {
+				$this->remote_lastest_seen = $data['remote_latest_seen'];
+			}
 		}
 	}
 
