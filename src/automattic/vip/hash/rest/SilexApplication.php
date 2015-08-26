@@ -48,7 +48,7 @@ class SilexApplication {
 
 	public function hash_seen_since ( $timestamp ) {
 		$model = new DataModel( $this->dbdir );
-		return $model->getHashesAfter( $timestamp );
+		return $model->getHashesSeenAfter( $timestamp );
 	}
 
 	function get_hash( $hash ) {
