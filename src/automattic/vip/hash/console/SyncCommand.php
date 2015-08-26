@@ -70,7 +70,6 @@ class SyncCommand extends Command {
 		$i_saw = $remote->getLatestSeen();
 
 		$client = new Client();
-		$data = new DataModel();
 
 		/**
 		 * Finish by retrieving the data from the remote end that we don't have
@@ -84,6 +83,7 @@ class SyncCommand extends Command {
 
 	protected function saveHashes( array $hashes  ) {
 		if ( !empty( $hashes ) ) {
+			$data = new DataModel();
 			foreach ( $hashes as $item ) {
 				// process each item and save
 				$data->markHash( $item['hash'], $item['user'], $item['status'], $item['notes'], $item['date'] );
