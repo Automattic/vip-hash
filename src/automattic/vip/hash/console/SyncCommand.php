@@ -41,10 +41,19 @@ class SyncCommand extends Command {
 
 		$output->writeln( "Synchronising hashes with " . $remote->getName() . " - " . $remote->getUri() );
 
-		$output->writeln( "Sending hashes" );
+		$output->writeln( "Fetching new remote hashes" );
+		$hashes = $this->fetchHashes( $remote, $output );
+
+		$output->writeln( "Sending new local hashes" );
 		$this->sendHashes( $remote, $output );
-		$output->writeln( "Fetching new hashes" );
-		$this->fetchHashes( $remote, $output );
+
+		if ( !empty( $hashes ) ) {
+			$output->writeln( "Saving ". count( $hashes ). " new hashes" );
+			$this->saveHashes( $hashes, $output );
+		} else {
+			$output->writeln( "No new hashes recieved" );
+		}
+
 		$output->writeln( "Updating remote record" );
 		$latest_hash = $data->getNewestSeenHash();
 		$remote->setLatestSeen( $latest_hash['date'] );
@@ -57,7 +66,7 @@ class SyncCommand extends Command {
 	 * @param                 $remote
 	 * @param OutputInterface $output
 	 */
-	protected function fetchHashes( Remote $remote, OutputInterface $output  ) {
+	protected function fetchHashes( Remote $remote, OutputInterface $output ) {
 		$i_saw = $remote->getLatestSeen();
 
 		$client = new Client();
@@ -70,18 +79,17 @@ class SyncCommand extends Command {
 		/** @noinspection PhpVoidFunctionResultUsedInspection */
 		$response = $client->get(  $remote->getUri() . 'hash/seen/since/' . $i_saw );
 		$new_items = $response->json();
+		return $new_items;
+	}
 
-		if ( !empty( $new_items ) ) {
-
-			$output->writeln( "Hashes recieved: " . count( $new_items ) );
-
-			foreach ( $new_items as $item ) {
+	protected function saveHashes( array $hashes  ) {
+		if ( !empty( $hashes ) ) {
+			foreach ( $hashes as $item ) {
 				// process each item and save
 				$data->markHash( $item['hash'], $item['user'], $item['status'], $item['notes'], $item['date'] );
 			}
-		} else {
-			$output->writeln( "No new hashes recieved" );
 		}
+
 	}
 
 	/**
