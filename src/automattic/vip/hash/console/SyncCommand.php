@@ -57,7 +57,13 @@ class SyncCommand extends Command {
 		$output->writeln( "Updating remote record" );
 		$latest_hash = $data->getNewestSeenHash();
 		$remote->setLatestSeen( $latest_hash['date'] );
-		$remote->save( $data );
+		$remote->setLastSent( time() );
+		$saved = $remote->save( $data );
+		if ( $saved ) {
+			$output->writeln( "Saved remote record" );
+		} else {
+			$output->writeln( "Failed to save remote record" );
+		}
 
 		$output->writeln( "Synchronised hashes with " . $remote->getName() . " - " . $remote->getUri() );
 	}
