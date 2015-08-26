@@ -236,7 +236,9 @@ class DataModel {
 
 		$remote = new Remote( array(
 			'name' => $name,
-			'uri' => $uri
+			'uri' => $uri,
+			'latest_seen' => 0,
+			'last_sent' => 0
 		) );
 		return $remote->save( $this );
 	}
@@ -254,7 +256,6 @@ class DataModel {
 
 		$output_data = array();
 		while ( $row = $results->fetch( PDO::FETCH_ASSOC ) ) {
-			unset( $row['id'] );
 			$output_data[] = new Remote( $row );
 		}
 		return $output_data;
@@ -274,7 +275,7 @@ class DataModel {
 		}
 
 		while ( $row = $results->fetch( PDO::FETCH_ASSOC ) ) {
-			unset( $row['id'] );
+			//unset( $row['id'] );
 			return new Remote( $row );
 		}
 		return false;
