@@ -77,5 +77,6 @@ class SilexApplication {
 				return array( 'error' => $e->getMessage() );
 			}
 		}
+		return $request;
 	}
 }
