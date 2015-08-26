@@ -2,19 +2,9 @@
 
 namespace automattic\vip\hash;
 
-
-/*$this->pdo->query( 'CREATE TABLE IF NOT EXISTS wpcom_vip_hash_remotes (
-	id INTEGER PRIMARY KEY AUTOINCREMENT,
-	name CHAR(50) NOT NULL UNIQUE,
-	uri CHAR(30) NOT NULL,
-	latest_seen INT NOT NULL,
-	last_sent INT NOT NULL
-)' );*/
 class Remote {
 
-	private $data;
-
-
+	private $id = 0;
 	private $name='';
 	private $uri='';
 	private $last_sent=0;
@@ -26,6 +16,7 @@ class Remote {
 	 */
 	function __construct( $data = array() ) {
 		if ( !empty( $data ) ) {
+			$this->id = $data['id'];
 			$this->name = $data['name'];
 			$this->uri = $data['uri'];
 			$this->last_sent = $data['last_sent'];
@@ -105,15 +96,13 @@ class Remote {
 		$pdo = $model->getPDO();
 
 		// check if we need to save or update the value
-		if ( isset( $this->data['id'] ) ) {
+		if ( empty( $this->id ) ) {
 			// it's new
-
 			$query = "INSERT INTO wpcom_vip_hash_remotes VALUES
-			( :id, :name, :uri, :latest_seen, :last_sent )";
+			( :name, :uri, :latest_seen, :last_sent )";
 			$sth   = $pdo->prepare( $query );
 			if ( $sth ) {
 				$result = $sth->execute( array(
-					':id'          => null,
 					':name'        => $this->name,
 					':uri'         => $this->uri,
 					':latest_seen' => $this->latest_seen,
@@ -136,7 +125,7 @@ class Remote {
 			$sth   = $pdo->prepare( $query );
 			if ( $sth ) {
 				$result = $sth->execute( array(
-					':id'          => $this->data['id'],
+					':id'          => $this->id,
 					':name'        => $this->name,
 					':uri'         => $this->uri,
 					':latest_seen' => $this->latest_seen,
@@ -148,6 +137,8 @@ class Remote {
 					throw new \Exception( $error_info );
 				}
 				return true;
+			} else {
+				throw new \Exception( 'failed to prepare statement' );
 			}
 
 			return false;
