@@ -56,7 +56,7 @@ class SyncCommand extends Command {
 
 		$output->writeln( "Updating remote record" );
 		$latest_hash = $data->getNewestSeenHash();
-		$remote->setLatestSeen( $latest_hash['date'] );
+		$remote->setLatestSeen( $latest_hash['seen'] );
 		$remote->setLastSent( time() );
 		$saved = $remote->save( $data );
 		if ( $saved ) {
@@ -108,32 +108,53 @@ class SyncCommand extends Command {
 	protected function sendHashes( Remote $remote, OutputInterface $output  ) {
 		$i_sent = $remote->getLastSent();
 
-		$client = new Client();
 		$data = new DataModel();
 
 		$send_data = $data->getHashesSeenAfter( $i_sent );
 		if ( !empty( $send_data ) ) {
 			$output->writeln( "Hashes to send: ". count( $send_data ) );
-			$send_data = json_encode( $send_data );
 
-			try {
-				/** @noinspection PhpVoidFunctionResultUsedInspection */
-				$response = $client->post( $remote->getUri() . 'hash', [
-					'body' => [
-						'data' => $send_data
-					]
-				] );
-				$json     = $response->json();
-				$remote->setLastSent( time() );
-			} catch (\GuzzleHttp\Exception\ServerException $e) {
-				$output->writeln( 'Guzzle ServerException: ' . $e->getResponse() );
-				return;
-			} catch ( \GuzzleHttp\Exception\ParseException $e ) {
-				$output->writeln( 'Guzzle JSON issue: ' . $response->getBody() );
-				return;
+			// don't send a request with thousands of hashes all at once,
+			// some servers have request size limits
+			if ( count ( $send_data > 500 ) ) {
+				$chunks = array_chunk( $send_data, 500 );
+			} else {
+				$chunks = array( $send_data );
+			}
+			$counter = 0;
+			foreach ( $chunks as $chunk ) {
+				$counter ++;
+				$output->writeln( "Sending chunk : ". $counter ." of ". count( $chunks ) );
+				$sent = $this->sendHashChunk( $chunk, $remote, $output );
+				// if something went wrong, don't continue sending chunks
+				if ( !$sent ) {
+					break;
+				}
 			}
 		} else {
 			$output->writeln( "No hashes to send" );
 		}
+	}
+
+	protected function sendHashChunk( array $data, Remote $remote, OutputInterface $output ) {
+		$client = new Client();
+		$send_data = json_encode( $data );
+		try {
+			/** @noinspection PhpVoidFunctionResultUsedInspection */
+			$response = $client->post( $remote->getUri() . 'hash', [
+				'body' => [
+					'data' => $send_data
+				]
+			] );
+			$json     = $response->json();
+			$remote->setLastSent( time() );
+		} catch (\GuzzleHttp\Exception\ServerException $e) {
+			$output->writeln( 'Guzzle ServerException: ' . $e->getResponse() );
+			return false;
+		} catch ( \GuzzleHttp\Exception\ParseException $e ) {
+			$output->writeln( 'Guzzle JSON issue: ' . $response->getBody() );
+			return false;
+		}
+		return true;
 	}
 }
