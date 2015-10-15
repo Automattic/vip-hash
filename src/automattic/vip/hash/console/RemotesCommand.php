@@ -49,7 +49,16 @@ class RemotesCommand extends Command {
 
 	protected function listRemotes( InputInterface $input, OutputInterface $output ) {
 		$data = new DataModel();
-		$result = $data->getRemotes();
+		$result = array();
+		$remotes = $data->getRemotes();
+		foreach ( $remotes as $remote ) {
+			$result[] = array(
+				'name' => $remote->getName(),
+				'uri' => $remote->getUri(),
+				'latest_seen' => $remote->getLatestSeen(),
+				'last_sent' => $remote->getLastSent()
+			);
+		}
 		$json = json_encode( $result, JSON_PRETTY_PRINT );
 		$output->writeln( $json );
 	}

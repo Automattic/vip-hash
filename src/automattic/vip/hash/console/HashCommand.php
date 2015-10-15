@@ -28,4 +28,4 @@ class HashCommand extends Command {
 		$hash = $data->hashFile( $file );
 		$output->writeln( $hash );
 	}
-} 
+}
