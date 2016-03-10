@@ -29,7 +29,7 @@ class StatusCommand extends Command {
 			->setDescription( 'take a folder and generates a status report of good bad and unknown file hashes' )
 			->addArgument(
 				'folder',
-				InputArgument::REQUIRED,
+				InputArgument::OPTIONAL,
 				'A file hash to find, or a file to be hashed. Assumes hash if the given value is not a locatable file'
 			);
 	}
@@ -37,7 +37,7 @@ class StatusCommand extends Command {
 	protected function execute( InputInterface $input, OutputInterface $output ) {
 		$folder = $input->getArgument( 'folder' );
 		if ( empty( $folder ) ) {
-			throw new \Exception( 'Empty folder parameter' );
+			$folder = '.';
 		}
 		$data = $this->ProcessFile( $folder );
 		$tree = $this->displayTree( $data );
