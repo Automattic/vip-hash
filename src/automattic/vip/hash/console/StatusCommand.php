@@ -45,7 +45,6 @@ class StatusCommand extends Command {
 		$bad = 0;
 		$unknown = 0;
 		foreach ($tree as $key => $line ) {
-			$line = str_replace( $folder, '', $line );
 			if (strpos($line, 'false') !== FALSE ) {
 				$output->writeln( '<error>'.$line.'</error>' );
 				$bad++;
@@ -124,12 +123,21 @@ class StatusCommand extends Command {
 				$statuses[] = 'unknown';
 			}
 			if ( !empty( $statuses ) ) {
-				$lines[] = $status.$md . ''.basename( $node['file'] ).' - '.implode(', ', $statuses );
+				$lines[] = $status.$md . ''. basename( $node['file'] ) .' - '.implode(', ', $this->count_statuses( $statuses ) );
 			}
 		} else {
 			$lines[] = '? unknown entry in data structure'.PHP_EOL;
 		}
 		return $lines;
+	}
+
+	public function count_statuses( array $statuses ) {
+		$result = array();
+		$counts = array_count_values( $statuses );
+		foreach ( $counts as $key => $count ) {
+			$result[] = $count.'x '.$key;
+		}
+		return $result;
 	}
 
 	/**
