@@ -77,11 +77,12 @@ class StatusCommand extends Command {
 				$md .= '├───';
 			}
 		}
+
 		$branch = '├';
 		if ( $last ) {
 			$branch = '└';
 		}
-		if ( $depth -1 > 0 ) {
+		if ( $depth > 0 ) {
 			$md .= str_repeat('|   ', $depth -1 ).$branch.'───';
 		}
 		if ( !empty( $node['folder'] ) ) {
