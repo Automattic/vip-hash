@@ -23,7 +23,7 @@ class StatusCommand extends Command {
 			'js',
 			'html',
 			'htm',
-			'twig'
+			'twig',
 		);
 		$this->setName( 'status' )
 			->setDescription( 'take a folder and generates a status report of good bad and unknown file hashes' )
@@ -44,14 +44,14 @@ class StatusCommand extends Command {
 		$good = 0;
 		$bad = 0;
 		$unknown = 0;
-		foreach ($tree as $key => $line ) {
-			if (strpos($line, 'false') !== FALSE ) {
+		foreach ( $tree as $key => $line ) {
+			if ( strpos( $line, 'false' ) !== FALSE ) {
 				$output->writeln( '<error>'.$line.'</error>' );
 				$bad++;
-			} else if (strpos($line, 'true') !== FALSE ) {
+			} else if ( strpos( $line, 'true' ) !== FALSE ) {
 				$output->writeln( '<info>'.$line.'</info>' );
 				$good++;
-			} else if (strpos($line, 'unknown') !== FALSE ) {
+			} else if ( strpos( $line, 'unknown' ) !== FALSE ) {
 				$output->writeln( '<comment>'.$line.'</comment>' );
 				$unknown++;
 			} else {
@@ -59,8 +59,8 @@ class StatusCommand extends Command {
 			}
 		}
 		$total = $good + $bad + $unknown;
-		$percentage = ( ( $good + $bad )/ $total ) * 100;
-		$final = "<info>".$good." good</info>, <error>".$bad." bad</error>, <comment>".$unknown." unknown</comment>, ".number_format( $percentage, 2 )."% seen";
+		$percentage = ( ( $good + $bad ) / $total ) * 100;
+		$final = "<info>".$good." good</info>, <error>".$bad." bad</error>, <comment>".$unknown." unknown</comment>, ".number_format( $percentage, 2 ).'% seen';
 		$output->writeln( $final );
 	}
 
@@ -83,14 +83,14 @@ class StatusCommand extends Command {
 			$branch = '└';
 		}
 		if ( $depth > 0 ) {
-			$md .= str_repeat('|   ', $depth -1 ).$branch.'───';
+			$md .= str_repeat( '|   ', $depth -1 ).$branch.'───';
 		}
-		if ( !empty( $node['folder'] ) ) {
+		if ( ! empty( $node['folder'] ) ) {
 			$folderlines = array();
-			if ( !empty( $node['contents'] ) ) {
+			if ( ! empty( $node['contents'] ) ) {
 				$i = 1;
 				foreach ( $node['contents'] as $subnode ) {
-					$newlines  = $this->displayTree( $subnode, $depth + 1, $i++ == count( $node['contents'] ) );
+					$newlines = $this->displayTree( $subnode, $depth + 1, $i++ == count( $node['contents'] ) );
 					$folderlines = array_merge( $folderlines, $newlines );
 				}
 			}
@@ -98,14 +98,14 @@ class StatusCommand extends Command {
 				$lines[] = $status.$md . '├ '.$node['folder'];
 				$lines = array_merge( $lines, $folderlines );
 			}
-		} else if ( !empty( $node['file'] ) ) {
+		} else if ( ! empty( $node['file'] ) ) {
 			$statuses = [];
 			$status = '? ';
 			$status_set = false;
-			if ( !empty( $node['hashes'] ) ) {
+			if ( ! empty( $node['hashes'] ) ) {
 				foreach ( $node['hashes'] as $hash ) {
 					$statuses[] = $hash['status'];
-					if ( !$status_set ) {
+					if ( ! $status_set ) {
 						if ( $hash['status'] == 'true' ) {
 							$status = '✓ ';
 						} else if ( $hash['status'] == 'false' ) {
@@ -113,8 +113,8 @@ class StatusCommand extends Command {
 						}
 						$status_set = true;
 					} else {
-						if ( $status == '✓ ' ) {
-							if ( $hash['status'] == 'false' ) {
+						if ( '✓ ' == $status  ) {
+							if ( 'false' == $hash['status']  ) {
 								$status = '~ ';
 							}
 						}
