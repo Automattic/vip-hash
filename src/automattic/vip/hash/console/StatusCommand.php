@@ -39,62 +39,71 @@ class StatusCommand extends Command {
 		if ( empty( $folder ) ) {
 			$folder = '.';
 		}
-		$data = $this->ProcessFile( $folder );
+		$data = $this->processNode( $folder );
 		$tree = $this->displayTree( $data );
 		$good = 0;
 		$bad = 0;
 		$unknown = 0;
-		foreach ( $tree as $key => $line ) {
-			if ( strpos( $line, 'false' ) !== FALSE ) {
-				$output->writeln( '<error>'.$line.'</error>' );
+		foreach ( $tree as $line ) {
+			$final_line = $line;
+			if ( strpos( $line, 'false' ) !== false ) {
+				$final_line = '<error>'.$line.'</error>';
 				$bad++;
-			} else if ( strpos( $line, 'true' ) !== FALSE ) {
-				$output->writeln( '<info>'.$line.'</info>' );
+			} else if ( false !== strpos( $line, 'true' ) ) {
+				$final_line = '<info>'.$line.'</info>';
 				$good++;
-			} else if ( strpos( $line, 'unknown' ) !== FALSE ) {
-				$output->writeln( '<comment>'.$line.'</comment>' );
+			} else if ( false !== strpos( $line, 'unknown' ) ) {
+				$final_line = '<comment>'.$line.'</comment>';
 				$unknown++;
-			} else {
-				$output->writeln( $line );
 			}
+			$output->writeln( $final_line );
 		}
 		$total = $good + $bad + $unknown;
 		$percentage = ( ( $good + $bad ) / $total ) * 100;
-		$final = "<info>".$good." good</info>, <error>".$bad." bad</error>, <comment>".$unknown." unknown</comment>, ".number_format( $percentage, 2 ).'% seen';
+		$final = '<info>'.$good.' good</info>, <error>'.$bad.' bad</error>, <comment>'.$unknown.' unknown</comment>, '.number_format( $percentage, 2 ).'% seen';
 		$output->writeln( $final );
 	}
 
-	private function displayTree( array $node, $depth=-1, $last=false ) {
+	/**
+	 * Returns a string representing the indent for the tree string
+	 * @param  integer $depth How deep into the tree is this node?
+	 * @param  boolean $last  Is this the last node at this depth?
+	 * @return string         An indent representing the node in the tree
+	 */
+	private function getTreeIndent( $depth, $last ) {
+		$indent = '├───';
+		if ( $depth > 0 ) {
+			$indent = '|   ';
+		} else if ( $last ) {
+			$indent = '└───';
+		}
+
+		if ( $depth > 0 ) {
+			$branch = '├';
+			if ( $last ) {
+				$branch = '└';
+			}
+			$indent .= str_repeat( '|   ', $depth -1 ).$branch.'───';
+		}
+		return $indent;
+	}
+
+	private function displayTree( array $node, $depth = -1, $last = false ) {
 		$lines = [];
 		$status = '  ';
 		$md = '';
-		if ( $depth > 0 ) {
-			$md .= '|   ';
-		} else {
-			if ( $last ) {
-				$md .= '└───';
-			} else {
-				$md .= '├───';
-			}
-		}
+		$md .= $this->getTreeIndent( $depth, $last );
 
-		$branch = '├';
-		if ( $last ) {
-			$branch = '└';
-		}
-		if ( $depth > 0 ) {
-			$md .= str_repeat( '|   ', $depth -1 ).$branch.'───';
-		}
 		if ( ! empty( $node['folder'] ) ) {
 			$folderlines = array();
 			if ( ! empty( $node['contents'] ) ) {
 				$i = 1;
 				foreach ( $node['contents'] as $subnode ) {
-					$newlines = $this->displayTree( $subnode, $depth + 1, $i++ == count( $node['contents'] ) );
+					$newlines = $this->displayTree( $subnode, $depth + 1, count( $node['contents'] ) == $i++ );
 					$folderlines = array_merge( $folderlines, $newlines );
 				}
 			}
-			if ( !empty( $folderlines ) ) {
+			if ( ! empty( $folderlines ) ) {
 				$lines[] = $status.$md . '├ '.$node['folder'];
 				$lines = array_merge( $lines, $folderlines );
 			}
@@ -102,13 +111,16 @@ class StatusCommand extends Command {
 			$statuses = [];
 			$status = '? ';
 			$status_set = false;
+			if ( empty( $node['hashes'] ) ) {
+				$statuses[] = 'unknown';
+			}
 			if ( ! empty( $node['hashes'] ) ) {
 				foreach ( $node['hashes'] as $hash ) {
 					$statuses[] = $hash['status'];
 					if ( ! $status_set ) {
-						if ( $hash['status'] == 'true' ) {
+						if ( 'true' == $hash['status'] ) {
 							$status = '✓ ';
-						} else if ( $hash['status'] == 'false' ) {
+						} else if ( 'false' == $hash['status'] ) {
 							$status = 'x ';
 						}
 						$status_set = true;
@@ -120,11 +132,9 @@ class StatusCommand extends Command {
 						}
 					}
 				}
-			} else {
-				$statuses[] = 'unknown';
 			}
-			if ( !empty( $statuses ) ) {
-				$lines[] = $status.$md . ''. basename( $node['file'] ) .' - '.implode(', ', $this->count_statuses( $statuses ) );
+			if ( ! empty( $statuses ) ) {
+				$lines[] = $status.$md . ''. basename( $node['file'] ) .' - '.implode( ', ', $this->count_statuses( $statuses ) );
 			}
 		} else {
 			$lines[] = '? unknown entry in data structure'.PHP_EOL;
@@ -147,90 +157,105 @@ class StatusCommand extends Command {
 	 * @return array
 	 * @throws \Exception
 	 */
-	private function ProcessFile( $file ) {
-		// don't process the vendor folder
-		if ( substr( $file, -6) === 'vendor' ){
-			return null;
-		}
-
-		// don't process the .git folder
-		if ( substr( $file, -4) === '.git' ){
-			return null;
-		}
-
-		// don't process the .svn folder
-		if ( substr( $file, -4) === '.svn' ){
-			return null;
-		}
-		// don't process the .svn folder
-		if ( substr( $file, -5) === '.idea' ){
-			return null;
-		}
+	private function processNode( $file ) {
 
 		$data = array();
 		if ( is_dir( $file ) ) {
-			$unfiltered_folders = scandir( $file );
-			$folders = array_diff( $unfiltered_folders, array( '..', '.' ) );
-			if ( empty( $folders ) ) {
+			$data = $this->processFolder( $file );
+		} else {
+			$data = $this->processFile( $file );
+		}
+		return $data;
+	}
+
+	/**
+	 * Processes a file node
+	 * @param  [type] $file [description]
+	 * @return array       the data representing this file with hash status and filename
+	 */
+	public function processFile( $file ) {
+		$data = array();
+		// only process the file types we're interested in
+		$info = pathinfo( $file );
+		if ( isset( $info['extension'] ) ) {
+			if ( ! in_array( $info['extension'], $this->allowed_file_types ) ) {
 				return null;
 			}
-			$contents = array();
-			foreach ( $folders as $found_file ) {
-				$result =  $this->ProcessFile( $file . DIRECTORY_SEPARATOR . $found_file );
-				if ( !empty( $result ) && ( $result != null ) ) {
-					if ( is_dir( $file . DIRECTORY_SEPARATOR . $found_file ) ) {
-						$contents[] = $result;
-					} else {
-						$f = array(
-							'file' => $file . DIRECTORY_SEPARATOR . $found_file,
-							'hashes' => $result
-						);
-						$contents[] = $f;
-					}
-				}
-			}
-			$data = array(
-				'folder'   => $file,
-				'contents' => $contents
-			);
-
-		} else {
-			// only process the file types we're interested in
-			$info = pathinfo( $file );
-			if ( isset( $info['extension'] ) ) {
-				if ( !in_array( $info['extension'], $this->allowed_file_types ) ) {
-					return null;
-				}
-			}
-			$data_model = new DataModel();
-			try {
-				$hash = $data_model->hashFile( $file );
-			} catch ( \Exception $e ) {
-				$data = array(
-					array(
-						'hash' => 'empty',
-						'status' => 'unknown',
-						'file' => $file
-					)
-				);
-				return $data;
-			}
-			try {
-				$data = $data_model->getHashStatusAllUsers( $hash );
-			} catch ( \Exception $e ) {
-				//
-			}
-			if ( empty( $data ) ) {
-				$data = array(
-					array(
-						'hash' => $hash,
-						'status' => 'unknown',
-						'file' => $file
-					)
-				);
-			}
-
 		}
+		$data_model = new DataModel();
+		try {
+			$hash = $data_model->hashFile( $file );
+		} catch ( \Exception $e ) {
+			$data = array(
+				array(
+					'hash' => 'empty',
+					'status' => 'unknown',
+					'file' => $file,
+				),
+			);
+			return $data;
+		}
+		try {
+			$data = $data_model->getHashStatusAllUsers( $hash );
+		} catch ( \Exception $e ) {
+			$data = array(
+				array(
+					'hash' => $hash,
+					'status' => 'unknown',
+					'file' => $file,
+				),
+			);
+		}
+		if ( empty( $data ) ) {
+			$data = array(
+				array(
+					'hash' => $hash,
+					'status' => 'unknown',
+					'file' => $file,
+				),
+			);
+		}
+		return $data;
+	}
+
+	public function processFolder( $file ) {
+
+		$skip_folders = array(
+			'vendor',
+			'.git',
+			'.svn',
+			'.idea',
+		);
+
+		foreach ( $skip_folders as $skip ) {
+			if ( substr( $file, strlen( $skip ) * -1 ) === $skip ) {
+				return null;
+			}
+		}
+
+		$unfiltered_folders = scandir( $file );
+		$folders = array_diff( $unfiltered_folders, array( '..', '.' ) );
+		if ( empty( $folders ) ) {
+			return null;
+		}
+		$contents = array();
+		foreach ( $folders as $found_file ) {
+			$result = $this->processNode( $file . DIRECTORY_SEPARATOR . $found_file );
+			if ( ! empty( $result ) && ( null != $result ) ) {
+				$f = array(
+					'file' => $file . DIRECTORY_SEPARATOR . $found_file,
+					'hashes' => $result,
+				);
+				if ( is_dir( $file . DIRECTORY_SEPARATOR . $found_file ) ) {
+					$f = $result;
+				}
+				$contents[] = $f;
+			}
+		}
+		$data = array(
+			'folder'   => $file,
+			'contents' => $contents,
+		);
 		return $data;
 	}
 }
