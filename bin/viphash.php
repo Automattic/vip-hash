@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-if (PHP_SAPI !== 'cli') {
+if ( PHP_SAPI !== 'cli' ) {
 	echo 'Warning: viphash should be invoked via the CLI version of PHP, not the '.PHP_SAPI.' SAPI'.PHP_EOL;
 }
 require __DIR__.'/../src/bootstrap.php';

@@ -12,7 +12,7 @@ class HashRecord {
 			'username' => '',
 			'status' => false,
 			'hash' => '',
-			'notes' => ''
+			'notes' => '',
 		);
 	}
 
@@ -109,8 +109,8 @@ class HashRecord {
 
 		$identifier = $hash.'-'.$username.'-'.$date;
 
-		$query = "INSERT INTO wpcom_vip_hashes VALUES
-		( :id, :identifier, :username, :hash, :date, :seen, :status, :notes )";
+		$query = 'INSERT INTO wpcom_vip_hashes VALUES
+		( :id, :identifier, :username, :hash, :date, :seen, :status, :notes )';
 		$sth   = $pdo->prepare( $query );
 		if ( $sth ) {
 			$result = $sth->execute( array(
@@ -121,7 +121,7 @@ class HashRecord {
 				':date'       => $date,
 				':seen'       => $seen,
 				':status'     => $status,
-				':notes'      => $notes
+				':notes'      => $notes,
 			) );
 
 			if ( !$result ) {

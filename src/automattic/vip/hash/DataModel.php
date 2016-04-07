@@ -13,13 +13,13 @@ class DataModel {
 
 	private $dbdir = '';
 
-	public function __construct( $dbdir='' ) {
+	public function __construct( $dbdir = '' ) {
 		$this->dbdir = $dbdir;
 		$this->init();
 	}
 
 	public function init() {
-		if ( !$this->pdo ) {
+		if ( ! $this->pdo ) {
 			$this->pdo = new PDO( 'sqlite:' . $this->getDBDir() . 'db.sqlite' );
 			$this->pdo->query( 'CREATE TABLE IF NOT EXISTS wpcom_vip_hashes (
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -69,7 +69,7 @@ class DataModel {
 		$record->setStatus( $value );
 		$record->setNote( $note );
 
-		if ( !empty( $date ) ) {
+		if ( ! empty( $date ) ) {
 			$record->setDate( $date );
 		}
 
@@ -83,14 +83,14 @@ class DataModel {
 	 * @throws \Exception
 	 */
 	public function hashFile( $file ) {
-		if ( !file_exists( $file ) ) {
-			throw new \Exception( "File does not exist" );
+		if ( ! file_exists( $file ) ) {
+			throw new \Exception( 'File does not exist' );
 		}
 		if ( is_dir( $file ) ) {
-			throw new \Exception( "You cannot hash a folder" );
+			throw new \Exception( 'You cannot hash a folder' );
 		}
-		if ( !is_file( $file ) ) {
-			throw new \Exception( "Only files can be hashed" );
+		if ( ! is_file( $file ) ) {
+			throw new \Exception( 'Only files can be hashed' );
 		}
 		$code = php_strip_whitespace( $file );
 		$hash = sha1( $code );
@@ -108,7 +108,7 @@ class DataModel {
 	public function getHashStatusByUser( $hash, $username ) {
 		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hashes WHERE hash = '$hash' AND user = '$username'" );
 
-		if ( !$results ) {
+		if ( ! $results ) {
 			$error_info = print_r( $this->pdo->errorInfo(), true );
 			throw new \Exception( $error_info, $this->pdo->errorCode() );
 		}
@@ -130,9 +130,9 @@ class DataModel {
 	public function getHashStatusAllUsers( $hash ) {
 		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hashes WHERE hash = '$hash'" );
 
-		if ( !$results ) {
+		if ( ! $results ) {
 			$error_info = print_r( $this->pdo->errorInfo(), true );
-			throw new \Exception( $error_info  );
+			throw new \Exception( $error_info );
 		}
 
 		$output_data = array();
@@ -148,11 +148,11 @@ class DataModel {
 	 */
 	public function getDBDir() {
 
-		if ( !empty( $this->dbdir ) ) {
+		if ( ! empty( $this->dbdir ) ) {
 			return $this->dbdir;
 		}
 		$folders = array();
-		if ( !empty ( $_SERVER['HOME'] ) ) {
+		if ( ! empty( $_SERVER['HOME'] ) ) {
 			$folders[] = $_SERVER['HOME'].DIRECTORY_SEPARATOR.'.viphash'.DIRECTORY_SEPARATOR;
 		}
 		if ( function_exists( 'posix_getpwuid' ) ) {
@@ -162,7 +162,7 @@ class DataModel {
 		}
 
 		// Windows
-		if ( !empty( $_SERVER['HOMEDRIVE'] ) && !empty( $_SERVER['HOMEPATH'] ) ) {
+		if ( ! empty( $_SERVER['HOMEDRIVE'] ) && ! empty( $_SERVER['HOMEPATH'] ) ) {
 			$folders[] = $_SERVER['HOMEDRIVE']. $_SERVER['HOMEPATH'].DIRECTORY_SEPARATOR.'.viphash'.DIRECTORY_SEPARATOR;
 		}
 		$folder[] = '.viphash'.DIRECTORY_SEPARATOR;
@@ -170,7 +170,7 @@ class DataModel {
 		$folder = '';
 		foreach ( $folders as $f ) {
 			if ( is_writable( $f ) ) {
-				if ( !file_exists( $f ) ) {
+				if ( ! file_exists( $f ) ) {
 					if ( ! mkdir( $f, 0777, true ) ) {
 						continue;
 					}
@@ -184,10 +184,10 @@ class DataModel {
 	}
 
 	public function getNewestSeenHash() {
-		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hashes ORDER BY seen DESC LIMIT 1" );
-		if ( !$results ) {
+		$results = $this->pdo->query( 'SELECT * FROM wpcom_vip_hashes ORDER BY seen DESC LIMIT 1' );
+		if ( ! $results ) {
 			$error_info = print_r( $this->pdo->errorInfo(), true );
-			throw new \Exception( $error_info  );
+			throw new \Exception( $error_info );
 		}
 
 		$output_data = array();
@@ -201,9 +201,9 @@ class DataModel {
 	public function getHashesAfter( $date ) {
 		$date = intval( $date );
 		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hashes WHERE date > $date ORDER BY date ASC" );
-		if ( !$results ) {
+		if ( ! $results ) {
 			$error_info = print_r( $this->pdo->errorInfo(), true );
-			throw new \Exception( $error_info  );
+			throw new \Exception( $error_info );
 		}
 
 		$output_data = array();
@@ -217,9 +217,9 @@ class DataModel {
 	public function getHashesSeenAfter( $date ) {
 		$date = intval( $date );
 		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hashes WHERE seen > $date ORDER BY seen ASC" );
-		if ( !$results ) {
+		if ( ! $results ) {
 			$error_info = print_r( $this->pdo->errorInfo(), true );
-			throw new \Exception( $error_info  );
+			throw new \Exception( $error_info );
 		}
 
 		$output_data = array();
@@ -232,13 +232,11 @@ class DataModel {
 
 
 	public function addRemote( $name, $uri ) {
-		$pdo = $this->getPDO();
-
 		$remote = new Remote( array(
 			'name' => $name,
 			'uri' => $uri,
 			'latest_seen' => 0,
-			'last_sent' => 0
+			'last_sent' => 0,
 		) );
 		return $remote->save( $this );
 	}
@@ -248,10 +246,10 @@ class DataModel {
 	 * @throws \Exception
 	 */
 	public function getRemotes() {
-		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hash_remotes" );
-		if ( !$results ) {
+		$results = $this->pdo->query( 'SELECT * FROM wpcom_vip_hash_remotes' );
+		if ( ! $results ) {
 			$error_info = print_r( $this->pdo->errorInfo(), true );
-			throw new \Exception( $error_info  );
+			throw new \Exception( $error_info );
 		}
 
 		$output_data = array();
@@ -269,9 +267,9 @@ class DataModel {
 	 */
 	public function getRemote( $name ) {
 		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hash_remotes WHERE name = '$name'" );
-		if ( !$results ) {
+		if ( ! $results ) {
 			$error_info = print_r( $this->pdo->errorInfo(), true );
-			throw new \Exception( $error_info  );
+			throw new \Exception( $error_info );
 		}
 
 		while ( $row = $results->fetch( PDO::FETCH_ASSOC ) ) {

@@ -34,17 +34,16 @@ class GetCommand extends Command {
 		if ( file_exists( $file ) ) {
 			$hash = $data->hashFile( $file );
 		}
-		if ( $username = $input->getArgument('username') ) {
+		$result = '';
+		if ( $username = $input->getArgument( 'username' ) ) {
 			$result = $data->getHashStatusByUser( $hash, $username );
-			$json = json_encode( $result, JSON_PRETTY_PRINT );
-			$output->writeln( $json );
 		} else {
 			$result = $data->getHashStatusAllUsers( $hash );
-			if ( empty( $result ) ) {
-				throw new \Exception('No Hashes found' );
-			}
-			$json = json_encode( $result, JSON_PRETTY_PRINT );
-			$output->writeln( $json );
 		}
+		if ( empty( $result ) ) {
+			throw new \Exception( 'No Hashes found' );
+		}
+		$json = json_encode( $result, JSON_PRETTY_PRINT );
+		$output->writeln( $json );
 	}
 }

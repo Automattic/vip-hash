@@ -55,7 +55,7 @@ class MarkCommand extends Command {
 		if ( empty( $status ) ) {
 			throw new \Exception( 'Empty status parameter' );
 		}
-		if ( $status != 'true' && $status != 'false' ) {
+		if ( ( 'true' != $status ) && ( 'false' != $status ) ) {
 			throw new \Exception( 'Hash status must be true or false' );
 		}
 
