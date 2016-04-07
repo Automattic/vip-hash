@@ -59,9 +59,9 @@ class ScanCommand extends Command {
 			$markdown .= $this->displayMarkdown( $data );
 
 			// use relative paths rather than full paths
-			/*if ( '.' != $folder ) {
+			if ( '.' != $folder ) {
 				$markdown = str_replace( $folder, '', $markdown );
-			}*/
+			}
 
 			$output->writeln( $markdown );
 		}
@@ -152,14 +152,15 @@ class ScanCommand extends Command {
 		foreach ( $folders as $found_file ) {
 			$result = $this->processNode( $file . DIRECTORY_SEPARATOR . $found_file );
 			if ( ! empty( $result ) && ( null != $result ) ) {
+				if ( is_dir( $file . DIRECTORY_SEPARATOR . $found_file ) ) {
+					$contents[] = $result;
+					continue;
+				}
 				$r = array(
 					'file' => $file . DIRECTORY_SEPARATOR . $found_file,
 					'hashes' => $result,
 				);
 
-				if ( is_dir( $file . DIRECTORY_SEPARATOR . $found_file ) ) {
-					$contents[] = $result;
-				}
 				$contents[] = $r;
 			}
 		}
