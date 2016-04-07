@@ -3,6 +3,7 @@
 namespace automattic\vip\hash\console;
 
 use automattic\vip\hash\DataModel;
+use automattic\vip\hash\Pdo_Data_Model;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,7 +25,7 @@ class HashCommand extends Command {
 		if ( empty( $file ) ) {
 			throw new \Exception( 'Empty file parameter' );
 		}
-		$data = new DataModel();
+		$data = new Pdo_Data_Model();
 		$hash = $data->hashFile( $file );
 		$output->writeln( $hash );
 	}

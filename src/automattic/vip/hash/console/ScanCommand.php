@@ -3,6 +3,7 @@
 namespace automattic\vip\hash\console;
 
 use automattic\vip\hash\DataModel;
+use automattic\vip\hash\Pdo_Data_Model;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -182,7 +183,7 @@ class ScanCommand extends Command {
 				return null;
 			}
 		}
-		$data_model = new DataModel();
+		$data_model = new Pdo_Data_Model();
 		try {
 			$hash = $data_model->hashFile( $file );
 		} catch ( \Exception $e ) {

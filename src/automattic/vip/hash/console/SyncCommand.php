@@ -3,6 +3,7 @@
 namespace automattic\vip\hash\console;
 
 use automattic\vip\hash\DataModel;
+use automattic\vip\hash\Pdo_Data_Model;
 use automattic\vip\hash\Remote;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -33,7 +34,7 @@ class SyncCommand extends Command {
 		if ( empty( $remote_name ) ) {
 			throw new \Exception( 'Missing remote name' );
 		}
-		$data = new DataModel();
+		$data = new Pdo_Data_Model();
 		$remote = $data->getRemote( $remote_name );
 		if ( ! $remote ) {
 			throw new \Exception( 'There was an issue trying to get the remotes information, does this remote name exist?' );
@@ -89,7 +90,7 @@ class SyncCommand extends Command {
 
 	protected function saveHashes( array $hashes ) {
 		if ( ! empty( $hashes ) ) {
-			$data = new DataModel();
+			$data = new Pdo_Data_Model();
 			foreach ( $hashes as $item ) {
 				// process each item and save
 				$data->markHash( $item['hash'], $item['user'], $item['status'], $item['notes'], $item['date'] );
@@ -108,7 +109,7 @@ class SyncCommand extends Command {
 	protected function sendHashes( Remote $remote, OutputInterface $output ) {
 		$i_sent = $remote->getLastSent();
 
-		$data = new DataModel();
+		$data = new Pdo_Data_Model();
 
 		$send_data = $data->getHashesSeenAfter( $i_sent );
 		if ( ! empty( $send_data ) ) {

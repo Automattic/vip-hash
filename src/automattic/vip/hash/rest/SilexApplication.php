@@ -3,13 +3,14 @@
 namespace automattic\vip\hash\rest;
 
 use automattic\vip\hash\DataModel;
+use automattic\vip\hash\Pdo_Data_Model;
 use automattic\vip\hash\HashRecord;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class SilexApplication {
 
-	private $dbdir='';
+	private $dbdir = '';
 	private $app;
 
 	public function __construct( $dbdir ) {
@@ -22,8 +23,8 @@ class SilexApplication {
 		$app['debug'] = true;
 		$this->register_endpoints( $app );
 
-		$app->view( function ( array $controllerResult ) use ( $app ) {
-			return $app->json( $controllerResult );
+		$app->view( function( array $controller_result ) use ( $app ) {
+			return $app->json( $controller_result );
 		});
 
 		$app->run();
@@ -35,10 +36,9 @@ class SilexApplication {
 		 * remote/hash/<hash> <- read
 		 * remote/hash/seen/since/<time> <- read
 		 */
-		$app->get ( '/', function () {
+		$app->get( '/', function () {
 			return 'VIP Hash Database';
 		});
-		$dbdir = $this->dbdir;
 
 		$app->get( '/hash/seen/since/{timestamp}', array( $this, 'hash_seen_since' ) );
 		$app->get( '/hash/{hash}', array( $this, 'get_hash' ) );
@@ -46,23 +46,23 @@ class SilexApplication {
 
 	}
 
-	public function hash_seen_since ( $timestamp ) {
-		$model = new DataModel( $this->dbdir );
+	public function hash_seen_since( $timestamp ) {
+		$model = new Pdo_Data_Model( $this->dbdir );
 		return $model->getHashesSeenAfter( $timestamp );
 	}
 
 	function get_hash( $hash ) {
-		$model = new DataModel( $this->dbdir );
+		$model = new Pdo_Data_Model( $this->dbdir );
 		try {
 			return $model->getHashStatusAllUsers( $hash );
-		} catch( \Exception $e ) {
+		} catch ( \Exception $e ) {
 			return array( 'error' => $e->getMessage() );
 		}
 	}
 
-	public function post_hash ( Request $request ) {
-		$json_data = $request->get('data');
-		$model = new DataModel( $this->dbdir );
+	public function post_hash( Request $request ) {
+		$json_data = $request->get( 'data' );
+		$model = new Pdo_Data_Model( $this->dbdir );
 		$data = json_decode( $json_data, true );
 		foreach ( $data as $record ) {
 			try {

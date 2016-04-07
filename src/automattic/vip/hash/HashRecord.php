@@ -96,7 +96,7 @@ class HashRecord {
 	 * @internal param string $folder the location of the hash database with a trailing slash
 	 *
 	 */
-	function save( DataModel $model ) {
+	function save( Pdo_Data_Model $model ) {
 
 		$pdo = $model->getPDO();
 
@@ -124,7 +124,7 @@ class HashRecord {
 				':notes'      => $notes,
 			) );
 
-			if ( !$result ) {
+			if ( ! $result ) {
 				$error_info = print_r( $pdo->errorInfo(), true );
 				throw new \Exception( $error_info );
 			}

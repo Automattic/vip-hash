@@ -3,6 +3,7 @@
 namespace automattic\vip\hash\console;
 
 use automattic\vip\hash\DataModel;
+use automattic\vip\hash\Pdo_Data_Model;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -37,18 +38,18 @@ class RemotesCommand extends Command {
 	protected function execute( InputInterface $input, OutputInterface $output ) {
 		$subcommand = $input->getArgument( 'subcommand' );
 
-		if ( $subcommand == 'add' ) {
+		if ( 'add' == $subcommand ) {
 			$this->addRemote( $input, $output );
 			return;
-		} else if ( $subcommand == 'list' ) {
+		} else if ( 'list ' == $subcommand ) {
 			$this->listRemotes( $input, $output );
 			return;
 		}
-		throw new \Exception( 'unknown subcommand');
+		throw new \Exception( 'unknown subcommand' );
 	}
 
 	protected function listRemotes( InputInterface $input, OutputInterface $output ) {
-		$data = new DataModel();
+		$data = new Pdo_Data_Model();
 		$result = array();
 		$remotes = $data->getRemotes();
 		foreach ( $remotes as $remote ) {
@@ -56,7 +57,7 @@ class RemotesCommand extends Command {
 				'name' => $remote->getName(),
 				'uri' => $remote->getUri(),
 				'latest_seen' => $remote->getLatestSeen(),
-				'last_sent' => $remote->getLastSent()
+				'last_sent' => $remote->getLastSent(),
 			);
 		}
 		$json = json_encode( $result, JSON_PRETTY_PRINT );
@@ -66,7 +67,7 @@ class RemotesCommand extends Command {
 	protected function addRemote( InputInterface $input, OutputInterface $output ) {
 		$name = $input->getArgument( 'name' );
 		$uri = $input->getArgument( 'uri' );
-		$data = new DataModel();
+		$data = new Pdo_Data_Model();
 		$result = $data->addRemote( $name, $uri );
 		$output->write( $result );
 	}
