@@ -50,7 +50,7 @@ class ScanCommand extends Command {
 		if ( ! in_array( $format, array( 'json', 'markdown' ) ) ) {
 			throw new \Exception( 'Unknown format' );
 		}
-		$data = $this->ProcessFile( $folder );
+		$data = $this->processNode( $folder );
 		if ( 'json' == $format ) {
 			$json = json_encode( $data, JSON_PRETTY_PRINT );
 			$output->writeln( $json );
@@ -59,9 +59,9 @@ class ScanCommand extends Command {
 			$markdown .= $this->displayMarkdown( $data );
 
 			// use relative paths rather than full paths
-			if ( '.' != $folder ) {
+			/*if ( '.' != $folder ) {
 				$markdown = str_replace( $folder, '', $markdown );
-			}
+			}*/
 
 			$output->writeln( $markdown );
 		}
@@ -116,96 +116,106 @@ class ScanCommand extends Command {
 	 * @return array
 	 * @throws \Exception
 	 */
-	private function ProcessFile( $file ) {
-		// don't process the vendor folder
-		if ( substr( $file, -6 ) === 'vendor' ) {
-			return null;
-		}
+	private function processNode( $file ) {
 
-		// don't process the .git folder
-		if ( substr( $file, -4 ) === '.git' ) {
-			return null;
-		}
+		$skip_folders = array(
+			'vendor',
+			'.git',
+			'.svn',
+			'.idea',
+		);
 
-		// don't process the .svn folder
-		if ( '.svn' === substr( $file, -4 ) ) {
-			return null;
-		}
-		// don't process the .svn folder
-		if ( '.idea' === substr( $file, -5 ) ) {
-			return null;
+		foreach ( $skip_folders as $skip ) {
+			if ( substr( $file, strlen( $skip ) * -1 ) === $skip ) {
+				return null;
+			}
 		}
 
 		$data = array();
 		if ( is_dir( $file ) ) {
-			$unfiltered_folders = scandir( $file );
-			$folders = array_diff( $unfiltered_folders, array( '..', '.' ) );
-			if ( empty( $folders ) ) {
-				return null;
-			}
-			$contents = array();
-			foreach ( $folders as $found_file ) {
-				$result = $this->ProcessFile( $file . DIRECTORY_SEPARATOR . $found_file );
-				if ( !empty( $result ) && ( $result != null ) ) {
-					$r = array(
-						'file' => $file . DIRECTORY_SEPARATOR . $found_file,
-						'hashes' => $result,
-					);
+			$data = $this->processFolder( $file );
+			return $data;
+		}
 
-					if ( is_dir( $file . DIRECTORY_SEPARATOR . $found_file ) ) {
-						$contents[] = $result;
-					}
-					$contents[] = $r;
-				}
-			}
-			$data = array(
-				'folder'   => $file,
-				'contents' => $contents,
-			);
+		$data = $this->processFile( $file );
+		return $data;
+	}
 
-		} else {
-			// only process the file types we're interested in
-			$info = pathinfo( $file );
-			if ( isset( $info['extension'] ) ) {
-				if ( ! in_array( $info['extension'], $this->allowed_file_types ) ) {
-					return null;
+	public function processFolder( $file ) {
+		$data = array();
+		$unfiltered_folders = scandir( $file );
+		$folders = array_diff( $unfiltered_folders, array( '..', '.' ) );
+		if ( empty( $folders ) ) {
+			return null;
+		}
+		$contents = array();
+		foreach ( $folders as $found_file ) {
+			$result = $this->processNode( $file . DIRECTORY_SEPARATOR . $found_file );
+			if ( ! empty( $result ) && ( null != $result ) ) {
+				$r = array(
+					'file' => $file . DIRECTORY_SEPARATOR . $found_file,
+					'hashes' => $result,
+				);
+
+				if ( is_dir( $file . DIRECTORY_SEPARATOR . $found_file ) ) {
+					$contents[] = $result;
 				}
-			}
-			$data_model = new DataModel();
-			try {
-				$hash = $data_model->hashFile( $file );
-			} catch ( \Exception $e ) {
-				$data = array(
-					array(
-						'hash' => 'empty',
-						'status' => 'unknown',
-						'file' => $file,
-					),
-				);
-				return $data;
-			}
-			try {
-				$data = $data_model->getHashStatusAllUsers( $hash );
-			} catch ( \Exception $e ) {
-				$data = array(
-					array(
-						'hash' => $hash,
-						'status' => 'unknown',
-						'file' => $file,
-					),
-				);
-				return $data;
-			}
-			if ( empty( $data ) ) {
-				$data = array(
-					array(
-						'hash' => $hash,
-						'status' => 'unknown',
-						'file' => $file,
-					),
-				);
+				$contents[] = $r;
 			}
 		}
+		$data = array(
+			'folder'   => $file,
+			'contents' => $contents,
+		);
+		return $data;
+	}
+
+
+	public function processFile( $file ) {
+		$data = array();
+
+		// only process the file types we're interested in
+		$info = pathinfo( $file );
+		if ( isset( $info['extension'] ) ) {
+			if ( ! in_array( $info['extension'], $this->allowed_file_types ) ) {
+				return null;
+			}
+		}
+		$data_model = new DataModel();
+		try {
+			$hash = $data_model->hashFile( $file );
+		} catch ( \Exception $e ) {
+			$data = array(
+				array(
+					'hash' => 'empty',
+					'status' => 'unknown',
+					'file' => $file,
+				),
+			);
+			return $data;
+		}
+		try {
+			$data = $data_model->getHashStatusAllUsers( $hash );
+		} catch ( \Exception $e ) {
+			$data = array(
+				array(
+					'hash' => $hash,
+					'status' => 'unknown',
+					'file' => $file,
+				),
+			);
+			return $data;
+		}
+		if ( empty( $data ) ) {
+			$data = array(
+				array(
+					'hash' => $hash,
+					'status' => 'unknown',
+					'file' => $file,
+				),
+			);
+		}
+
 		return $data;
 	}
 }
