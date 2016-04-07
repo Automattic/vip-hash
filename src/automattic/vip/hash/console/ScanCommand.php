@@ -93,7 +93,7 @@ class ScanCommand extends Command {
 
 	private function displayFileMarkdown( array $node ) {
 		$md = '';
-		if ( ! empty( $node['hashes'] ) ) {
+		if ( empty( $node['hashes'] ) ) {
 			return '';
 		}
 
