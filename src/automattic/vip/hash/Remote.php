@@ -92,55 +92,14 @@ class Remote {
 	/**
 	 * @param DataModel $data
 	 */
-	public function save( Pdo_Data_Model $model ) {
-		$pdo = $model->getPDO();
+	public function save( Pdo_Data_Model $data_model ) {
+		$pdo = $data_model->getPDO();
 
 		// check if we need to save or update the value
 		if ( empty( $this->id ) ) {
 			// it's new
-			$query = 'INSERT INTO wpcom_vip_hash_remotes VALUES
-			( :name, :uri, :latest_seen, :last_sent )';
-			$sth   = $pdo->prepare( $query );
-			if ( $sth ) {
-				$result = $sth->execute( array(
-					':name'        => $this->name,
-					':uri'         => $this->uri,
-					':latest_seen' => $this->latest_seen,
-					':last_sent'   => $this->last_sent,
-				) );
-
-				if ( ! $result ) {
-					$error_info = print_r( $pdo->errorInfo(), true );
-					throw new \Exception( $error_info );
-				}
-				return true;
-			}
-
-			return false;
-		} else {
-			// it's old, update it
-			// //UPDATE Cars SET Name='Skoda Octavia' WHERE Id=3;
-			$query = 'UPDATE wpcom_vip_hash_remotes SET
-			 name= :name, uri = :uri, latest_seen = :latest_seen, last_sent = :last_sent WHERE id = :id';
-			$sth   = $pdo->prepare( $query );
-			if ( $sth ) {
-				$result = $sth->execute( array(
-					':id'          => $this->id,
-					':name'        => $this->name,
-					':uri'         => $this->uri,
-					':latest_seen' => $this->latest_seen,
-					':last_sent'   => $this->last_sent,
-				) );
-
-				if ( ! $result ) {
-					$error_info = print_r( $pdo->errorInfo(), true );
-					throw new \Exception( $error_info );
-				}
-				return true;
-			}
-			throw new \Exception( 'failed to prepare statement' );
-
-			return false;
+			return $data_model->addRemote( $this->name, $this->uri, $this->latest_seen, $this->last_seen );
 		}
+		return $data_model->updateRemote( $this->id, $this->name, $this->uri, $this->latest_seen, $this->last_seen );
 	}
 }

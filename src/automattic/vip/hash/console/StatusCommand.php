@@ -40,7 +40,8 @@ class StatusCommand extends Command {
 		if ( empty( $folder ) ) {
 			$folder = '.';
 		}
-		$data = $this->processNode( $folder );
+		$data_model = new Pdo_Data_Model();
+		$data = $this->processNode( $folder, $data_model );
 		$tree = $this->displayTree( $data );
 		$good = 0;
 		$bad = 0;
@@ -158,13 +159,13 @@ class StatusCommand extends Command {
 	 * @return array
 	 * @throws \Exception
 	 */
-	private function processNode( $file ) {
+	private function processNode( $file, DataModel $data_model ) {
 
 		$data = array();
 		if ( is_dir( $file ) ) {
-			$data = $this->processFolder( $file );
+			$data = $this->processFolder( $file, $data_model );
 		} else {
-			$data = $this->processFile( $file );
+			$data = $this->processFile( $file, $data_model );
 		}
 		return $data;
 	}
@@ -174,7 +175,7 @@ class StatusCommand extends Command {
 	 * @param  [type] $file [description]
 	 * @return array       the data representing this file with hash status and filename
 	 */
-	public function processFile( $file ) {
+	public function processFile( $file, DataModel $data_model ) {
 		$data = array();
 		// only process the file types we're interested in
 		$info = pathinfo( $file );
@@ -183,7 +184,6 @@ class StatusCommand extends Command {
 				return null;
 			}
 		}
-		$data_model = new Pdo_Data_Model();
 		try {
 			$hash = $data_model->hashFile( $file );
 		} catch ( \Exception $e ) {
@@ -219,7 +219,7 @@ class StatusCommand extends Command {
 		return $data;
 	}
 
-	public function processFolder( $file ) {
+	public function processFolder( $file, DataModel $data_model ) {
 
 		$skip_folders = array(
 			'vendor',
@@ -241,7 +241,7 @@ class StatusCommand extends Command {
 		}
 		$contents = array();
 		foreach ( $folders as $found_file ) {
-			$result = $this->processNode( $file . DIRECTORY_SEPARATOR . $found_file );
+			$result = $this->processNode( $file . DIRECTORY_SEPARATOR . $found_file, $data_model );
 			if ( ! empty( $result ) && ( null != $result ) ) {
 				$f = array(
 					'file' => $file . DIRECTORY_SEPARATOR . $found_file,

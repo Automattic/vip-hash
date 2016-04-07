@@ -4,6 +4,7 @@ namespace automattic\vip\hash\console;
 
 use automattic\vip\hash\DataModel;
 use automattic\vip\hash\Pdo_Data_Model;
+use automattic\vip\hash\Remote;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -37,21 +38,28 @@ class RemotesCommand extends Command {
 	 */
 	protected function execute( InputInterface $input, OutputInterface $output ) {
 		$subcommand = $input->getArgument( 'subcommand' );
-
+		$data = new Pdo_Data_Model();
 		if ( 'add' == $subcommand ) {
-			$this->addRemote( $input, $output );
+			$name = $input->getArgument( 'name' );
+			$uri = $input->getArgument( 'uri' );
+			$remote = new Remote();
+			$remote->setName( $name );
+			$remote->setUri( $uri );
+			$result = $remote->save( $data );
+			$output->write( $result );
 			return;
-		} else if ( 'list ' == $subcommand ) {
-			$this->listRemotes( $input, $output );
+		} else if ( 'list' == $subcommand ) {
+			$result = $this->listRemotes( $data );
+			$json = json_encode( $result, JSON_PRETTY_PRINT );
+			$output->writeln( $json );
 			return;
 		}
 		throw new \Exception( 'unknown subcommand' );
 	}
 
-	protected function listRemotes( InputInterface $input, OutputInterface $output ) {
-		$data = new Pdo_Data_Model();
+	protected function listRemotes( DataModel $data_model ) {
 		$result = array();
-		$remotes = $data->getRemotes();
+		$remotes = $data_model->getRemotes();
 		foreach ( $remotes as $remote ) {
 			$result[] = array(
 				'name' => $remote->getName(),
@@ -60,15 +68,6 @@ class RemotesCommand extends Command {
 				'last_sent' => $remote->getLastSent(),
 			);
 		}
-		$json = json_encode( $result, JSON_PRETTY_PRINT );
-		$output->writeln( $json );
-	}
-
-	protected function addRemote( InputInterface $input, OutputInterface $output ) {
-		$name = $input->getArgument( 'name' );
-		$uri = $input->getArgument( 'uri' );
-		$data = new Pdo_Data_Model();
-		$result = $data->addRemote( $name, $uri );
-		$output->write( $result );
+		return $result;
 	}
 }

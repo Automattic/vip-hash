@@ -51,7 +51,8 @@ class ScanCommand extends Command {
 		if ( ! in_array( $format, array( 'json', 'markdown' ) ) ) {
 			throw new \Exception( 'Unknown format' );
 		}
-		$data = $this->processNode( $folder );
+		$data_model = new Pdo_Data_Model();
+		$data = $this->processNode( $folder, $data_model );
 		if ( 'json' == $format ) {
 			$json = json_encode( $data, JSON_PRETTY_PRINT );
 			$output->writeln( $json );
@@ -117,7 +118,7 @@ class ScanCommand extends Command {
 	 * @return array
 	 * @throws \Exception
 	 */
-	private function processNode( $file ) {
+	private function processNode( $file, DataModel $data_model ) {
 
 		$skip_folders = array(
 			'vendor',
@@ -134,15 +135,15 @@ class ScanCommand extends Command {
 
 		$data = array();
 		if ( is_dir( $file ) ) {
-			$data = $this->processFolder( $file );
+			$data = $this->processFolder( $file, $data_model );
 			return $data;
 		}
 
-		$data = $this->processFile( $file );
+		$data = $this->processFile( $file, $data_model );
 		return $data;
 	}
 
-	public function processFolder( $file ) {
+	public function processFolder( $file, DataModel $data_model ) {
 		$data = array();
 		$unfiltered_folders = scandir( $file );
 		$folders = array_diff( $unfiltered_folders, array( '..', '.' ) );
@@ -151,7 +152,7 @@ class ScanCommand extends Command {
 		}
 		$contents = array();
 		foreach ( $folders as $found_file ) {
-			$result = $this->processNode( $file . DIRECTORY_SEPARATOR . $found_file );
+			$result = $this->processNode( $file . DIRECTORY_SEPARATOR . $found_file, $data_model );
 			if ( ! empty( $result ) && ( null != $result ) ) {
 				if ( is_dir( $file . DIRECTORY_SEPARATOR . $found_file ) ) {
 					$contents[] = $result;
@@ -173,7 +174,7 @@ class ScanCommand extends Command {
 	}
 
 
-	public function processFile( $file ) {
+	public function processFile( $file, DataModel $data_model ) {
 		$data = array();
 
 		// only process the file types we're interested in
@@ -183,7 +184,7 @@ class ScanCommand extends Command {
 				return null;
 			}
 		}
-		$data_model = new Pdo_Data_Model();
+
 		try {
 			$hash = $data_model->hashFile( $file );
 		} catch ( \Exception $e ) {

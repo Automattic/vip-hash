@@ -63,7 +63,8 @@ interface DataModel {
 	public function getHashesSeenAfter( $date );
 
 
-	public function addRemote( $name, $uri );
+	public function addRemote( $name, $uri, $latest_seen = 0, $last_sent = 0  );
+	public function updateRemote( $id, $name, $uri, $latest_seen = 0, $last_sent = 0 );
 
 	/**
 	 * @return array

@@ -49,7 +49,7 @@ class SyncCommand extends Command {
 		$this->sendHashes( $remote, $output );
 
 		if ( ! empty( $hashes ) ) {
-			$output->writeln( 'Saving ". count( $hashes ). " new hashes' );
+			$output->writeln( 'Saving '. count( $hashes ). ' new hashes' );
 			$this->saveHashes( $hashes, $output );
 		} else {
 			$output->writeln( 'No new hashes recieved' );
@@ -88,9 +88,8 @@ class SyncCommand extends Command {
 		return $new_items;
 	}
 
-	protected function saveHashes( array $hashes ) {
+	protected function saveHashes( array $hashes, DataModel $data ) {
 		if ( ! empty( $hashes ) ) {
-			$data = new Pdo_Data_Model();
 			foreach ( $hashes as $item ) {
 				// process each item and save
 				$data->markHash( $item['hash'], $item['user'], $item['status'], $item['notes'], $item['date'] );
@@ -106,10 +105,8 @@ class SyncCommand extends Command {
 	 *
 	 * @throws \Exception
 	 */
-	protected function sendHashes( Remote $remote, OutputInterface $output ) {
+	protected function sendHashes( Remote $remote, OutputInterface $output, DataModel $data ) {
 		$i_sent = $remote->getLastSent();
-
-		$data = new Pdo_Data_Model();
 
 		$send_data = $data->getHashesSeenAfter( $i_sent );
 		if ( ! empty( $send_data ) ) {

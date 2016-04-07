@@ -170,15 +170,15 @@ class Pdo_Data_Model implements DataModel {
 
 		$folder = '';
 		foreach ( $folders as $f ) {
-			if ( is_writable( $f ) ) {
-				if ( ! file_exists( $f ) ) {
-					if ( ! mkdir( $f, 0777, true ) ) {
-						continue;
-					}
-				}
-				$folder = $f;
-				break;
+			if ( ! is_writable( $f ) ) {
+				continue;
 			}
+			if ( ( ! file_exists( $f ) ) &&
+				( ! mkdir( $f, 0777, true ) ) ) {
+				continue;
+			}
+			$folder = $f;
+			break;
 		}
 		$this->dbdir = $folder;
 		return $folder;
@@ -232,14 +232,52 @@ class Pdo_Data_Model implements DataModel {
 	}
 
 
-	public function addRemote( $name, $uri ) {
-		$remote = new Remote( array(
-			'name' => $name,
-			'uri' => $uri,
-			'latest_seen' => 0,
-			'last_sent' => 0,
-		) );
-		return $remote->save( $this );
+	public function addRemote( $name, $uri, $latest_seen = 0, $last_sent = 0 ) {
+		$query = 'INSERT INTO wpcom_vip_hash_remotes VALUES
+			( :name, :uri, :latest_seen, :last_sent )';
+		$sth = $this->pdo->prepare( $query );
+		if ( $sth ) {
+			$result = $sth->execute( array(
+				':name'        => $name,
+				':uri'         => $uri,
+				':latest_seen' => $latest_seen,
+				':last_sent'   => $last_sent,
+			) );
+
+			if ( ! $result ) {
+				$error_info = print_r( $this->pdo->errorInfo(), true );
+				throw new \Exception( $error_info );
+			}
+			return true;
+		}
+
+		return false;
+	}
+
+	public function updateRemote( $id, $name, $uri, $latest_seen = 0, $last_sent = 0 ) {
+		// it's old, update it
+		// //UPDATE Cars SET Name='Skoda Octavia' WHERE Id=3;
+		$query = 'UPDATE wpcom_vip_hash_remotes SET
+		 name= :name, uri = :uri, latest_seen = :latest_seen, last_sent = :last_sent WHERE id = :id';
+		$sth   = $this->pdo->prepare( $query );
+		if ( $sth ) {
+			$result = $sth->execute( array(
+				':id'          => $id,
+				':name'        => $name,
+				':uri'         => $uri,
+				':latest_seen' => $latest_seen,
+				':last_sent'   => $last_sent,
+			) );
+
+			if ( ! $result ) {
+				$error_info = print_r( $this->pdo->errorInfo(), true );
+				throw new \Exception( $error_info );
+			}
+			return true;
+		}
+		throw new \Exception( 'failed to prepare statement' );
+
+		return false;
 	}
 
 	/**

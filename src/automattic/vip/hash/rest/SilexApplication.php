@@ -13,6 +13,12 @@ class SilexApplication {
 	private $dbdir = '';
 	private $app;
 
+	/**
+	 * The primary data model
+	 * @var DataModel
+	 */
+	private $model;
+
 	public function __construct( $dbdir ) {
 		$this->dbdir = $dbdir;
 	}
@@ -26,6 +32,8 @@ class SilexApplication {
 		$app->view( function( array $controller_result ) use ( $app ) {
 			return $app->json( $controller_result );
 		});
+
+		$this->model = new Pdo_Data_Model( $this->dbdir );
 
 		$app->run();
 	}
@@ -47,14 +55,12 @@ class SilexApplication {
 	}
 
 	public function hash_seen_since( $timestamp ) {
-		$model = new Pdo_Data_Model( $this->dbdir );
-		return $model->getHashesSeenAfter( $timestamp );
+		return $this->model->getHashesSeenAfter( $timestamp );
 	}
 
 	function get_hash( $hash ) {
-		$model = new Pdo_Data_Model( $this->dbdir );
 		try {
-			return $model->getHashStatusAllUsers( $hash );
+			return $this->model->getHashStatusAllUsers( $hash );
 		} catch ( \Exception $e ) {
 			return array( 'error' => $e->getMessage() );
 		}
@@ -62,11 +68,10 @@ class SilexApplication {
 
 	public function post_hash( Request $request ) {
 		$json_data = $request->get( 'data' );
-		$model = new Pdo_Data_Model( $this->dbdir );
 		$data = json_decode( $json_data, true );
 		foreach ( $data as $record ) {
 			try {
-				$model->markHash(
+				$this->model->markHash(
 					$record['hash'],
 					$record['user'],
 					$record['status'],
