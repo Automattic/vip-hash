@@ -222,7 +222,6 @@ class StatusCommand extends Command {
 	public function processFolder( $file, DataModel $data_model ) {
 
 		$skip_folders = array(
-			'vendor',
 			'.git',
 			'.svn',
 			'.idea',

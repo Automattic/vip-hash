@@ -121,7 +121,6 @@ class ScanCommand extends Command {
 	private function processNode( $file, DataModel $data_model ) {
 
 		$skip_folders = array(
-			'vendor',
 			'.git',
 			'.svn',
 			'.idea',
