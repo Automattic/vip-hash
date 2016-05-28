@@ -4,6 +4,7 @@ namespace automattic\vip\hash\console;
 
 use automattic\vip\hash\DataModel;
 use automattic\vip\hash\Pdo_Data_Model;
+use automattic\vip\hash\console\FileSystemCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,19 +14,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Class ScanCommand
  * @package automattic\vip\hash\console
  */
-class ScanCommand extends Command {
-
-	private $allowed_file_types;
+class ScanCommand extends FileSystemCommand {
 
 	protected function configure() {
-		$this->allowed_file_types = array(
-			'php',
-			'php5',
-			'js',
-			'html',
-			'htm',
-			'twig',
-		);
 		$this->setName( 'scan' )
 			->setDescription( 'take a folder and generate a json response detailing the files inside' )
 			->addArgument(
