@@ -16,5 +16,11 @@ abstract class FileSystemCommand extends Command {
 		'po',
 		'pot',
 	);
+
+	public $skip_folders = array(
+		'.git',
+		'.svn',
+		'.idea',
+	);
 }
 

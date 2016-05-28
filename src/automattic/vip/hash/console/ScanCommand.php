@@ -111,13 +111,7 @@ class ScanCommand extends FileSystemCommand {
 	 */
 	private function processNode( $file, DataModel $data_model ) {
 
-		$skip_folders = array(
-			'.git',
-			'.svn',
-			'.idea',
-		);
-
-		foreach ( $skip_folders as $skip ) {
+		foreach ( $this->skip_folders as $skip ) {
 			if ( substr( $file, strlen( $skip ) * -1 ) === $skip ) {
 				return null;
 			}
