@@ -16,6 +16,20 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class StatusCommand extends FileSystemCommand {
 
+	private $status_markup = [
+		'?' => '<comment>%s</>',
+		'~' => '<fg=magenta>%s</>',
+		'x' => '<fg=red>%s</>',
+		'✓' => '<info>%s</>',
+	];
+
+	private $status_names = [
+		'?' => 'Not seen',
+		'~' => 'Mixed',
+		'x' => 'Bad',
+		'✓' => 'Good',
+	];
+
 	protected function configure() {
 		$this->setName( 'status' )
 			->setDescription( 'take a folder and generates a status report of good bad and unknown file hashes' )
@@ -33,19 +47,72 @@ class StatusCommand extends FileSystemCommand {
 		}
 		$data_model = new Pdo_Data_Model();
 		$data = $this->processNode( $folder, $data_model );
+		$this->display_tree( $output, $data );
+		$this->display_totals( $output, $data );
+	}
+
+	function display_tree( OutputInterface $output, array $data ) {
 		$tree = new \cli\Tree;
 		$tree->setData( $this->prettify_tree( $data ) );
 		$tree->setRenderer( new \cli\tree\Markdown( 4 ) );
 		$output->write( $tree->render() );
+	}
 
-		$good = 1;
-		$bad = 1;
-		$unknown = 1;
-		$total = $good + $bad + $unknown;
-		$percentage = ( ( $good + $bad ) / $total ) * 100;
-		$final = '<info>'.$good.' good</info>, <error>'.$bad.' bad</error>, <comment>'.$unknown.' unknown</comment>, '.number_format( $percentage, 2 ).'% seen';
+	function display_totals( OutputInterface $output, array $data ) {
 		$output->writeln( '' );
-		$output->writeln( $final );
+
+		$statuses = $this->count_tree( $data );
+		$total = 0;
+		$parts = [];
+		foreach ( $statuses as $status => $count ) {
+			$part = $status.': '.$this->status_names[ $status ];
+			$parts[] = sprintf( $this->status_markup[ $status ], $part );
+			$total += $count;
+		}
+		$legend = implode( $parts, ', ' );
+		$output->writeln( '<fg=white>Legend:</> '.$legend );
+		$parts = [];
+		foreach ( $statuses as $status => $count ) {
+			if ( $count > 0 ) {
+				$part = $status.': '.$count. ' ('.number_format( ( $count / $total ) * 100, 1 ).'%)';
+				$part = sprintf( $this->status_markup[ $status ], $part );
+				$parts[] = $part;
+			}
+		}
+
+		$final = implode( $parts, ', ' );
+		$output->writeln( '<fg=white>Results:</> '.$final );
+		$output->writeln( '<fg=white>Seen:</> '.( $total - $statuses['?'] ).'/'.$total.' files ( '.number_format( ( $total - $statuses['?'] ) / $total * 100, 1 ).'% )' );
+	}
+
+	function count_tree( array $data ) {
+		$statuses = [
+			'~' => 0,
+			'?' => 0,
+			'✓' => 0,
+			'x' => 0,
+		];
+		if ( ! empty( $data['folder'] ) ) {
+			foreach ( $data['contents'] as $item ) {
+				if ( ! empty( $item['file'] ) ) {
+					$status = '?';
+					if ( ! empty( $item['hashes'] ) ) {
+						$status = $this->hash_status( $item['hashes'] );
+					}
+					$statuses[ $status ] += 1;
+					continue;
+				}
+				if ( empty( $item['folder'] ) ) {
+					continue;
+				}
+				$sub = $this->count_tree( $item );
+				$statuses['~'] += $sub['~'];
+				$statuses['?'] += $sub['?'];
+				$statuses['✓'] += $sub['✓'];
+				$statuses['x'] += $sub['x'];
+			}
+		}
+		return $statuses;
 	}
 
 	function prettify_tree( array $data ) {
@@ -58,19 +125,8 @@ class StatusCommand extends FileSystemCommand {
 						$status = $this->hash_status( $item['hashes'] );
 					}
 					$key = explode( '/', $item['file'] );
-					$str = end( $key ).' '. $status;//"\t( ".$item['file']. ' ) ';
-					if ( '?' === $status ) {
-						$str = '<comment>'.$str.'</>';
-					}
-					if ( '✓' === $status ) {
-						$str = '<info>'.$str.'</>';
-					}
-					if ( 'x' == $status ) {
-						$str = '<fg=red>'.$str.'</>';
-					}
-					if ( '~' == $status ) {
-						$str = '<fg=magenta>'.$str.'</>';
-					}
+					$str = end( $key ).' '. $status;
+					$str = sprintf( $this->status_markup[ $status ], $str );
 					$contents[] = $str;
 					continue;
 				}
@@ -108,6 +164,11 @@ class StatusCommand extends FileSystemCommand {
 			}
 			if ( '✓' == $status  ) {
 				if ( 'false' == $hash['status']  ) {
+					$status = '~';
+				}
+			}
+			if ( 'x' == $status  ) {
+				if ( 'true' == $hash['status']  ) {
 					$status = '~';
 				}
 			}
