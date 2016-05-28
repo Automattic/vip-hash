@@ -17,7 +17,8 @@
 		"guzzlehttp/guzzle": "~5.0",
 		"seld/phar-utils": "~1.0",
 		"silex/silex": "~1.3",
-		"ext-pdo_sqlite": "*"
+		"ext-pdo_sqlite": "*",
+		"wp-cli/php-cli-tools": "*"
 	},
 	"autoload"    : {
 		"classmap": [
