@@ -15,6 +15,10 @@ abstract class FileSystemCommand extends Command {
 		'twig',
 		'po',
 		'pot',
+		'jss',
+		'jsx',
+		'mustache',
+		'handlebars',
 	);
 
 	public $skip_folders = array(
