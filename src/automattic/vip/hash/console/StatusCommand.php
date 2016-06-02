@@ -75,7 +75,7 @@ class StatusCommand extends FileSystemCommand {
 
 		if ( empty( $total ) ) {
 			// nothing found
-			$output->writeln('<comment>No reviewable files found</>');
+			$output->writeln( '<comment>No reviewable files found</>' );
 			return;
 		}
 		$output->writeln( '' );
