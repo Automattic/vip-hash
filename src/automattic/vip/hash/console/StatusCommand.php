@@ -52,6 +52,10 @@ class StatusCommand extends FileSystemCommand {
 	}
 
 	function display_tree( OutputInterface $output, array $data ) {
+		if ( empty( $data ) ) {
+			$output->write( '<error>Nothing found</error>' );
+			return;
+		}
 		$tree = new \cli\Tree;
 		$tree->setData( $this->prettify_tree( $data ) );
 		$tree->setRenderer( new \cli\tree\Markdown( 4 ) );
@@ -59,9 +63,8 @@ class StatusCommand extends FileSystemCommand {
 	}
 
 	function display_totals( OutputInterface $output, array $data ) {
-		$output->writeln( '' );
-
 		$statuses = $this->count_tree( $data );
+
 		$total = 0;
 		$parts = [];
 		foreach ( $statuses as $status => $count ) {
@@ -69,6 +72,13 @@ class StatusCommand extends FileSystemCommand {
 			$parts[] = sprintf( $this->status_markup[ $status ], $part );
 			$total += $count;
 		}
+
+		if ( empty( $total ) ) {
+			// nothing found
+			$output->writeln('<comment>No reviewable files found</>');
+			return;
+		}
+		$output->writeln( '' );
 		$legend = implode( $parts, ', ' );
 		$output->writeln( '<fg=white>Legend:</> '.$legend );
 		$parts = [];
