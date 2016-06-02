@@ -127,6 +127,9 @@ class StatusCommand extends FileSystemCommand {
 
 	function prettify_tree( array $data ) {
 		if ( ! empty( $data['folder'] ) ) {
+			if ( empty( $data['contents'] ) ) {
+				return array();
+			}
 			$contents = array();
 			foreach ( $data['contents'] as $item ) {
 				if ( ! empty( $item['file'] ) ) {
@@ -145,6 +148,9 @@ class StatusCommand extends FileSystemCommand {
 					$key = explode( '/', $item['folder'] );
 					$contents[ end( $key ).'/' ] = $this->prettify_tree( $item );
 				}
+			}
+			if ( empty( $contents ) ) {
+				return array();
 			}
 			return $contents;
 		}
@@ -315,6 +321,9 @@ class StatusCommand extends FileSystemCommand {
 				}
 				$contents[] = $f;
 			}
+		}
+		if ( empty( $contents ) ) {
+			return null;
 		}
 		$data = array(
 			'folder'   => $file,
