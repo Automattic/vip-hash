@@ -19,6 +19,8 @@ abstract class FileSystemCommand extends Command {
 		'jsx',
 		'mustache',
 		'handlebars',
+		'diff',
+		'patch',
 	);
 
 	public $skip_folders = array(
