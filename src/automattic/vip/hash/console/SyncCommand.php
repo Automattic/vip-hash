@@ -48,23 +48,18 @@ class SyncCommand extends Command {
 		$output->writeln( 'Sending new local hashes' );
 		$this->sendHashes( $remote, $output, $data );
 
-		if ( ! empty( $hashes ) ) {
-			$output->writeln( 'Saving '. count( $hashes ). ' new hashes' );
-			$this->saveHashes( $hashes, $output, $data );
-		} else {
-			$output->writeln( 'No new hashes recieved' );
-		}
+		$this->saveHashes( $hashes, $output, $data );
 
 		$output->writeln( 'Updating remote record' );
 		$latest_hash = $data->getNewestSeenHash();
 		$remote->setLatestSeen( $latest_hash['seen'] );
 		$remote->setLastSent( time() );
 		$saved = $remote->save( $data );
+		$message = 'Failed to save remote record';
 		if ( $saved ) {
-			$output->writeln( 'Saved remote record' );
-		} else {
-			$output->writeln( 'Failed to save remote record' );
+			$message = 'Saved remote record';
 		}
+		$output->writeln( $message );
 
 		$output->writeln( 'Synchronised hashes with ' . $remote->getName() . ' - ' . $remote->getUri() );
 	}
@@ -88,12 +83,15 @@ class SyncCommand extends Command {
 		return $new_items;
 	}
 
-	protected function saveHashes( array $hashes, DataModel $data ) {
-		if ( ! empty( $hashes ) ) {
-			foreach ( $hashes as $item ) {
-				// process each item and save
-				$data->markHash( $item['hash'], $item['user'], $item['status'], $item['notes'], $item['date'] );
-			}
+	protected function saveHashes( array $hashes, OutputInterface $output, DataModel $data ) {
+		if ( empty( $hashes ) ) {
+			$output->writeln( 'No new hashes recieved' );
+			return;
+		}
+		$output->writeln( 'Saving '. count( $hashes ). ' new hashes' );
+		foreach ( $hashes as $item ) {
+			// process each item and save
+			$data->markHash( $item['hash'], $item['user'], $item['status'], $item['notes'], $item['date'] );
 		}
 
 	}
@@ -109,28 +107,26 @@ class SyncCommand extends Command {
 		$i_sent = $remote->getLastSent();
 
 		$send_data = $data->getHashesSeenAfter( $i_sent );
-		if ( ! empty( $send_data ) ) {
-			$output->writeln( 'Hashes to send: '. count( $send_data ) );
-
-			// don't send a request with thousands of hashes all at once,
-			// some servers have request size limits
-			if ( count( $send_data > 500 ) ) {
-				$chunks = array_chunk( $send_data, 500 );
-			} else {
-				$chunks = array( $send_data );
-			}
-			$counter = 0;
-			foreach ( $chunks as $chunk ) {
-				$counter ++;
-				$output->writeln( 'Sending chunk : '. $counter .' of '. count( $chunks ) );
-				$sent = $this->sendHashChunk( $chunk, $remote, $output );
-				// if something went wrong, don't continue sending chunks
-				if ( ! $sent ) {
-					break;
-				}
-			}
-		} else {
+		if ( empty( $send_data ) ) {
 			$output->writeln( 'No hashes to send' );
+		}
+		$output->writeln( 'Hashes to send: '. count( $send_data ) );
+
+		// don't send a request with thousands of hashes all at once,
+		// some servers have request size limits
+		$chunks = array( $send_data );
+		if ( count( $send_data > 500 ) ) {
+			$chunks = array_chunk( $send_data, 500 );
+		}
+		$counter = 0;
+		foreach ( $chunks as $chunk ) {
+			$counter ++;
+			$output->writeln( 'Sending chunk : '. $counter .' of '. count( $chunks ) );
+			$sent = $this->sendHashChunk( $chunk, $remote, $output );
+			// if something went wrong, don't continue sending chunks
+			if ( ! $sent ) {
+				break;
+			}
 		}
 	}
 
