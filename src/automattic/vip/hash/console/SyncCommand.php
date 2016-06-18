@@ -46,11 +46,11 @@ class SyncCommand extends Command {
 		$hashes = $this->fetchHashes( $remote );
 
 		$output->writeln( 'Sending new local hashes' );
-		$this->sendHashes( $remote, $output );
+		$this->sendHashes( $remote, $output, $data );
 
 		if ( ! empty( $hashes ) ) {
 			$output->writeln( 'Saving '. count( $hashes ). ' new hashes' );
-			$this->saveHashes( $hashes, $output );
+			$this->saveHashes( $hashes, $output, $data );
 		} else {
 			$output->writeln( 'No new hashes recieved' );
 		}
