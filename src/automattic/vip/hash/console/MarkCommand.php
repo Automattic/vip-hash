@@ -20,23 +20,27 @@ class MarkCommand extends Command {
 	 */
 	protected function configure() {
 		$this->setName( 'mark' )
-			->setDescription( 'take a file and mark it\'s VIP worthiness as <info>true</info> or <error>false</error>' )
+			->setDescription( 'take a hash or file and mark it\'s VIP worthiness as <info>true</info> or <error>false</error>, other values accepted' )
 			->addArgument(
-				'file',
+				'hash',
 				InputArgument::REQUIRED,
-				'The file or hash to be marked'
+				'A string hash to be marked, if a file is passed instead a hash will be generated for it'
 			)->addArgument(
 				'username',
 				InputArgument::REQUIRED,
-				'A wordpress.com username'
+				'A WordPress.com username'
 			)->addArgument(
 				'status',
 				InputArgument::REQUIRED,
-				'"true" or "false"'
+				'The status to mark this hash with'
 			)->addArgument(
 				'note',
 				InputArgument::OPTIONAL,
 				'the offending item if marking as bad'
+			)->addArgument(
+				'human_note',
+				InputArgument::OPTIONAL,
+				'An explanation or information in a human readable format'
 			);
 	}
 
@@ -44,9 +48,9 @@ class MarkCommand extends Command {
 	 * {@inheritDoc}
 	 */
 	protected function execute( InputInterface $input, OutputInterface $output ) {
-		$file = $input->getArgument( 'file' );
+		$file = $input->getArgument( 'hash' );
 		if ( empty( $file ) ) {
-			throw new \Exception( 'Empty file parameter' );
+			throw new \Exception( 'Empty hash/file parameter' );
 		}
 		$username = $input->getArgument( 'username' );
 		if ( empty( $username ) ) {
@@ -61,11 +65,12 @@ class MarkCommand extends Command {
 		}
 
 		$note = $input->getArgument( 'note' );
+		$human_note = $input->getArgument( 'human_note' );
 		$data = new Pdo_Data_Model();
 		$hash = $file;
 		if ( file_exists( $file ) ) {
 			$hash = $data->hashFile( $file );
 		}
-		$data->markHash( $hash, $username, $status, $note );
+		$data->markHash( $hash, $username, $status, $note, $human_note );
 	}
 }
