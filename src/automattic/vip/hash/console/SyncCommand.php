@@ -11,6 +11,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use GuzzleHttp\Client;
 
+/**
+ * Handle syncing hashes with a remote source
+ */
 class SyncCommand extends Command {
 
 	/**
