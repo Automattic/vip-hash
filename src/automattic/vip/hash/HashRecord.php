@@ -13,6 +13,7 @@ class HashRecord {
 			'status' => false,
 			'hash' => '',
 			'notes' => '',
+			'human_note' => '',
 		);
 	}
 
@@ -22,6 +23,7 @@ class HashRecord {
 	 * @return bool
 	 */
 	function exists() {
+		// @TODO: implement check
 		return false;
 	}
 
@@ -36,6 +38,20 @@ class HashRecord {
 	 * @param string $note
 	 */
 	public function setNote( $note ) {
+		$this->data['note'] = $note;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getHumanNote() {
+		return $this->data['note'];
+	}
+
+	/**
+	 * @param string $note
+	 */
+	public function setHumanNote( $note ) {
 		$this->data['note'] = $note;
 	}
 
@@ -65,14 +81,14 @@ class HashRecord {
 	}
 
 	/**
-	 * @return bool
+	 * @return STRING
 	 */
 	function getStatus() {
 		return $this->data['status'];
 	}
 
 	/**
-	 * @param bool $status
+	 * @param string $status
 	 */
 	function setStatus( $status ) {
 		$this->data['status'] = $status;
@@ -106,11 +122,12 @@ class HashRecord {
 		$seen = time();
 		$status = $this->getStatus();
 		$notes = $this->getNote();
+		$human_note = $this->getHumanNote();
 
 		$identifier = $hash.'-'.$username.'-'.$date;
 
 		$query = 'INSERT INTO wpcom_vip_hashes VALUES
-		( :id, :identifier, :username, :hash, :date, :seen, :status, :notes )';
+		( :id, :identifier, :username, :hash, :date, :seen, :status, :notes, :human_note )';
 		$sth   = $pdo->prepare( $query );
 		if ( $sth ) {
 			$result = $sth->execute( array(
@@ -122,6 +139,7 @@ class HashRecord {
 				':seen'       => $seen,
 				':status'     => $status,
 				':notes'      => $notes,
+				':human_note' => $human_note,
 			) );
 
 			if ( ! $result ) {

@@ -5,6 +5,9 @@ namespace automattic\vip\hash;
 use PDO;
 use automattic\vip\hash\DataModel;
 
+/**
+ * Implements the DataModel interface with PDO sqlite
+ */
 class Pdo_Data_Model implements DataModel {
 
 	/**
@@ -29,8 +32,9 @@ class Pdo_Data_Model implements DataModel {
 				hash CHAR(30) NOT NULL,
 				date INT NOT NULL,
 				seen INT NOT NULL,
-				status INT NOT NULL,
-				notes TEXT
+				status CHAR(30) NOT NULL,
+				notes TEXT,
+				human_note TEXT
 			)' );
 			$this->pdo->query( 'CREATE TABLE IF NOT EXISTS wpcom_vip_hash_remotes (
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -62,13 +66,14 @@ class Pdo_Data_Model implements DataModel {
 	 * @throws \Exception
 	 * @return bool
 	 */
-	public function markHash( $hash, $username, $value, $note = '', $date = '' ) {
+	public function markHash( $hash, $username, $value, $note = '', $date = '', $human_note = '' ) {
 
 		$record = new HashRecord( $this );
 		$record->setHash( $hash );
 		$record->setUsername( $username );
 		$record->setStatus( $value );
 		$record->setNote( $note );
+		$record->setHumanNote( $human_note );
 
 		if ( ! empty( $date ) ) {
 			$record->setDate( $date );

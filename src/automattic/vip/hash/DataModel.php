@@ -23,7 +23,7 @@ interface DataModel {
 	 * @throws \Exception
 	 * @return bool
 	 */
-	public function markHash( $hash, $username, $value, $note = '', $date = '' );
+	public function markHash( $hash, $username, $value, $note = '', $date = '', $human_note = '' );
 
 	/**
 	 * @param $file
