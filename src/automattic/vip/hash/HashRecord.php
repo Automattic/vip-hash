@@ -128,28 +128,31 @@ class HashRecord {
 
 		$query = 'INSERT INTO wpcom_vip_hashes VALUES
 		( :id, :identifier, :username, :hash, :date, :seen, :status, :notes, :human_note )';
-		$sth   = $pdo->prepare( $query );
-		if ( $sth ) {
-			$result = $sth->execute( array(
-				':id'         => null,
-				':identifier' => $identifier,
-				':username'   => $username,
-				':hash'       => $hash,
-				':date'       => $date,
-				':seen'       => $seen,
-				':status'     => $status,
-				':notes'      => $notes,
-				':human_note' => $human_note,
-			) );
-
-			if ( ! $result ) {
-				$error_info = print_r( $pdo->errorInfo(), true );
-				throw new \Exception( $error_info );
-			}
-			return true;
+		$sth = $pdo->prepare( $query );
+		if ( ! $sth ) {
+			$error_info = print_r( $pdo->errorInfo(), true );
+			throw new \Exception( $error_info );
+			return false;
 		}
+		$result = $sth->execute( array(
+			':id'         => null,
+			':identifier' => $identifier,
+			':username'   => $username,
+			':hash'       => $hash,
+			':date'       => $date,
+			':seen'       => $seen,
+			':status'     => $status,
+			':notes'      => $notes,
+			':human_note' => $human_note,
+		) );
 
-		return false;
+		var_dump( $result );
+
+		if ( ! $result ) {
+			$error_info = print_r( $pdo->errorInfo(), true );
+			throw new \Exception( $error_info );
+		}
+		return true;
 	}
 
 	/**
