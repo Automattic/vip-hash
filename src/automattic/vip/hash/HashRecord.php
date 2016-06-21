@@ -146,8 +146,6 @@ class HashRecord {
 			':human_note' => $human_note,
 		) );
 
-		var_dump( $result );
-
 		if ( ! $result ) {
 			$error_info = print_r( $pdo->errorInfo(), true );
 			throw new \Exception( $error_info );
