@@ -29,8 +29,8 @@ class Pdo_Data_Model implements DataModel {
 		$this->create_tables();
 	}
 
-	private function create_tables() {
-		$this->pdo->query( 'CREATE TABLE IF NOT EXISTS wpcom_vip_hashes (
+	private function create_tables( $prefix = 'wpcom_' ) {
+		$this->pdo->query( 'CREATE TABLE IF NOT EXISTS '.$prefix.'vip_hashes (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			identifier CHAR(50) NOT NULL UNIQUE,
 			user CHAR(30) NOT NULL,
@@ -41,7 +41,7 @@ class Pdo_Data_Model implements DataModel {
 			notes TEXT,
 			human_note TEXT
 		)' );
-		$this->pdo->query( 'CREATE TABLE IF NOT EXISTS wpcom_vip_hash_remotes (
+		$this->pdo->query( 'CREATE TABLE IF NOT EXISTS '.$prefix.'vip_hash_remotes (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			name CHAR(50) NOT NULL UNIQUE,
 			uri CHAR(30) NOT NULL,
@@ -49,6 +49,59 @@ class Pdo_Data_Model implements DataModel {
 			remote_last_seen INT NOT NULL,
 			last_sent INT NOT NULL
 		)' );
+	}
+
+	private function copy_and_upgrade() {
+		// start a transaction
+		$this->pdo->beginTransaction();
+
+		// create copies
+		$this->create_tables( 'wpcom_temp_' );
+
+		//copy data over to temporary tables
+		$this->copy_table( 'wpcom_vip_hashes', 'wpcom_temp_vip_hashes' );
+		$this->copy_table( 'wpcom_vip_hash_remotes', 'wpcom_temp_vip_hash_remotes' );
+
+		// drop original tables
+		$this->drop_table( 'wpcom_vip_hashes' );
+		$this->drop_table( 'wpcom_vip_hash_remotes' );
+
+		// rename copies to original
+		$this->rename_table( 'wpcom_temp_vip_hashes', 'wpcom_vip_hashes' );
+		$this->rename_table( 'wpcom_temp_vip_hash_remotes', 'wpcom_vip_hash_remotes' );
+
+		// end transaction
+		$this->pdo->commit();
+	}
+
+	private function drop_table( $table_name ) {
+		// DROP TABLE X
+		$st = $this->prepare( 'DROP TABLE ?' );
+		if ( ! $st ) {
+			$error_info = print_r( $this->pdo->errorInfo(), true );
+			throw new \Exception( $error_info );
+		}
+		$st->execute( [ $table_name ] );
+	}
+
+	private function copy_table( $source, $target ) {
+		// INSERT INTO new_X SELECT ... FROM X
+		$st = $this->prepare( 'INSERT INTO ? SELECT * FROM ?' );
+		if ( ! $st ) {
+			$error_info = print_r( $this->pdo->errorInfo(), true );
+			throw new \Exception( $error_info );
+		}
+		$st->execute( [ $target, $source ] );
+	}
+
+	private function rename_table( $old, $new ) {
+		// ALTER TABLE new_X RENAME TO X
+		$st = $this->prepare( 'ALTER TABLE ? RENAME TO ?' );
+		if ( ! $st ) {
+			$error_info = print_r( $this->pdo->errorInfo(), true );
+			throw new \Exception( $error_info );
+		}
+		$st->execute( [ $old, $new ] );
 	}
 
 	/**
