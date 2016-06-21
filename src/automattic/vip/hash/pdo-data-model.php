@@ -25,26 +25,30 @@ class Pdo_Data_Model implements DataModel {
 	public function init() {
 		if ( ! $this->pdo ) {
 			$this->pdo = new PDO( 'sqlite:' . $this->getDBDir() . 'db.sqlite' );
-			$this->pdo->query( 'CREATE TABLE IF NOT EXISTS wpcom_vip_hashes (
-				id INTEGER PRIMARY KEY AUTOINCREMENT,
-				identifier CHAR(50) NOT NULL UNIQUE,
-				user CHAR(30) NOT NULL,
-				hash CHAR(30) NOT NULL,
-				date INT NOT NULL,
-				seen INT NOT NULL,
-				status CHAR(30) NOT NULL,
-				notes TEXT,
-				human_note TEXT
-			)' );
-			$this->pdo->query( 'CREATE TABLE IF NOT EXISTS wpcom_vip_hash_remotes (
-				id INTEGER PRIMARY KEY AUTOINCREMENT,
-				name CHAR(50) NOT NULL UNIQUE,
-				uri CHAR(30) NOT NULL,
-				latest_seen INT NOT NULL,
-				remote_last_seen INT NOT NULL,
-				last_sent INT NOT NULL
-			)' );
 		}
+		$this->create_tables();
+	}
+
+	private function create_tables() {
+		$this->pdo->query( 'CREATE TABLE IF NOT EXISTS wpcom_vip_hashes (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			identifier CHAR(50) NOT NULL UNIQUE,
+			user CHAR(30) NOT NULL,
+			hash CHAR(30) NOT NULL,
+			date INT NOT NULL,
+			seen INT NOT NULL,
+			status CHAR(30) NOT NULL,
+			notes TEXT,
+			human_note TEXT
+		)' );
+		$this->pdo->query( 'CREATE TABLE IF NOT EXISTS wpcom_vip_hash_remotes (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			name CHAR(50) NOT NULL UNIQUE,
+			uri CHAR(30) NOT NULL,
+			latest_seen INT NOT NULL,
+			remote_last_seen INT NOT NULL,
+			last_sent INT NOT NULL
+		)' );
 	}
 
 	/**
