@@ -77,6 +77,6 @@ class MarkCommand extends Command {
 		if ( file_exists( $file ) ) {
 			$hash = $data->hashFile( $file );
 		}
-		$data->markHash( $hash, $username, $status, $note, $human_note );
+		$data->markHash( $hash, $username, $status, $note, null, $human_note );
 	}
 }
