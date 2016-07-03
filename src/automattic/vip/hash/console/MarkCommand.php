@@ -36,11 +36,11 @@ class MarkCommand extends Command {
 			)->addArgument(
 				'note',
 				InputArgument::OPTIONAL,
-				'the offending item if marking as bad'
+				'the offending item if marking as bad, or a file containing the note'
 			)->addArgument(
 				'human_note',
 				InputArgument::OPTIONAL,
-				'An explanation or information in a human readable format'
+				'An explanation or information in a human readable format, or a file containing the note'
 			);
 	}
 
@@ -65,7 +65,13 @@ class MarkCommand extends Command {
 		}
 
 		$note = $input->getArgument( 'note' );
+		if ( file_exists( $note ) && is_readable( $note ) ) {
+			$note = file_get_contents( $note );
+		}
 		$human_note = $input->getArgument( 'human_note' );
+		if ( file_exists( $human_note ) && is_readable( $human_note ) ) {
+			$human_note = file_get_contents( $human_note );
+		}
 		$data = new Pdo_Data_Model();
 		$hash = $file;
 		if ( file_exists( $file ) ) {
