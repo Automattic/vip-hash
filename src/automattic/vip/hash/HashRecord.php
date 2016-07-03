@@ -45,14 +45,14 @@ class HashRecord {
 	 * @return string
 	 */
 	public function getHumanNote() {
-		return $this->data['note'];
+		return $this->data['humannote'];
 	}
 
 	/**
 	 * @param string $note
 	 */
 	public function setHumanNote( $note ) {
-		$this->data['note'] = $note;
+		$this->data['humannote'] = $note;
 	}
 
 	/**
