@@ -148,11 +148,47 @@ class Pdo_Data_Model implements DataModel {
 	 * Save a hash record to the data store
 	 *
 	 * @param  \automattic\vip\hash\HashRecord $hash the hash to be saved
+	 * @throws \Exception
 	 * @return bool                                  succesful?
 	 */
 	public function saveHash( \automattic\vip\hash\HashRecord $hash ) {
-		// @TODO: move the PDO saving code out of the save method in HashRecord to here and deprecate HashRecord::save
-		return $hash->save( $this );
+		$pdo = $this->getPDO();
+
+		$username = $hash->getUsername();
+		$hash = $hash->getHash();
+		$date = $hash->getDate();
+		$seen = time();
+		$status = $hash->getStatus();
+		$notes = $hash->getNote();
+		$human_note = $hash->getHumanNote();
+
+		$identifier = $hash.'-'.$username.'-'.$date;
+
+		$query = 'INSERT INTO wpcom_vip_hashes VALUES
+		( :id, :identifier, :username, :hash, :date, :seen, :status, :notes, :human_note )';
+		$sth = $pdo->prepare( $query );
+		if ( ! $sth ) {
+			$error_info = print_r( $pdo->errorInfo(), true );
+			throw new \Exception( $error_info );
+			return false;
+		}
+		$result = $sth->execute( array(
+			':id'         => null,
+			':identifier' => $identifier,
+			':username'   => $username,
+			':hash'       => $hash,
+			':date'       => $date,
+			':seen'       => $seen,
+			':status'     => $status,
+			':notes'      => $notes,
+			':human_note' => $human_note,
+		) );
+
+		if ( ! $result ) {
+			$error_info = print_r( $pdo->errorInfo(), true );
+			throw new \Exception( $error_info );
+		}
+		return true;
 	}
 
 	/**
