@@ -92,9 +92,7 @@ class Remote {
 	/**
 	 * @param DataModel $data
 	 */
-	public function save( Pdo_Data_Model $data_model ) {
-		$pdo = $data_model->getPDO();
-
+	public function save( DataModel $data_model ) {
 		// check if we need to save or update the value
 		if ( empty( $this->id ) ) {
 			// it's new
