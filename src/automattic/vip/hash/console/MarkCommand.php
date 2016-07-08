@@ -49,19 +49,19 @@ class MarkCommand extends Command {
 	 */
 	protected function execute( InputInterface $input, OutputInterface $output ) {
 		$data = new Pdo_Data_Model();
-		$hash = $file;
-		if ( file_exists( $file ) ) {
-			$hash = $data->hashFile( $file );
-		}
-		$hash = new HashCommand();
-		$this->fill_hash( $hash, $input );
-		$data->saveHash( $hash );
+		$record = new HashRecord();
+		$this->fill_hash( $record, $input, $data );
+		$data->saveHash( $record );
 	}
 
-	private function fill_hash( HashCommand $hash, InputInterface $input ) {
+	private function fill_hash( HashRecord $record, InputInterface $input , DataModel $data) {
 		$file = $input->getArgument( 'hash' );
 		if ( empty( $file ) ) {
 			throw new \Exception( 'Empty hash/file parameter' );
+		}
+		$hash = $file;
+		if ( file_exists( $file ) ) {
+			$hash = $data->hashFile( $file );
 		}
 		$username = $input->getArgument( 'username' );
 		if ( empty( $username ) ) {
@@ -78,11 +78,11 @@ class MarkCommand extends Command {
 		$note = $this->get_potential_file_arg( $input, 'note' );
 		$human_note = $this->get_potential_file_arg( $input, 'human_note' );
 
-		$hash->setHash( $hash );
-		$hash->setUsername( $username );
-		$hash->setStatus( $status );
-		$hash->setNote( $note );
-		$hash->setHumanNote( $human_note );
+		$record->setHash( $hash );
+		$record->setUsername( $username );
+		$record->setStatus( $status );
+		$record->setNote( $note );
+		$record->setHumanNote( $human_note );
 	}
 
 	private function get_potential_file_arg( InputInterface $input, $field ) {
