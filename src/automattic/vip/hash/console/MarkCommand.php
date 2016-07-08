@@ -50,11 +50,19 @@ class MarkCommand extends Command {
 	protected function execute( InputInterface $input, OutputInterface $output ) {
 		$data = new Pdo_Data_Model();
 		$record = new HashRecord();
-		$this->fill_hash( $record, $input, $data );
+		$record = $this->fill_hash( $record, $input, $data );
 		$data->saveHash( $record );
 	}
 
-	private function fill_hash( HashRecord $record, InputInterface $input , DataModel $data) {
+	/**
+	 * Fill in a HashRecord from an InputInterface with the relevant args
+	 *
+	 * @param  HashRecord     $record [description]
+	 * @param  InputInterface $input  [description]
+	 * @param  DataModel      $data   [description]
+	 * @return [type]                 [description]
+	 */
+	private function fill_hash( HashRecord $record, InputInterface $input , DataModel $data ) {
 		$file = $input->getArgument( 'hash' );
 		if ( empty( $file ) ) {
 			throw new \Exception( 'Empty hash/file parameter' );
@@ -83,6 +91,8 @@ class MarkCommand extends Command {
 		$record->setStatus( $status );
 		$record->setNote( $note );
 		$record->setHumanNote( $human_note );
+
+		return $record;
 	}
 
 	private function get_potential_file_arg( InputInterface $input, $field ) {
