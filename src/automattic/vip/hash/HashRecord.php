@@ -103,57 +103,6 @@ class HashRecord {
 	}
 
 	/**
-	 * Saves this record
-	 *
-	 * @param DataModel $model
-	 *
-	 * @return bool
-	 * @throws \Exception
-	 * @internal param string $folder the location of the hash database with a trailing slash
-	 *
-	 */
-	function save( Pdo_Data_Model $model ) {
-
-		$pdo = $model->getPDO();
-
-		$username = $this->getUsername();
-		$hash = $this->getHash();
-		$date = $this->getDate();
-		$seen = time();
-		$status = $this->getStatus();
-		$notes = $this->getNote();
-		$human_note = $this->getHumanNote();
-
-		$identifier = $hash.'-'.$username.'-'.$date;
-
-		$query = 'INSERT INTO wpcom_vip_hashes VALUES
-		( :id, :identifier, :username, :hash, :date, :seen, :status, :notes, :human_note )';
-		$sth = $pdo->prepare( $query );
-		if ( ! $sth ) {
-			$error_info = print_r( $pdo->errorInfo(), true );
-			throw new \Exception( $error_info );
-			return false;
-		}
-		$result = $sth->execute( array(
-			':id'         => null,
-			':identifier' => $identifier,
-			':username'   => $username,
-			':hash'       => $hash,
-			':date'       => $date,
-			':seen'       => $seen,
-			':status'     => $status,
-			':notes'      => $notes,
-			':human_note' => $human_note,
-		) );
-
-		if ( ! $result ) {
-			$error_info = print_r( $pdo->errorInfo(), true );
-			throw new \Exception( $error_info );
-		}
-		return true;
-	}
-
-	/**
 	 * @return array
 	 */
 	public function getData() {
