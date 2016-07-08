@@ -1,0 +1,7 @@
+<phpunit bootstrap="src/bootstrap.php">
+  <testsuites>
+    <testsuite name="viphash">
+      <directory>tests</directory>
+    </testsuite>
+  </testsuites>
+</phpunit>
