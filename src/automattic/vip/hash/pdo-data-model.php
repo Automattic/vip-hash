@@ -151,16 +151,16 @@ class Pdo_Data_Model implements DataModel {
 	 * @throws \Exception
 	 * @return bool                                  succesful?
 	 */
-	public function saveHash( \automattic\vip\hash\HashRecord $hash ) {
+	public function saveHash( \automattic\vip\hash\HashRecord $record ) {
 		$pdo = $this->getPDO();
 
-		$username = $hash->getUsername();
-		$hash = $hash->getHash();
-		$date = $hash->getDate();
+		$username = $record->getUsername();
+		$hash = $record->getHash();
+		$date = $record->getDate();
 		$seen = time();
-		$status = $hash->getStatus();
-		$notes = $hash->getNote();
-		$human_note = $hash->getHumanNote();
+		$status = $record->getStatus();
+		$notes = $record->getNote();
+		$human_note = $record->getHumanNote();
 
 		$identifier = $hash.'-'.$username.'-'.$date;
 
