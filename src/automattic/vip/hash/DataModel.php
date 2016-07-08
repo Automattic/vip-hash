@@ -10,20 +10,13 @@ interface DataModel {
 	public function __construct( $dbdir = '' );
 
 	public function init();
-
 	/**
-	 * @param        $hash
-	 * @param        $username
-	 * @param bool   $value
+	 * Save a hash record to the data store
 	 *
-	 * @param string $note
-	 *
-	 * @param string $date
-	 *
-	 * @throws \Exception
-	 * @return bool
+	 * @param  \automattic\vip\hash\HashRecord $hash the hash to be saved
+	 * @return bool                                  succesful?
 	 */
-	public function markHash( $hash, $username, $value, $note = '', $date = '', $human_note = '' );
+	public function saveHash( \automattic\vip\hash\HashRecord $hash );
 
 	/**
 	 * @param $file

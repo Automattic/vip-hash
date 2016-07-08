@@ -48,6 +48,17 @@ class MarkCommand extends Command {
 	 * {@inheritDoc}
 	 */
 	protected function execute( InputInterface $input, OutputInterface $output ) {
+		$data = new Pdo_Data_Model();
+		$hash = $file;
+		if ( file_exists( $file ) ) {
+			$hash = $data->hashFile( $file );
+		}
+		$hash = new HashCommand();
+		$this->fill_hash( $hash, $input );
+		$data->saveHash( $hash );
+	}
+
+	private function fill_hash( HashCommand $hash, InputInterface $input ) {
 		$file = $input->getArgument( 'hash' );
 		if ( empty( $file ) ) {
 			throw new \Exception( 'Empty hash/file parameter' );
@@ -64,19 +75,21 @@ class MarkCommand extends Command {
 			throw new \Exception( 'Hash status must be true or false' );
 		}
 
-		$note = $input->getArgument( 'note' );
-		if ( file_exists( $note ) && is_readable( $note ) ) {
-			$note = file_get_contents( $note );
+		$note = $this->get_potential_file_arg( $input, 'note' );
+		$human_note = $this->get_potential_file_arg( $input, 'human_note' );
+
+		$hash->setHash( $hash );
+		$hash->setUsername( $username );
+		$hash->setStatus( $status );
+		$hash->setNote( $note );
+		$hash->setHumanNote( $human_note );
+	}
+
+	private function get_potential_file_arg( InputInterface $input, $field ) {
+		$val = $input->getArgument( $field );
+		if ( file_exists( $val ) && is_readable( $val ) ) {
+			$val = file_get_contents( $val );
 		}
-		$human_note = $input->getArgument( 'human_note' );
-		if ( file_exists( $human_note ) && is_readable( $human_note ) ) {
-			$human_note = file_get_contents( $human_note );
-		}
-		$data = new Pdo_Data_Model();
-		$hash = $file;
-		if ( file_exists( $file ) ) {
-			$hash = $data->hashFile( $file );
-		}
-		$data->markHash( $hash, $username, $status, $note, null, $human_note );
+		return $val;
 	}
 }

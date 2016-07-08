@@ -91,14 +91,14 @@ class Pdo_Data_Model implements DataModel {
 		// INSERT INTO new_X SELECT ... FROM X
 		// get rid of duplicate identifiers
 		$sql = "delete from $source where rowid not in
-         (
-         select  min(rowid)
-         from    $source
-         group by
-                 identifier
-         )";
-        print_r( $sql."\n" );
-        $st = $this->pdo->prepare( $sql );
+		 (
+		 select  min(rowid)
+		 from    $source
+		 group by
+				 identifier
+		 )";
+		print_r( $sql."\n" );
+		$st = $this->pdo->prepare( $sql );
 		if ( ! $st ) {
 			$error_info = print_r( $this->pdo->errorInfo(), true );
 			throw new \Exception( $error_info );
@@ -143,32 +143,16 @@ class Pdo_Data_Model implements DataModel {
 		return $this->pdo;
 	}
 
+
 	/**
-	 * @param        $hash
-	 * @param        $username
-	 * @param bool   $value
+	 * Save a hash record to the data store
 	 *
-	 * @param string $note
-	 *
-	 * @param string $date
-	 *
-	 * @throws \Exception
-	 * @return bool
+	 * @param  \automattic\vip\hash\HashRecord $hash the hash to be saved
+	 * @return bool                                  succesful?
 	 */
-	public function markHash( $hash, $username, $value, $note = '', $date = '', $human_note = '' ) {
-
-		$record = new HashRecord( $this );
-		$record->setHash( $hash );
-		$record->setUsername( $username );
-		$record->setStatus( $value );
-		$record->setNote( $note );
-		$record->setHumanNote( $human_note );
-
-		if ( ! empty( $date ) ) {
-			$record->setDate( $date );
-		}
-
-		return $record->save( $this );
+	public function saveHash( \automattic\vip\hash\HashRecord $hash ) {
+		// @TODO: move the PDO saving code out of the save method in HashRecord to here and deprecate HashRecord::save
+		return $hash->save( $this );
 	}
 
 	/**
