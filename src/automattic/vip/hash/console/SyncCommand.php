@@ -3,6 +3,7 @@
 namespace automattic\vip\hash\console;
 
 use automattic\vip\hash\DataModel;
+use automattic\vip\hash\HashRecord;
 use automattic\vip\hash\Pdo_Data_Model;
 use automattic\vip\hash\Remote;
 use Symfony\Component\Console\Command\Command;
@@ -94,7 +95,15 @@ class SyncCommand extends Command {
 		$output->writeln( 'Saving '. count( $hashes ). ' new hashes' );
 		foreach ( $hashes as $item ) {
 			// process each item and save
-			$data->markHash( $item['hash'], $item['user'], $item['status'], $item['notes'], $item['date'] );
+			$hash = new HashRecord();
+			$hash->setHash( $item['hash'] );
+			$hash->setIdentifier( $item['identifier'] );
+			$hash->setUsername( $item['user'] );
+			$hash->setStatus( $item['status'] );
+			$hash->setNote( $item['notes'] );
+			$hash->setHumanNote( $item['human_note'] );
+			$hash->setDate( $item['date'] );
+			$data->saveHash( $hash );
 		}
 
 	}

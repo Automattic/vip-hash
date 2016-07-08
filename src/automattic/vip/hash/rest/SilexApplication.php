@@ -69,15 +69,17 @@ class SilexApplication {
 	public function post_hash( Request $request ) {
 		$json_data = $request->get( 'data' );
 		$data = json_decode( $json_data, true );
-		foreach ( $data as $record ) {
+		foreach ( $data as $item ) {
 			try {
-				$this->model->markHash(
-					$record['hash'],
-					$record['user'],
-					$record['status'],
-					$record['notes'],
-					$record['date']
-				);
+				$hash = new HashRecord();
+				$hash->setHash( $item['hash'] );
+				$hash->setIdentifier( $item['identifier'] );
+				$hash->setUsername( $item['user'] );
+				$hash->setStatus( $item['status'] );
+				$hash->setNote( $item['notes'] );
+				$hash->setDate( $item['date'] );
+				$hash->setHumanNote( $item['human_note'] );
+				$this->model->saveHash( $hash );
 			} catch ( \Exception $e ) {
 				return array( 'error' => $e->getMessage() );
 			}
