@@ -14,7 +14,7 @@ interface DataModel {
 	 * Save a hash record to the data store
 	 *
 	 * @param  HashRecord $hash the hash to be saved
-	 * @return bool                                  succesful?
+	 * @return bool successful?
 	 */
 	public function saveHash( HashRecord $hash );
 
@@ -55,8 +55,25 @@ interface DataModel {
 
 	public function getHashesSeenAfter( $date );
 
-
+	/**
+	 * @param     $name
+	 * @param     $uri
+	 * @param int $latest_seen
+	 * @param int $last_sent
+	 *
+	 * @return bool
+	 */
 	public function addRemote( $name, $uri, $latest_seen = 0, $last_sent = 0  );
+
+	/**
+	 * @param     $id
+	 * @param     $name
+	 * @param     $uri
+	 * @param int $latest_seen
+	 * @param int $last_sent
+	 *
+	 * @return bool
+	 */
 	public function updateRemote( $id, $name, $uri, $latest_seen = 0, $last_sent = 0 );
 
 	/**
