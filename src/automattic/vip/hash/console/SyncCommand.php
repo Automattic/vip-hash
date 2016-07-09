@@ -71,8 +71,10 @@ class SyncCommand extends Command {
 	}
 
 	/**
-	 * @param                 $remote
-	 * @param OutputInterface $output
+	 * @param Remote $remote
+	 *
+	 * @return mixed
+	 *
 	 */
 	protected function fetchHashes( Remote $remote ) {
 		$i_saw = $remote->getLatestSeen();
@@ -99,7 +101,6 @@ class SyncCommand extends Command {
 			// process each item and save
 			$hash = new HashRecord();
 			$hash->setHash( $item['hash'] );
-			$hash->setIdentifier( $item['identifier'] );
 			$hash->setUsername( $item['user'] );
 			$hash->setStatus( $item['status'] );
 			$hash->setNote( $item['notes'] );
@@ -129,7 +130,7 @@ class SyncCommand extends Command {
 		// don't send a request with thousands of hashes all at once,
 		// some servers have request size limits
 		$chunks = array( $send_data );
-		if ( count( $send_data > 500 ) ) {
+		if ( count( $send_data ) > 500 ) {
 			$chunks = array_chunk( $send_data, 500 );
 		}
 		$counter = 0;
