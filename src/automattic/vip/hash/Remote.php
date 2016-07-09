@@ -67,14 +67,6 @@ class Remote {
 		return $this->latest_seen;
 	}
 
-	public function setRemoteLatestSeen( $remote_latest_seen ) {
-		$this->remote_atest_seen = $remote_latest_seen;
-	}
-
-	public function getRemoteLatestSeen() {
-		return $this->remote_latest_seen;
-	}
-
 	/**
 	 * @param $last_seen
 	 */
@@ -90,13 +82,16 @@ class Remote {
 	}
 
 	/**
-	 * @param DataModel $data
+	 * @param DataModel $data_model
+	 *
+	 * @return
+	 * @internal param DataModel $data
 	 */
 	public function save( DataModel $data_model ) {
 		// check if we need to save or update the value
 		if ( empty( $this->id ) ) {
 			// it's new
-			return $data_model->addRemote( $this->name, $this->uri, $this->latest_seen, $this->last_seen );
+			return $data_model->addRemote( $this->name, $this->uri, $this->latest_seen, $this->last_sent );
 		}
 		return $data_model->updateRemote( $this->id, $this->name, $this->uri, $this->latest_seen, $this->last_seen );
 	}

@@ -5,12 +5,22 @@ namespace automattic\vip\hash\rest;
 use automattic\vip\hash\DataModel;
 use automattic\vip\hash\Pdo_Data_Model;
 use automattic\vip\hash\HashRecord;
+use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Class SilexApplication
+ * @package automattic\vip\hash\rest
+ */
 class SilexApplication {
 
+	/**
+	 * @var string
+	 */
 	private $dbdir = '';
+	/**
+	 * @var
+	 */
 	private $app;
 
 	/**
@@ -19,12 +29,20 @@ class SilexApplication {
 	 */
 	private $model;
 
+	/**
+	 * SilexApplication constructor.
+	 *
+	 * @param $dbdir
+	 */
 	public function __construct( $dbdir ) {
 		$this->dbdir = $dbdir;
 	}
 
+	/**
+	 *
+	 */
 	public function run() {
-		$app = new \Silex\Application();
+		$app = new Application();
 		$this->app = $app;
 		$app['debug'] = true;
 		$this->register_endpoints( $app );
@@ -38,7 +56,10 @@ class SilexApplication {
 		$app->run();
 	}
 
-	public function register_endpoints( \Silex\Application $app ) {
+	/**
+	 * @param Application $app
+	 */
+	public function register_endpoints( Application $app ) {
 		/**
 		 * remote/hash <- send
 		 * remote/hash/<hash> <- read
@@ -54,10 +75,20 @@ class SilexApplication {
 
 	}
 
+	/**
+	 * @param $timestamp
+	 *
+	 * @return mixed
+	 */
 	public function hash_seen_since( $timestamp ) {
 		return $this->model->getHashesSeenAfter( $timestamp );
 	}
 
+	/**
+	 * @param $hash
+	 *
+	 * @return array
+	 */
 	function get_hash( $hash ) {
 		try {
 			return $this->model->getHashStatusAllUsers( $hash );
@@ -66,6 +97,11 @@ class SilexApplication {
 		}
 	}
 
+	/**
+	 * @param Request $request
+	 *
+	 * @return array|Request
+	 */
 	public function post_hash( Request $request ) {
 		$json_data = $request->get( 'data' );
 		$data = json_decode( $json_data, true );

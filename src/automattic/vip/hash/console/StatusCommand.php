@@ -4,6 +4,8 @@ namespace automattic\vip\hash\console;
 
 use automattic\vip\hash\DataModel;
 use automattic\vip\hash\Pdo_Data_Model;
+use cli\Tree;
+use cli\tree\Markdown;
 use Symfony\Component\Console\Command\Command;
 use automattic\vip\hash\console\FileSystemCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -16,6 +18,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class StatusCommand extends FileSystemCommand {
 
+	/**
+	 * @var array
+	 */
 	private $status_markup = [
 		'?' => '<comment>%s</>',
 		'~' => '<fg=magenta>%s</>',
@@ -23,6 +28,9 @@ class StatusCommand extends FileSystemCommand {
 		'✓' => '<info>%s</>',
 	];
 
+	/**
+	 * @var array
+	 */
 	private $status_names = [
 		'?' => 'Not seen',
 		'~' => 'Mixed',
@@ -30,6 +38,9 @@ class StatusCommand extends FileSystemCommand {
 		'✓' => 'Good',
 	];
 
+	/**
+	 *
+	 */
 	protected function configure() {
 		$this->setName( 'status' )
 			->setDescription( 'take a folder and generates a status report of good bad and unknown file hashes' )
@@ -40,6 +51,10 @@ class StatusCommand extends FileSystemCommand {
 			);
 	}
 
+	/**
+	 * @param InputInterface  $input
+	 * @param OutputInterface $output
+	 */
 	protected function execute( InputInterface $input, OutputInterface $output ) {
 		$folder = $input->getArgument( 'folder' );
 		if ( empty( $folder ) ) {
@@ -51,17 +66,25 @@ class StatusCommand extends FileSystemCommand {
 		$this->display_totals( $output, $data );
 	}
 
+	/**
+	 * @param OutputInterface $output
+	 * @param array           $data
+	 */
 	function display_tree( OutputInterface $output, array $data ) {
 		if ( empty( $data ) ) {
 			$output->write( '<error>Nothing found</error>' );
 			return;
 		}
-		$tree = new \cli\Tree;
+		$tree = new Tree;
 		$tree->setData( $this->prettify_tree( $data ) );
-		$tree->setRenderer( new \cli\tree\Markdown( 4 ) );
+		$tree->setRenderer( new Markdown( 4 ) );
 		$output->write( $tree->render() );
 	}
 
+	/**
+	 * @param OutputInterface $output
+	 * @param array           $data
+	 */
 	function display_totals( OutputInterface $output, array $data ) {
 		$statuses = $this->count_tree( $data );
 
@@ -95,6 +118,11 @@ class StatusCommand extends FileSystemCommand {
 		$output->writeln( '<fg=white>Seen:</> '.( $total - $statuses['?'] ).'/'.$total.' files ( '.number_format( ( $total - $statuses['?'] ) / $total * 100, 1 ).'% )' );
 	}
 
+	/**
+	 * @param array $data
+	 *
+	 * @return array
+	 */
 	function count_tree( array $data ) {
 		$statuses = [
 			'~' => 0,
@@ -125,6 +153,11 @@ class StatusCommand extends FileSystemCommand {
 		return $statuses;
 	}
 
+	/**
+	 * @param array $data
+	 *
+	 * @return array
+	 */
 	function prettify_tree( array $data ) {
 		if ( ! empty( $data['folder'] ) ) {
 			if ( empty( $data['contents'] ) ) {
@@ -144,7 +177,6 @@ class StatusCommand extends FileSystemCommand {
 					continue;
 				}
 				if ( ! empty( $item['folder'] ) ) {
-					$key = $item['folder'];
 					$key = explode( '/', $item['folder'] );
 					$contents[ end( $key ).'/' ] = $this->prettify_tree( $item );
 				}
@@ -192,6 +224,9 @@ class StatusCommand extends FileSystemCommand {
 		return $status;
 	}
 
+	/**
+	 * @param array $hashes
+	 */
 	function count_hash_status( array $hashes ) {
 		$statuses = [];
 		$status = '? ';
@@ -220,6 +255,11 @@ class StatusCommand extends FileSystemCommand {
 		}
 	}
 
+	/**
+	 * @param array $statuses
+	 *
+	 * @return array
+	 */
 	public function count_statuses( array $statuses ) {
 		$result = array();
 		$counts = array_count_values( $statuses );
@@ -230,10 +270,11 @@ class StatusCommand extends FileSystemCommand {
 	}
 
 	/**
-	 * @param $file
+	 * @param           $file
+	 *
+	 * @param DataModel $data_model
 	 *
 	 * @return array
-	 * @throws \Exception
 	 */
 	private function processNode( $file, DataModel $data_model ) {
 
@@ -248,11 +289,14 @@ class StatusCommand extends FileSystemCommand {
 
 	/**
 	 * Processes a file node
-	 * @param  [type] $file [description]
-	 * @return array       the data representing this file with hash status and filename
+	 *
+	 * @param           $file
+	 * @param DataModel $data_model
+	 *
+	 * @return array the data representing this file with hash status and filename
+	 * @internal param $ [type] $file [description]
 	 */
 	public function processFile( $file, DataModel $data_model ) {
-		$data = array();
 		// only process the file types we're interested in
 		$info = pathinfo( $file );
 		if ( isset( $info['extension'] ) ) {
@@ -295,6 +339,12 @@ class StatusCommand extends FileSystemCommand {
 		return $data;
 	}
 
+	/**
+	 * @param           $file
+	 * @param DataModel $data_model
+	 *
+	 * @return array|null
+	 */
 	public function processFolder( $file, DataModel $data_model ) {
 
 		foreach ( $this->skip_folders as $skip ) {

@@ -2,7 +2,6 @@
 
 namespace automattic\vip\hash;
 
-use PDO;
 
 interface DataModel {
 
@@ -10,13 +9,14 @@ interface DataModel {
 	public function __construct( $dbdir = '' );
 
 	public function init();
+
 	/**
 	 * Save a hash record to the data store
 	 *
-	 * @param  \automattic\vip\hash\HashRecord $hash the hash to be saved
+	 * @param  HashRecord $hash the hash to be saved
 	 * @return bool                                  succesful?
 	 */
-	public function saveHash( \automattic\vip\hash\HashRecord $hash );
+	public function saveHash( HashRecord $hash );
 
 	/**
 	 * @param $file

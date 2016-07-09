@@ -2,10 +2,20 @@
 
 namespace automattic\vip\hash;
 
+/**
+ * Class HashRecord
+ * @package automattic\vip\hash
+ */
 class HashRecord {
 
+	/**
+	 * @var array
+	 */
 	private $data;
 
+	/**
+	 * HashRecord constructor.
+	 */
 	function __construct() {
 		$this->data = array(
 			'date' => time(),
@@ -62,6 +72,9 @@ class HashRecord {
 		return $this->data['date'];
 	}
 
+	/**
+	 * @param $date
+	 */
 	function setDate( $date ) {
 		$this->data['date'] = $date;
 	}
@@ -94,10 +107,16 @@ class HashRecord {
 		$this->data['status'] = $status;
 	}
 
+	/**
+	 * @param $username
+	 */
 	function setUsername( $username) {
 		$this->data['username'] = $username;
 	}
 
+	/**
+	 * @return mixed
+	 */
 	function getUsername() {
 		return $this->data['username'];
 	}

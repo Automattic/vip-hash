@@ -60,7 +60,9 @@ class MarkCommand extends Command {
 	 * @param  HashRecord     $record [description]
 	 * @param  InputInterface $input  [description]
 	 * @param  DataModel      $data   [description]
-	 * @return [type]                 [description]
+	 *
+	 * @return HashRecord [type]                 [description]
+	 * @throws \Exception
 	 */
 	private function fill_hash( HashRecord $record, InputInterface $input , DataModel $data ) {
 		$file = $input->getArgument( 'hash' );

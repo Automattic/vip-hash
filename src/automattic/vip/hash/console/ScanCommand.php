@@ -117,7 +117,6 @@ class ScanCommand extends FileSystemCommand {
 			}
 		}
 
-		$data = array();
 		if ( is_dir( $file ) ) {
 			$data = $this->processFolder( $file, $data_model );
 			return $data;

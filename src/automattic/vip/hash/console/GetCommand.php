@@ -2,7 +2,6 @@
 
 namespace automattic\vip\hash\console;
 
-use automattic\vip\hash\DataModel;
 use automattic\vip\hash\Pdo_Data_Model;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -35,7 +34,6 @@ class GetCommand extends Command {
 		if ( file_exists( $file ) ) {
 			$hash = $data->hashFile( $file );
 		}
-		$result = '';
 		if ( $username = $input->getArgument( 'username' ) ) {
 			$result = $data->getHashStatusByUser( $hash, $username );
 		} else {

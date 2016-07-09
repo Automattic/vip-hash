@@ -6,6 +6,8 @@ use automattic\vip\hash\DataModel;
 use automattic\vip\hash\HashRecord;
 use automattic\vip\hash\Pdo_Data_Model;
 use automattic\vip\hash\Remote;
+use GuzzleHttp\Exception\ParseException;
+use GuzzleHttp\Exception\ServerException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -155,10 +157,10 @@ class SyncCommand extends Command {
 			// @TODO: do something with the response
 			//$json = $response->json();
 			$remote->setLastSent( time() );
-		} catch (\GuzzleHttp\Exception\ServerException $e) {
+		} catch ( ServerException $e) {
 			$output->writeln( 'Guzzle ServerException: ' . $e->getResponse() );
 			return false;
-		} catch ( \GuzzleHttp\Exception\ParseException $e ) {
+		} catch ( ParseException $e ) {
 			$output->writeln( 'Guzzle JSON issue: ' . $response->getBody() );
 			return false;
 		}

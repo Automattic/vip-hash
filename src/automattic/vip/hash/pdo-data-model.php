@@ -3,7 +3,6 @@
 namespace automattic\vip\hash;
 
 use PDO;
-use automattic\vip\hash\DataModel;
 
 /**
  * Implements the DataModel interface with PDO sqlite
@@ -147,11 +146,12 @@ class Pdo_Data_Model implements DataModel {
 	/**
 	 * Save a hash record to the data store
 	 *
-	 * @param  \automattic\vip\hash\HashRecord $hash the hash to be saved
+	 * @param \automattic\vip\hash\HashRecord $record the hash to be saved
+	 *
+	 * @return bool
 	 * @throws \Exception
-	 * @return bool                                  succesful?
 	 */
-	public function saveHash( \automattic\vip\hash\HashRecord $record ) {
+	public function saveHash( HashRecord $record ) {
 		$pdo = $this->getPDO();
 
 		$username = $record->getUsername();
@@ -170,7 +170,6 @@ class Pdo_Data_Model implements DataModel {
 		if ( ! $sth ) {
 			$error_info = print_r( $pdo->errorInfo(), true );
 			throw new \Exception( $error_info );
-			return false;
 		}
 		$result = $sth->execute( array(
 			':id'         => null,
@@ -390,8 +389,6 @@ class Pdo_Data_Model implements DataModel {
 			return true;
 		}
 		throw new \Exception( 'failed to prepare statement' );
-
-		return false;
 	}
 
 	/**
