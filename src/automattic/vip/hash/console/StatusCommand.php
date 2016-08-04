@@ -199,8 +199,10 @@ class StatusCommand extends FileSystemCommand {
 
 	/**
 	 * Returns the hash status identifier
-	 * @param  array  $hashes [description]
-	 * @return [type]         [description]
+	 *
+	 * @param  array $hashes [description]
+	 *
+	 * @return string [type]         [description]
 	 */
 	function hash_status( array $hashes ) {
 		$status = '?';
@@ -285,8 +287,6 @@ class StatusCommand extends FileSystemCommand {
 	 * @return array
 	 */
 	private function processNode( $file, DataModel $data_model ) {
-
-		$data = array();
 		if ( is_dir( $file ) ) {
 			$data = $this->processFolder( $file, $data_model );
 		} else {
