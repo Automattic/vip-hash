@@ -168,8 +168,8 @@ class Pdo_Data_Model implements DataModel {
 		( :id, :identifier, :username, :hash, :date, :seen, :status, :notes, :human_note )';
 		$sth = $pdo->prepare( $query );
 		if ( ! $sth ) {
-			$error_info = print_r( $pdo->errorInfo(), true );
-			throw new \Exception( $error_info );
+			$error_info = print_r( $sth->errorInfo(), true );
+			throw new \Exception( "Error creating insert statement ".$error_info );
 		}
 		$result = $sth->execute( array(
 			':id'         => null,
@@ -185,7 +185,11 @@ class Pdo_Data_Model implements DataModel {
 
 		if ( ! $result ) {
 			$error_info = print_r( $pdo->errorInfo(), true );
-			throw new \Exception( $error_info );
+			$error_info_sth = print_r( $sth->errorInfo(), true );
+			throw new \Exception(
+				"Error executing insert statement\nPDO: #".$pdo->errorCode().' '.$error_info.
+				"\n STH: #".$sth->errorCode().' '.$error_info_sth
+			);
 		}
 		return true;
 	}
@@ -201,7 +205,7 @@ class Pdo_Data_Model implements DataModel {
 			throw new \Exception( 'File does not exist' );
 		}
 		if ( is_dir( $file ) ) {
-			throw new \Exception( 'You cannot hash a folder' );
+			throw new \Exception( 'You cannot hash a folder "'.$file.'"' );
 		}
 		if ( ! is_file( $file ) ) {
 			throw new \Exception( 'Only files can be hashed' );
