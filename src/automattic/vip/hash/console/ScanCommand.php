@@ -111,7 +111,7 @@ class ScanCommand extends FileSystemCommand {
 	 */
 	private function processNode( $file, DataModel $data_model ) {
 
-		foreach ( $this->skip_folders as $skip ) {
+		foreach ( self::$skip_folders as $skip ) {
 			if ( substr( $file, strlen( $skip ) * -1 ) === $skip ) {
 				return null;
 			}
@@ -163,7 +163,7 @@ class ScanCommand extends FileSystemCommand {
 		// only process the file types we're interested in
 		$info = pathinfo( $file );
 		if ( isset( $info['extension'] ) ) {
-			if ( ! in_array( $info['extension'], $this->allowed_file_types ) ) {
+			if ( ! in_array( $info['extension'], self::$allowed_file_types ) ) {
 				return null;
 			}
 		}
