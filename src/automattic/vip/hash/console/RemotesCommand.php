@@ -37,9 +37,9 @@ class RemotesCommand extends Command {
 	 * {@inheritDoc}
 	 */
 	protected function execute( InputInterface $input, OutputInterface $output ) {
-		$subcommand = $input->getArgument( 'subcommand' );
+		$sub_command = $input->getArgument( 'subcommand' );
 		$data = new Pdo_Data_Model();
-		if ( 'add' == $subcommand ) {
+		if ( 'add' == $sub_command ) {
 			$name = $input->getArgument( 'name' );
 			$uri = $input->getArgument( 'uri' );
 			$remote = new Remote();
@@ -48,7 +48,7 @@ class RemotesCommand extends Command {
 			$result = $remote->save( $data );
 			$output->write( $result );
 			return;
-		} else if ( 'list' == $subcommand ) {
+		} else if ( 'list' == $sub_command ) {
 			$result = $this->listRemotes( $data );
 			$json = json_encode( $result, JSON_PRETTY_PRINT );
 			$output->writeln( $json );
