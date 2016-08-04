@@ -16,3 +16,4 @@ class RemoteTest extends TestCase {
 		$this->assertEquals( $uri, $r->getUri() );
 	}
 }
+
