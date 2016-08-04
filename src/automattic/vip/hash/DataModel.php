@@ -77,7 +77,7 @@ interface DataModel {
 	public function updateRemote( $id, $name, $uri, $latest_seen = 0, $last_sent = 0 );
 
 	/**
-	 * @return array
+	 * @return Remote[]
 	 * @throws \Exception
 	 */
 	public function getRemotes();
