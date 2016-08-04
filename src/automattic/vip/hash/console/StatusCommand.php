@@ -6,8 +6,7 @@ use automattic\vip\hash\DataModel;
 use automattic\vip\hash\Pdo_Data_Model;
 use cli\Tree;
 use cli\tree\Markdown;
-use Symfony\Component\Console\Command\Command;
-use automattic\vip\hash\console\FileSystemCommand;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -22,10 +21,10 @@ class StatusCommand extends FileSystemCommand {
 	 * @var array
 	 */
 	private $status_markup = [
-		'?' => '<comment>%s</>',
-		'~' => '<fg=magenta>%s</>',
-		'x' => '<fg=red>%s</>',
-		'✓' => '<info>%s</>',
+		'?' => '<comment>%s</comment>',
+		'~' => '<mixed>%s</mixed>',
+		'x' => '<bad>%s</bad>',
+		'✓' => '<info>%s</info>',
 	];
 
 	/**
@@ -54,12 +53,21 @@ class StatusCommand extends FileSystemCommand {
 	/**
 	 * @param InputInterface  $input
 	 * @param OutputInterface $output
+	 *
+	 * @return int|null|void
 	 */
 	protected function execute( InputInterface $input, OutputInterface $output ) {
 		$folder = $input->getArgument( 'folder' );
 		if ( empty( $folder ) ) {
 			$folder = '.';
 		}
+		$mixed_style = new OutputFormatterStyle('magenta', null );
+		$bad_style = new OutputFormatterStyle('red', null );
+		$bold_style = new OutputFormatterStyle('white', null );
+		$output->getFormatter()->setStyle('mixed', $mixed_style );
+		$output->getFormatter()->setStyle('bad', $bad_style );
+		$output->getFormatter()->setStyle('bold', $bold_style );
+
 		$data_model = new Pdo_Data_Model();
 		$data = $this->processNode( $folder, $data_model );
 		$this->display_tree( $output, $data );
@@ -98,12 +106,12 @@ class StatusCommand extends FileSystemCommand {
 
 		if ( empty( $total ) ) {
 			// nothing found
-			$output->writeln( '<comment>No reviewable files found</>' );
+			$output->writeln( '<comment>No reviewable files found</comment>' );
 			return;
 		}
 		$output->writeln( '' );
 		$legend = implode( $parts, ', ' );
-		$output->writeln( '<fg=white>Legend:</> '.$legend );
+		$output->writeln( '<bold>Legend:</bold> '.$legend );
 		$parts = [];
 		foreach ( $statuses as $status => $count ) {
 			if ( $count > 0 ) {
@@ -114,8 +122,8 @@ class StatusCommand extends FileSystemCommand {
 		}
 
 		$final = implode( $parts, ', ' );
-		$output->writeln( '<fg=white>Results:</> '.$final );
-		$output->writeln( '<fg=white>Seen:</> '.( $total - $statuses['?'] ).'/'.$total.' files ( '.number_format( ( $total - $statuses['?'] ) / $total * 100, 1 ).'% )' );
+		$output->writeln( '<bold>Results:</bold> '.$final );
+		$output->writeln( '<bold>Seen:</bold> '.( $total - $statuses['?'] ).'/'.$total.' files ( '.number_format( ( $total - $statuses['?'] ) / $total * 100, 1 ).'% )' );
 	}
 
 	/**
@@ -300,7 +308,7 @@ class StatusCommand extends FileSystemCommand {
 		// only process the file types we're interested in
 		$info = pathinfo( $file );
 		if ( isset( $info['extension'] ) ) {
-			if ( ! in_array( $info['extension'], $this->allowed_file_types ) ) {
+			if ( ! in_array( $info['extension'], self::$allowed_file_types ) ) {
 				return null;
 			}
 		}
@@ -347,7 +355,7 @@ class StatusCommand extends FileSystemCommand {
 	 */
 	public function processFolder( $file, DataModel $data_model ) {
 
-		foreach ( $this->skip_folders as $skip ) {
+		foreach ( self::$skip_folders as $skip ) {
 			if ( substr( $file, strlen( $skip ) * -1 ) === $skip ) {
 				return null;
 			}
