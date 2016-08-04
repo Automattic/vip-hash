@@ -6,7 +6,7 @@ use Symfony\Component\Console\Command\Command;
 
 abstract class FileSystemCommand extends Command {
 
-	public $allowed_file_types = array(
+	public static $allowed_file_types = array(
 		'php',
 		'php5',
 		'js',
@@ -23,7 +23,7 @@ abstract class FileSystemCommand extends Command {
 		'patch',
 	);
 
-	public $skip_folders = array(
+	public static $skip_folders = array(
 		'.git',
 		'.svn',
 		'.idea',
