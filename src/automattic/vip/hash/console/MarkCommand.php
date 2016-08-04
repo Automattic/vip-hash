@@ -5,6 +5,9 @@ namespace automattic\vip\hash\console;
 use automattic\vip\hash\DataModel;
 use automattic\vip\hash\Pdo_Data_Model;
 use automattic\vip\hash\HashRecord;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use SplFileInfo;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -49,8 +52,43 @@ class MarkCommand extends Command {
 	 */
 	protected function execute( InputInterface $input, OutputInterface $output ) {
 		$data = new Pdo_Data_Model();
+
+		$hash = $input->getArgument( 'hash' );
+		if ( empty( $hash ) ) {
+			throw new \Exception( 'Empty hash/file/folder parameter' );
+		}
+		/**
+		 * If this is a folder, we need to handle it differently
+		 */
+		if ( is_dir( $hash ) ) {
+			$dir_iterator = new RecursiveDirectoryIterator($hash);
+			$filter = new \RecursiveCallbackFilterIterator($dir_iterator, function ( SplFileInfo $current, $key, $iterator ) {
+				// Skip hidden files and directories.
+				if ( $current->getFilename()[0] === '.') {
+					return false;
+				}
+				if ( $current->isDir() ) {
+					return false;
+					//return !in_array( $current->getFilename(), FileSystemCommand::$skip_folders );
+				}
+				// only process the file types we're interested in
+				if ( ! in_array( $current->getExtension(), FileSystemCommand::$allowed_file_types ) ) {
+					return false;
+				}
+				return true;
+			});
+
+			$objects = new RecursiveIteratorIterator( $filter, RecursiveIteratorIterator::SELF_FIRST);
+			/** @var SplFileInfo  $file_info */
+			foreach( $objects as $name => $file_info ) {
+				$record = new HashRecord();
+				$record = $this->fill_hash_from_input( $record, $input, $file_info->getRealPath(), $data );
+				$data->saveHash( $record );
+			}
+			return;
+		}
 		$record = new HashRecord();
-		$record = $this->fill_hash( $record, $input, $data );
+		$record = $this->fill_hash_from_input( $record, $input, $hash, $data );
 		$data->saveHash( $record );
 	}
 
@@ -59,19 +97,15 @@ class MarkCommand extends Command {
 	 *
 	 * @param  HashRecord     $record [description]
 	 * @param  InputInterface $input  [description]
+	 * @param  String         $hash
 	 * @param  DataModel      $data   [description]
 	 *
 	 * @return HashRecord [type]                 [description]
 	 * @throws \Exception
 	 */
-	private function fill_hash( HashRecord $record, InputInterface $input , DataModel $data ) {
-		$file = $input->getArgument( 'hash' );
-		if ( empty( $file ) ) {
-			throw new \Exception( 'Empty hash/file parameter' );
-		}
-		$hash = $file;
-		if ( file_exists( $file ) ) {
-			$hash = $data->hashFile( $file );
+	private function fill_hash_from_input( HashRecord $record, InputInterface $input , $hash, DataModel $data ) {
+		if ( file_exists( $hash ) ) {
+			$hash = $data->hashFile( $hash );
 		}
 		$username = $input->getArgument( 'username' );
 		if ( empty( $username ) ) {
