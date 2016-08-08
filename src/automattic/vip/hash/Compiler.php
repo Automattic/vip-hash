@@ -131,7 +131,7 @@ class Compiler
             $this->addFile($phar, new \SplFileInfo(__DIR__.'/../../../../vendor/composer/include_paths.php'));
         }
         $this->addFile($phar, new \SplFileInfo(__DIR__.'/../../../../vendor/composer/ClassLoader.php'));
-        $this->addVipHashBin($phar);
+        //$this->addVipHashBin($phar);
 
         // Stubs
         $phar->setStub($this->getStub());
