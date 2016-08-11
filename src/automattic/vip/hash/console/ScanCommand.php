@@ -5,6 +5,8 @@ namespace automattic\vip\hash\console;
 use automattic\vip\hash\DataModel;
 use automattic\vip\hash\Pdo_Data_Model;
 use automattic\vip\hash\console\FileSystemCommand;
+use DirectoryIterator;
+use SplFileInfo;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,7 +23,7 @@ class ScanCommand extends FileSystemCommand {
 			->setDescription( 'take a folder and generate a json response detailing the files inside' )
 			->addArgument(
 				'folder',
-				InputArgument::REQUIRED,
+				InputArgument::OPTIONAL,
 				'A file hash to find, or a file to be hashed. Assumes hash if the given value is not a locatable file'
 			)->addArgument(
 				'format',
@@ -31,10 +33,12 @@ class ScanCommand extends FileSystemCommand {
 	}
 
 	protected function execute( InputInterface $input, OutputInterface $output ) {
-		$folder = $input->getArgument( 'folder' );
 		$format = $input->getArgument( 'format' );
-		if ( empty( $folder ) ) {
-			throw new \Exception( 'Empty folder parameter' );
+		$folder = $input->getArgument( 'folder' );
+		if ( empty( $folder ) || $folder === '.' ) {
+			$folder = getcwd();
+		} elseif ( $folder === '..' ) {
+			$folder = dirname( getcwd() );
 		}
 		if ( empty( $format ) ) {
 			$format = 'json';
@@ -43,7 +47,8 @@ class ScanCommand extends FileSystemCommand {
 			throw new \Exception( 'Unknown format' );
 		}
 		$data_model = new Pdo_Data_Model();
-		$data = $this->processNode( $folder, $data_model );
+		$fileinfo = new SplFileInfo( $folder );
+		$data = $this->processNode( $fileinfo, $data_model );
 		if ( 'json' == $format ) {
 			$json = json_encode( $data, JSON_PRETTY_PRINT );
 			$output->writeln( $json );
@@ -103,61 +108,7 @@ class ScanCommand extends FileSystemCommand {
 		return $md;
 	}
 
-	/**
-	 * @param $file
-	 *
-	 * @return array
-	 * @throws \Exception
-	 */
-	private function processNode( $file, DataModel $data_model ) {
-
-		foreach ( self::$skip_folders as $skip ) {
-			if ( substr( $file, strlen( $skip ) * -1 ) === $skip ) {
-				return null;
-			}
-		}
-
-		if ( is_dir( $file ) ) {
-			$data = $this->processFolder( $file, $data_model );
-			return $data;
-		}
-
-		$data = $this->processFile( $file, $data_model );
-		return $data;
-	}
-
-	public function processFolder( $file, DataModel $data_model ) {
-		$data = array();
-		$unfiltered_folders = scandir( $file );
-		$folders = array_diff( $unfiltered_folders, array( '..', '.' ) );
-		if ( empty( $folders ) ) {
-			return null;
-		}
-		$contents = array();
-		foreach ( $folders as $found_file ) {
-			$result = $this->processNode( $file . DIRECTORY_SEPARATOR . $found_file, $data_model );
-			if ( ! empty( $result ) && ( null != $result ) ) {
-				if ( is_dir( $file . DIRECTORY_SEPARATOR . $found_file ) ) {
-					$contents[] = $result;
-					continue;
-				}
-				$r = array(
-					'file' => $file . DIRECTORY_SEPARATOR . $found_file,
-					'hashes' => $result,
-				);
-
-				$contents[] = $r;
-			}
-		}
-		$data = array(
-			'folder'   => $file,
-			'contents' => $contents,
-		);
-		return $data;
-	}
-
-
-	public function processFile( $file, DataModel $data_model ) {
+	/*public function processFile( $file, DataModel $data_model ) {
 		$data = array();
 
 		// only process the file types we're interested in
@@ -203,5 +154,5 @@ class ScanCommand extends FileSystemCommand {
 		}
 
 		return $data;
-	}
+	}*/
 }
