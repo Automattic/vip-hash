@@ -33,9 +33,8 @@ abstract class FileSystemCommand extends Command {
 	);
 
 	/**
-	 * @param           $file
-	 *
-	 * @param DataModel $data_model
+	 * @param SplFileInfo $file
+	 * @param DataModel   $data_model
 	 *
 	 * @return array
 	 */
@@ -49,8 +48,8 @@ abstract class FileSystemCommand extends Command {
 	}
 
 	/**
-	 * @param           $file
-	 * @param DataModel $data_model
+	 * @param SplFileInfo $file
+	 * @param DataModel   $data_model
 	 *
 	 * @return array|null
 	 */
@@ -58,11 +57,6 @@ abstract class FileSystemCommand extends Command {
 		if ( in_array( $file->getBasename(), self::$skip_folders) ) {
 			return null;
 		}
-		/*foreach ( self::$skip_folders as $skip ) {
-			if ( strpos( $file->getBasename(), strlen( $skip ) * -1 ) === $skip ) {
-				return null;
-			}
-		}*/
 
 		$contents = array();
 		/** @var SplFileInfo  $file_info */
@@ -92,11 +86,10 @@ abstract class FileSystemCommand extends Command {
 	/**
 	 * Processes a file node
 	 *
-	 * @param           $file
-	 * @param DataModel $data_model
+	 * @param SplFileInfo $file
+	 * @param DataModel   $data_model
 	 *
 	 * @return array the data representing this file with hash status and filename
-	 * @internal param $ [type] $file [description]
 	 */
 	public function processFile( SplFileInfo $file, DataModel $data_model ) {
 		// only process the file types we're interested in
