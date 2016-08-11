@@ -6,6 +6,8 @@ use automattic\vip\hash\DataModel;
 use automattic\vip\hash\Pdo_Data_Model;
 use cli\Tree;
 use cli\tree\Markdown;
+use DirectoryIterator;
+use SplFileInfo;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -361,13 +363,34 @@ class StatusCommand extends FileSystemCommand {
 			}
 		}
 
-		$unfiltered_folders = scandir( $file );
-		$folders = array_diff( $unfiltered_folders, array( '..', '.' ) );
+
+		//$unfiltered_folders = scandir( $file );
+
+		/*$folders = array_diff( $unfiltered_folders, array( '..', '.' ) );
 		if ( empty( $folders ) ) {
 			return null;
-		}
+		}*/
 		$contents = array();
-		foreach ( $folders as $found_file ) {
+		/** @var SplFileInfo  $file_info */
+		foreach ( new DirectoryIterator( $file ) as $fileInfo ) {
+			if( $fileInfo->isDot() ) {
+				continue;
+			}
+			$result = $this->processNode( $fileInfo->getRealPath(), $data_model );
+			if ( ! empty( $result ) && ( null != $result ) ) {
+				$f = array(
+					'file' => $fileInfo->getRealPath(),
+					'hashes' => $result,
+				);
+
+				if ( $fileInfo->isDir() ) {
+					$f = $result;
+				}
+				$contents[] = $f;
+			}
+			//echo $fileInfo->getFilename() . "<br>\n";
+		}
+		/*foreach ( $folders as $found_file ) {
 			$result = $this->processNode( $file . DIRECTORY_SEPARATOR . $found_file, $data_model );
 			if ( ! empty( $result ) && ( null != $result ) ) {
 				$f = array(
@@ -379,7 +402,7 @@ class StatusCommand extends FileSystemCommand {
 				}
 				$contents[] = $f;
 			}
-		}
+		}*/
 		if ( empty( $contents ) ) {
 			return null;
 		}
