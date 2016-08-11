@@ -64,7 +64,6 @@ class MarkCommand extends Command {
 			$dir_iterator = new RecursiveDirectoryIterator($hash);
 			$filter = new \RecursiveCallbackFilterIterator($dir_iterator, function ( SplFileInfo $current, $key, RecursiveDirectoryIterator $iterator ) {
 				// Skip hidden files and directories.
-				echo $key."\n";
 				if ( $current->getFilename()[0] === '.') {
 					return false;
 				}
