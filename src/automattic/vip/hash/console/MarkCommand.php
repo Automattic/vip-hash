@@ -62,14 +62,15 @@ class MarkCommand extends Command {
 		 */
 		if ( is_dir( $hash ) ) {
 			$dir_iterator = new RecursiveDirectoryIterator($hash);
-			$filter = new \RecursiveCallbackFilterIterator($dir_iterator, function ( SplFileInfo $current, $key, $iterator ) {
+			$filter = new \RecursiveCallbackFilterIterator($dir_iterator, function ( SplFileInfo $current, $key, RecursiveDirectoryIterator $iterator ) {
 				// Skip hidden files and directories.
+				echo $key."\n";
 				if ( $current->getFilename()[0] === '.') {
 					return false;
 				}
 				if ( $current->isDir() ) {
-					return false;
-					//return !in_array( $current->getFilename(), FileSystemCommand::$skip_folders );
+					//return false;
+					return !in_array( $current->getFilename(), FileSystemCommand::$skip_folders );
 				}
 				// only process the file types we're interested in
 				if ( ! in_array( $current->getExtension(), FileSystemCommand::$allowed_file_types ) ) {
@@ -81,6 +82,9 @@ class MarkCommand extends Command {
 			$objects = new RecursiveIteratorIterator( $filter, RecursiveIteratorIterator::SELF_FIRST);
 			/** @var SplFileInfo  $file_info */
 			foreach( $objects as $name => $file_info ) {
+				if ( $file_info->isDir() ) {
+					continue;
+				}
 				$record = new HashRecord();
 				$record = $this->fill_hash_from_input( $record, $input, $file_info->getRealPath(), $data );
 				$data->saveHash( $record );
