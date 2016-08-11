@@ -60,8 +60,10 @@ class StatusCommand extends FileSystemCommand {
 	 */
 	protected function execute( InputInterface $input, OutputInterface $output ) {
 		$folder = $input->getArgument( 'folder' );
-		if ( empty( $folder ) ) {
-			$folder = '.';
+		if ( empty( $folder ) || $folder === '.' ) {
+			$folder = getcwd();
+		} elseif ( $folder === '..' ) {
+			$folder = dirname( getcwd() );
 		}
 		$mixed_style = new OutputFormatterStyle('magenta', null );
 		$bad_style = new OutputFormatterStyle('red', null );
