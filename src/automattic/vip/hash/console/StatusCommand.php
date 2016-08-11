@@ -2,11 +2,9 @@
 
 namespace automattic\vip\hash\console;
 
-use automattic\vip\hash\DataModel;
 use automattic\vip\hash\Pdo_Data_Model;
 use cli\Tree;
 use cli\tree\Markdown;
-use DirectoryIterator;
 use SplFileInfo;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputArgument;
