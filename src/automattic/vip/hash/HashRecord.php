@@ -28,16 +28,6 @@ class HashRecord {
 	}
 
 	/**
-	 * Does this hash already exist in the database?
-	 *
-	 * @return bool
-	 */
-	function exists() {
-		// @TODO: implement check
-		return false;
-	}
-
-	/**
 	 * @return string
 	 */
 	public function getNote() {
