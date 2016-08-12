@@ -25,5 +25,8 @@
 		"classmap": [
 			""
 		]
+	},
+	"require-dev": {
+		"clue/phar-composer": "^1.0"
 	}
 }
