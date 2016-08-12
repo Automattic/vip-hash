@@ -109,7 +109,7 @@ class SilexApplication {
 			try {
 				$hash = new HashRecord();
 				$hash->setHash( $item['hash'] );
-				$hash->setIdentifier( $item['identifier'] );
+				//$hash->setIdentifier( $item['identifier'] );
 				$hash->setUsername( $item['user'] );
 				$hash->setStatus( $item['status'] );
 				$hash->setNote( $item['notes'] );
