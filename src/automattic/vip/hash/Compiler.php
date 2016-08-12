@@ -72,7 +72,7 @@ class Compiler
 
         $phar->startBuffering();
 
-        $finderSort = function ($a, $b) {
+        $finderSort = function ( \SplFileInfo $a, \SplFileInfo $b) {
             return strcmp(strtr($a->getRealPath(), '\\', '/'), strtr($b->getRealPath(), '\\', '/'));
         };
 
@@ -151,7 +151,7 @@ class Compiler
         $util->save($pharFile, \Phar::SHA1);
     }
 
-    private function addFile($phar, $file, $strip = true)
+    private function addFile( \Phar $phar, $file, $strip = true)
     {
         $path = strtr(str_replace(dirname(dirname(dirname(dirname(__DIR__)))).DIRECTORY_SEPARATOR, '', $file->getRealPath()), '\\', '/');
 
@@ -171,7 +171,7 @@ class Compiler
         $phar->addFromString($path, $content);
     }
 
-    private function addVipHashBin($phar)
+    private function addVipHashBin( \Phar $phar)
     {
         $content = file_get_contents(__DIR__.'/../../../../bin/viphash.php');
         $content = preg_replace('{^#!/usr/bin/env php\s*}', '', $content);
