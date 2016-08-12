@@ -112,11 +112,11 @@ class SyncCommand extends Command {
 	}
 
 	/**
-	 * @param                 $remote
+	 * @param Remote          $remote
 	 *
 	 * @param OutputInterface $output
 	 *
-	 * @throws \Exception
+	 * @param DataModel       $data
 	 */
 	protected function sendHashes( Remote $remote, OutputInterface $output, DataModel $data ) {
 		$i_sent = $remote->getLastSent();
