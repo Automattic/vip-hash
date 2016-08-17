@@ -49,6 +49,11 @@ class ScanCommand extends FileSystemCommand {
 			$json = json_encode( $data, JSON_PRETTY_PRINT );
 			$output->writeln( $json );
 		} else if ( 'markdown' == $format ) {
+			if ( empty( $data ) ) {
+				$output->writeln("<info>There are no reviewable files to scan for. The tools scan/status commands look for these file extensions:</info>");
+				$output->writeln("<info>".implode(', ', FileSystemCommand::$allowed_file_types )."</info>");
+				return;
+			}
 			$markdown = '';
 			$markdown .= $this->displayMarkdown( $data );
 

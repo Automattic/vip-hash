@@ -73,6 +73,11 @@ class StatusCommand extends FileSystemCommand {
 		$data_model = new Pdo_Data_Model();
 		$fileInfo = new SplFileInfo( $folder );
 		$data = $this->processNode( $fileInfo, $data_model );
+		if ( empty( $data ) ) {
+			$output->writeln("<info>There are no reviewable files to check the status for. The tools scan/status commands look for these file extensions:</info>");
+			$output->writeln("<info>".implode(', ', FileSystemCommand::$allowed_file_types )."</info>");
+			return;
+		}
 		$this->display_tree( $output, $data );
 		$this->display_totals( $output, $data );
 	}
