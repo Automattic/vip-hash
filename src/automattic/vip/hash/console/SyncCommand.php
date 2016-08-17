@@ -162,7 +162,7 @@ class SyncCommand extends Command {
 			$output->writeln( 'Guzzle ServerException: ' . $e->getResponse() );
 			return false;
 		} catch ( ParseException $e ) {
-			$output->writeln( 'Guzzle JSON issue: ' . $response->getBody() );
+			$output->writeln( 'Guzzle JSON issue: ' . $e->getResponse(). ' -- '. $response->getBody() );
 			return false;
 		}
 		return true;
