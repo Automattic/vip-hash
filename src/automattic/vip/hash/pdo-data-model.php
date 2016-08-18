@@ -164,11 +164,13 @@ class Pdo_Data_Model implements DataModel {
 
 		$identifier = $hash.'-'.$username.'-'.$date;
 
-		$query = 'INSERT INTO wpcom_vip_hashes VALUES
-		( :id, :identifier, :username, :hash, :date, :seen, :status, :notes, :human_note )';
+		$query = 'INSERT INTO wpcom_vip_hashes( id, identifier, user, hash, date, seen, status, notes, human_note )
+								SELECT :id, :identifier, :username, :hash, :date, :seen, :status, :notes, :human_note
+								WHERE NOT EXISTS ( select 1 from wpcom_vip_hashes
+													WHERE identifier = :identifier)';
 		$sth = $pdo->prepare( $query );
 		if ( ! $sth ) {
-			$error_info = print_r( $sth->errorInfo(), true );
+			$error_info = print_r( $pdo->errorInfo(), true );
 			throw new \Exception( "Error creating insert statement ".$error_info );
 		}
 		$result = $sth->execute( array(
@@ -188,7 +190,8 @@ class Pdo_Data_Model implements DataModel {
 			$error_info_sth = print_r( $sth->errorInfo(), true );
 			throw new \Exception(
 				"Error executing insert statement\nPDO: #".$pdo->errorCode().' '.$error_info.
-				"\n STH: #".$sth->errorCode().' '.$error_info_sth
+				"\n STH: #".$sth->errorCode().' '.$error_info_sth.
+				"\n identifier:".$identifier
 			);
 		}
 		return true;
