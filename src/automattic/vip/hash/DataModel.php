@@ -6,8 +6,6 @@ namespace automattic\vip\hash;
 interface DataModel {
 
 
-	public function __construct( $dbdir = '' );
-
 	public function init();
 
 	/**
