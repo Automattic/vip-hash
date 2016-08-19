@@ -42,11 +42,6 @@ interface DataModel {
 	 */
 	public function getHashStatusAllUsers( $hash );
 
-	/**
-	 * @return string the folder containing hash records with a trailing slash
-	 */
-	public function getDBDir();
-
 	public function getNewestSeenHash();
 
 	public function getHashesAfter( $date );
