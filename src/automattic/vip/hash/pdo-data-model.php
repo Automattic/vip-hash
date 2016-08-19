@@ -7,7 +7,7 @@ use PDO;
 /**
  * Implements the DataModel interface with PDO sqlite
  */
-class Pdo_Data_Model implements DataModel {
+class Pdo_Data_Model extends NullDataModel {
 
 	/**
 	 * @var \PDO
@@ -196,28 +196,6 @@ class Pdo_Data_Model implements DataModel {
 		}
 		return true;
 	}
-
-	/**
-	 * @param $file
-	 *
-	 * @return string
-	 * @throws \Exception
-	 */
-	public function hashFile( $file ) {
-		if ( ! file_exists( $file ) ) {
-			throw new \Exception( 'File does not exist' );
-		}
-		if ( is_dir( $file ) ) {
-			throw new \Exception( 'You cannot hash a folder "'.$file.'"' );
-		}
-		if ( ! is_file( $file ) ) {
-			throw new \Exception( 'Only files can be hashed' );
-		}
-		$code = php_strip_whitespace( $file );
-		$hash = sha1( $code );
-		return $hash;
-	}
-
 
 	/**
 	 * @param $hash
