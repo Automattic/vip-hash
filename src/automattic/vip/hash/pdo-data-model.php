@@ -31,8 +31,8 @@ class Pdo_Data_Model extends NullDataModel {
 	private function create_tables( $prefix = 'wpcom_' ) {
 		$this->pdo->query( 'CREATE TABLE IF NOT EXISTS '.$prefix.'vip_hashes (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			identifier CHAR(50) NOT NULL UNIQUE,
-			user CHAR(30) NOT NULL,
+			identifier CHAR(100) NOT NULL UNIQUE,
+			user CHAR(50) NOT NULL,
 			hash CHAR(30) NOT NULL,
 			date INT NOT NULL,
 			seen INT NOT NULL,
@@ -42,10 +42,9 @@ class Pdo_Data_Model extends NullDataModel {
 		)' );
 		$this->pdo->query( 'CREATE TABLE IF NOT EXISTS '.$prefix.'vip_hash_remotes (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			name CHAR(50) NOT NULL UNIQUE,
-			uri CHAR(30) NOT NULL,
+			name CHAR(60) NOT NULL UNIQUE,
+			uri CHAR(255) NOT NULL,
 			latest_seen INT NOT NULL,
-			remote_last_seen INT NOT NULL,
 			last_sent INT NOT NULL
 		)' );
 	}
@@ -332,24 +331,26 @@ class Pdo_Data_Model extends NullDataModel {
 
 	public function addRemote( $name, $uri, $latest_seen = 0, $last_sent = 0 ) {
 		$query = 'INSERT INTO wpcom_vip_hash_remotes VALUES
-			( :name, :uri, :latest_seen, :last_sent )';
+			( :id, :name, :uri, :latest_seen, :last_sent )';
 		$sth = $this->pdo->prepare( $query );
-		if ( $sth ) {
-			$result = $sth->execute( array(
-				':name'        => $name,
-				':uri'         => $uri,
-				':latest_seen' => $latest_seen,
-				':last_sent'   => $last_sent,
-			) );
-
-			if ( ! $result ) {
-				$error_info = print_r( $this->pdo->errorInfo(), true );
-				throw new \Exception( $error_info );
-			}
-			return true;
+		if ( !$sth ) {
+			$error_info = print_r( $this->pdo->errorInfo(), true );
+			throw new \Exception( $error_info );
+			//throw new \Exception( 'failed to prepare statement' );
 		}
+		$result = $sth->execute( array(
+			':id'          => null,
+			':name'        => $name,
+			':uri'         => $uri,
+			':latest_seen' => $latest_seen,
+			':last_sent'   => $last_sent,
+		) );
 
-		return false;
+		if ( ! $result ) {
+			$error_info = print_r( $sth->errorInfo(), true );
+			throw new \Exception( $error_info );
+		}
+		return true;
 	}
 
 	public function updateRemote( $id, $name, $uri, $latest_seen = 0, $last_sent = 0 ) {
@@ -358,22 +359,23 @@ class Pdo_Data_Model extends NullDataModel {
 		$query = 'UPDATE wpcom_vip_hash_remotes SET
 		 name= :name, uri = :uri, latest_seen = :latest_seen, last_sent = :last_sent WHERE id = :id';
 		$sth   = $this->pdo->prepare( $query );
-		if ( $sth ) {
-			$result = $sth->execute( array(
-				':id'          => $id,
-				':name'        => $name,
-				':uri'         => $uri,
-				':latest_seen' => $latest_seen,
-				':last_sent'   => $last_sent,
-			) );
-
-			if ( ! $result ) {
-				$error_info = print_r( $this->pdo->errorInfo(), true );
-				throw new \Exception( $error_info );
-			}
-			return true;
+		if ( !$sth ) {
+			$error_info = print_r( $this->pdo->errorInfo(), true );
+			throw new \Exception( $error_info );
 		}
-		throw new \Exception( 'failed to prepare statement' );
+		$result = $sth->execute( array(
+			':id'          => $id,
+			':name'        => $name,
+			':uri'         => $uri,
+			':latest_seen' => $latest_seen,
+			':last_sent'   => $last_sent,
+		) );
+
+		if ( ! $result ) {
+			$error_info = print_r( $sth->errorInfo(), true );
+			throw new \Exception( $error_info );
+		}
+		return true;
 	}
 
 	/**
