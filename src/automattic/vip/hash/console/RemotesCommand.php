@@ -46,7 +46,9 @@ class RemotesCommand extends Command {
 			$remote->setName( $name );
 			$remote->setUri( $uri );
 			$result = $remote->save( $data );
-			$output->write( $result );
+			if ( !$result ) {
+				$output->writeln( "<error>Saving the new entry failed</error>");
+			}
 			return;
 		} else if ( 'list' == $sub_command ) {
 			$result = $this->listRemotes( $data );
