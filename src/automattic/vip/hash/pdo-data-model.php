@@ -45,7 +45,10 @@ class Pdo_Data_Model extends NullDataModel {
 			name CHAR(60) NOT NULL UNIQUE,
 			uri CHAR(255) NOT NULL,
 			latest_seen INT NOT NULL,
-			last_sent INT NOT NULL
+			last_sent INT NOT NULL,
+			oauth_access CHAR(255),
+			oauth_expire CHAR(255),
+			oauth_refreshCHAR(255)
 		)' );
 	}
 
