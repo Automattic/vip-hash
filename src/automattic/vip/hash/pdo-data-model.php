@@ -332,7 +332,19 @@ class Pdo_Data_Model extends NullDataModel {
 	}
 
 
-	public function addRemote( $name, $uri, $latest_seen = 0, $last_sent = 0 ) {
+	/**
+	 * @param Remote $remote
+	 *
+	 * @return bool
+	 * @throws \Exception
+	 */
+	public function addRemote( Remote $remote ) {
+
+		$name = $remote->getName();
+		$uri = $remote->getUri();
+		$latest_seen = $remote->getLatestSeen();
+		$last_sent = $remote->getLastSent();
+
 		$query = 'INSERT INTO wpcom_vip_hash_remotes VALUES
 			( :id, :name, :uri, :latest_seen, :last_sent )';
 		$sth = $this->pdo->prepare( $query );
@@ -356,7 +368,13 @@ class Pdo_Data_Model extends NullDataModel {
 		return true;
 	}
 
-	public function updateRemote( $id, $name, $uri, $latest_seen = 0, $last_sent = 0 ) {
+	public function updateRemote( Remote $remote ) {
+		$id = $remote->getId();
+		$name = $remote->getName();
+		$uri = $remote->getUri();
+		$latest_seen = $remote->getLatestSeen();
+		$last_sent = $remote->getLastSent();
+
 		// it's old, update it
 		// //UPDATE Cars SET Name='Skoda Octavia' WHERE Id=3;
 		$query = 'UPDATE wpcom_vip_hash_remotes SET
