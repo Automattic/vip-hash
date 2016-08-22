@@ -49,25 +49,29 @@ interface DataModel {
 	public function getHashesSeenAfter( $date );
 
 	/**
-	 * @param     $name
-	 * @param     $uri
-	 * @param int $latest_seen
-	 * @param int $last_sent
+	 * @param Remote $remote
 	 *
 	 * @return bool
+	 * @internal param $name
+	 * @internal param $uri
+	 * @internal param int $latest_seen
+	 * @internal param int $last_sent
+	 *
 	 */
-	public function addRemote( $name, $uri, $latest_seen = 0, $last_sent = 0  );
+	public function addRemote( Remote $remote );
 
 	/**
-	 * @param     $id
-	 * @param     $name
-	 * @param     $uri
-	 * @param int $latest_seen
-	 * @param int $last_sent
+	 * @param Remote $remote
 	 *
 	 * @return bool
+	 * @internal param $id
+	 * @internal param $name
+	 * @internal param $uri
+	 * @internal param int $latest_seen
+	 * @internal param int $last_sent
+	 *
 	 */
-	public function updateRemote( $id, $name, $uri, $latest_seen = 0, $last_sent = 0 );
+	public function updateRemote( Remote $remote );
 
 	/**
 	 * @return Remote[]
