@@ -17,11 +17,11 @@ class RemotesCommand extends Command {
 	 */
 	protected function configure() {
 		$this->setName( 'remote' )
-			->setDescription( 'managing remotes' )
+			->setDescription( 'Managing remotes' )
 			->addArgument(
 				'subcommand',
 				InputArgument::REQUIRED,
-				'add or list'
+				'add, auth, list or rm'
 			)->addArgument(
 				'name',
 				InputArgument::OPTIONAL,
@@ -50,11 +50,13 @@ class RemotesCommand extends Command {
 		if ( 'auth' == $sub_command ) {
 			// authenticate a remote
 			$this->authenticate( $input, $output, $data );
+			return;
 		}
 
 		if ( 'rm' == $sub_command ) {
 			// remove a remote
 			$this->remove_remote( $output, $data );
+			return;
 		}
 
 		throw new \Exception( 'unknown subcommand '.$sub_command );
