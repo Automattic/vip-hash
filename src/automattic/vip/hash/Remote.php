@@ -24,6 +24,9 @@ class Remote {
 			$this->uri = $data['uri'];
 			$this->last_sent = $data['last_sent'];
 			$this->latest_seen = $data['latest_seen'];
+			$this->oauth2_access_token = $data['oauth2_access_token'];
+			$this->oauth2_expires = $data['oauth2_expires'];
+			$this->oauth2_refresh_token = $data['oauth2_refresh_token'];
 		}
 	}
 
@@ -128,5 +131,19 @@ class Remote {
 	 */
 	public function setOauth2RefreshToken( $oauth2_refresh_token ) {
 		$this->oauth2_refresh_token = $oauth2_refresh_token;
+	}
+
+	/**
+	 * @return int|mixed
+	 */
+	public function getId() {
+		return $this->id;
+	}
+
+	/**
+	 * @param int|mixed $id
+	 */
+	public function setId( $id ) {
+		$this->id = $id;
 	}
 }
