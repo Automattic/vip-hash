@@ -39,27 +39,46 @@ class RemotesCommand extends Command {
 	protected function execute( InputInterface $input, OutputInterface $output ) {
 		$sub_command = $input->getArgument( 'subcommand' );
 		$data = new Pdo_Data_Model();
-		if ( 'add' == $sub_command ) {
-			$name = $input->getArgument( 'name' );
-			$uri = $input->getArgument( 'uri' );
-			$remote = new Remote();
-			$remote->setName( $name );
-			$remote->setUri( $uri );
-			$result = $remote->save( $data );
-			if ( !$result ) {
-				$output->writeln( "<error>Saving the new entry failed</error>");
-			}
-			return;
-		} else if ( 'list' == $sub_command ) {
-			$result = $this->listRemotes( $data );
-			$json = json_encode( $result, JSON_PRETTY_PRINT );
-			$output->writeln( $json );
+		if ( 'add' === $sub_command ) {
+			$this->add_remote( $output, $data );
 			return;
 		}
-		throw new \Exception( 'unknown subcommand' );
+		if ( 'list' === $sub_command ) {
+			$this->list_remotes( $output, $data );
+			return;
+		}
+		if ( 'auth' == $sub_command ) {
+			// authenticate a remote
+			$this->authenticate( $input, $output, $data );
+		}
+
+		if ( 'rm' == $sub_command ) {
+			// remove a remote
+			$this->remove_remote( $output, $data );
+		}
+
+		throw new \Exception( 'unknown subcommand '.$sub_command );
 	}
 
-	protected function listRemotes( DataModel $data_model ) {
+	public function add_remote( OutputInterface $output, DataModel $data ) {
+		$name = $input->getArgument( 'name' );
+		$uri = $input->getArgument( 'uri' );
+		$remote = new Remote();
+		$remote->setName( $name );
+		$remote->setUri( $uri );
+		$result = $remote->save( $data );
+		if ( !$result ) {
+			$output->writeln( "<error>Saving the new entry failed</error>");
+		}
+	}
+
+	public function list_remotes( OutputInterface $output, DataModel $data ) {
+		$result = $this->get_remotes( $data );
+		$json = json_encode( $result, JSON_PRETTY_PRINT );
+		$output->writeln( $json );
+	}
+
+	public function get_remotes( DataModel $data_model ) {
 		$result = array();
 		$remotes = $data_model->getRemotes();
 		foreach ( $remotes as $remote ) {
@@ -71,5 +90,22 @@ class RemotesCommand extends Command {
 			);
 		}
 		return $result;
+	}
+
+	/**
+	 * @param InputInterface  $input
+	 * @param OutputInterface $output
+	 * @param DataModel       $data
+	 */
+	public function authenticate( InputInterface $input, OutputInterface $output, DataModel $data ) {
+		$output->writeln( "<error>Not supported yet</error>" );
+	}
+
+	/**
+	 * @param OutputInterface $output
+	 * @param DataModel       $data
+	 */
+	public function remove_remote( OutputInterface $output, DataModel $data ) {
+		$output->writeln( "<error>Not supported yet</error>" );
 	}
 }
