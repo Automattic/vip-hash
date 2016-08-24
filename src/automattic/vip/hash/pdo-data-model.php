@@ -46,9 +46,9 @@ class Pdo_Data_Model extends NullDataModel {
 			uri CHAR(255) NOT NULL,
 			latest_seen INT NOT NULL,
 			last_sent INT NOT NULL,
-			oauth_access CHAR(255),
-			oauth_expire CHAR(255),
-			oauth_refreshCHAR(255)
+			oauth_access_token CHAR(255),
+			oauth_expires CHAR(255),
+			oauth_refresh_token CHAR(255)
 		)' );
 	}
 
@@ -345,8 +345,13 @@ class Pdo_Data_Model extends NullDataModel {
 		$latest_seen = $remote->getLatestSeen();
 		$last_sent = $remote->getLastSent();
 
+		$oauth_access_token = $remote->getOauth2AccessToken();
+		$oauth_expires = $remote->getOauth2Expires();
+		$oauth_refresh_token = $remote->getOauth2RefreshToken();
+
 		$query = 'INSERT INTO wpcom_vip_hash_remotes VALUES
-			( :id, :name, :uri, :latest_seen, :last_sent )';
+			( :id, :name, :uri, :latest_seen, :last_sent,
+			:oauth_access_token, :oauth_expires, :oauth_refresh_token )';
 		$sth = $this->pdo->prepare( $query );
 		if ( !$sth ) {
 			$error_info = print_r( $this->pdo->errorInfo(), true );
@@ -354,11 +359,14 @@ class Pdo_Data_Model extends NullDataModel {
 			//throw new \Exception( 'failed to prepare statement' );
 		}
 		$result = $sth->execute( array(
-			':id'          => null,
-			':name'        => $name,
-			':uri'         => $uri,
-			':latest_seen' => $latest_seen,
-			':last_sent'   => $last_sent,
+			':id'                  => $id,
+			':name'                => $name,
+			':uri'                 => $uri,
+			':latest_seen'         => $latest_seen,
+			':last_sent'           => $last_sent,
+			':oauth_access_token'  => $oauth_access_token,
+			':oauth_expires'       => $oauth_expires,
+			':oauth_refresh_token' => $oauth_refresh_token,
 		) );
 
 		if ( ! $result ) {
@@ -375,21 +383,30 @@ class Pdo_Data_Model extends NullDataModel {
 		$latest_seen = $remote->getLatestSeen();
 		$last_sent = $remote->getLastSent();
 
+		$oauth_access_token = $remote->getOauth2AccessToken();
+		$oauth_expires = $remote->getOauth2Expires();
+		$oauth_refresh_token = $remote->getOauth2RefreshToken();
+
 		// it's old, update it
 		// //UPDATE Cars SET Name='Skoda Octavia' WHERE Id=3;
 		$query = 'UPDATE wpcom_vip_hash_remotes SET
-		 name= :name, uri = :uri, latest_seen = :latest_seen, last_sent = :last_sent WHERE id = :id';
+		 name= :name, uri = :uri, latest_seen = :latest_seen, last_sent = :last_sent,
+		 oauth_access_token = :oauth_access_token, oauth_expires = :oauth_expires,
+		 oauth_refresh_token = :oauth_refresh_token WHERE id = :id';
 		$sth   = $this->pdo->prepare( $query );
 		if ( !$sth ) {
 			$error_info = print_r( $this->pdo->errorInfo(), true );
 			throw new \Exception( $error_info );
 		}
 		$result = $sth->execute( array(
-			':id'          => $id,
-			':name'        => $name,
-			':uri'         => $uri,
-			':latest_seen' => $latest_seen,
-			':last_sent'   => $last_sent,
+			':id'                  => $id,
+			':name'                => $name,
+			':uri'                 => $uri,
+			':latest_seen'         => $latest_seen,
+			':last_sent'           => $last_sent,
+			':oauth_access_token'  => $oauth_access_token,
+			':oauth_expires'       => $oauth_expires,
+			':oauth_refresh_token' => $oauth_refresh_token,
 		) );
 
 		if ( ! $result ) {
