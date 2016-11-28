@@ -25,116 +25,13 @@ class Pdo_Data_Model extends NullDataModel {
 		if ( ! $this->pdo ) {
 			$this->pdo = new PDO( 'sqlite:' . $this->getDBDir() . 'db.sqlite' );
 		}
-		$this->create_tables();
-	}
-
-	private function create_tables( $prefix = 'wpcom_' ) {
-		$this->pdo->query( 'CREATE TABLE IF NOT EXISTS '.$prefix.'vip_hashes (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			identifier CHAR(100) NOT NULL UNIQUE,
-			user CHAR(50) NOT NULL,
-			hash CHAR(30) NOT NULL,
-			date INT NOT NULL,
-			seen INT NOT NULL,
-			status CHAR(30) NOT NULL,
-			notes TEXT,
-			human_note TEXT
-		)' );
-		$this->pdo->query( 'CREATE TABLE IF NOT EXISTS '.$prefix.'vip_hash_remotes (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			name CHAR(60) NOT NULL UNIQUE,
-			uri CHAR(255) NOT NULL,
-			latest_seen INT NOT NULL,
-			last_sent INT NOT NULL,
-			oauth_access_token CHAR(255),
-			oauth_expires CHAR(255),
-			oauth_refresh_token CHAR(255)
-		)' );
+		$helper = new pdo\DB_Helper( $this->pdo );
+		$helper->create_tables();
 	}
 
 	public function copy_and_upgrade() {
-		// start a transaction
-		$this->pdo->beginTransaction();
-
-		// create copies
-		$this->create_tables( 'wpcom_temp_' );
-
-		//copy data over to temporary tables
-		$this->copy_table( 'wpcom_vip_hashes', 'wpcom_temp_vip_hashes' );
-		//$this->copy_table( 'wpcom_vip_hash_remotes', 'wpcom_temp_vip_hash_remotes' );
-		//
-
-		// drop original tables
-		$this->drop_table( 'wpcom_vip_hashes' );
-		//$this->drop_table( 'wpcom_vip_hash_remotes' );
-
-		// rename copies to original
-		$this->rename_table( 'wpcom_temp_vip_hashes', 'wpcom_vip_hashes' );
-
-		//$this->rename_table( 'wpcom_temp_vip_hash_remotes', 'wpcom_vip_hash_remotes' );
-		$this->drop_table( 'wpcom_temp_vip_hash_remotes' );
-
-		// end transaction
-		$this->pdo->commit();
-	}
-
-	private function drop_table( $table_name ) {
-		// DROP TABLE X
-		$st = $this->pdo->prepare( 'DROP TABLE '.$table_name );
-		if ( ! $st ) {
-			$error_info = print_r( $this->pdo->errorInfo(), true );
-			throw new \Exception( $error_info );
-		}
-		$st->execute();
-	}
-
-	private function copy_table( $source, $target ) {
-		// INSERT INTO new_X SELECT ... FROM X
-		// get rid of duplicate identifiers
-		$sql = "delete from $source where rowid not in
-		 (
-		 select  min(rowid)
-		 from    $source
-		 group by
-				 identifier
-		 )";
-		print_r( $sql."\n" );
-		$st = $this->pdo->prepare( $sql );
-		if ( ! $st ) {
-			$error_info = print_r( $this->pdo->errorInfo(), true );
-			throw new \Exception( $error_info );
-		}
-		$st->execute();
-
-		$columns = implode( ', ', [
-			'id',
-			'identifier',
-			'user',
-			'hash',
-			'date',
-			'seen',
-			'status',
-			'notes',
-			'""',
-		] );
-		$sql = 'INSERT INTO '.$target.' SELECT '.$columns.' FROM '.$source ;
-		print_r( $sql."\n" );
-		$st = $this->pdo->prepare( $sql );
-		if ( ! $st ) {
-			$error_info = print_r( $this->pdo->errorInfo(), true );
-			throw new \Exception( $error_info );
-		}
-		$st->execute();
-	}
-
-	private function rename_table( $old, $new ) {
-		// ALTER TABLE new_X RENAME TO X
-		$st = $this->pdo->prepare( 'ALTER TABLE '.$old.' RENAME TO '.$new );
-		if ( ! $st ) {
-			$error_info = print_r( $this->pdo->errorInfo(), true );
-			throw new \Exception( $error_info );
-		}
-		$st->execute();
+		$helper = new pdo\DB_Helper( $this->pdo );
+		$helper->copy_and_upgrade();
 	}
 
 	/**
@@ -350,16 +247,15 @@ class Pdo_Data_Model extends NullDataModel {
 		$oauth_refresh_token = $remote->getOauth2RefreshToken();
 
 		$query = 'INSERT INTO wpcom_vip_hash_remotes VALUES
-			( :id, :name, :uri, :latest_seen, :last_sent,
-			:oauth_access_token, :oauth_expires, :oauth_refresh_token )';
+			( :id, :name, :uri, :latest_seen, :last_sent,:oauth_access_token, :oauth_expires, :oauth_refresh_token )';
 		$sth = $this->pdo->prepare( $query );
-		if ( !$sth ) {
+		if ( ! $sth ) {
 			$error_info = print_r( $this->pdo->errorInfo(), true );
 			throw new \Exception( $error_info );
 			//throw new \Exception( 'failed to prepare statement' );
 		}
 		$result = $sth->execute( array(
-			':id'                  => $id,
+			':id'                  => '',
 			':name'                => $name,
 			':uri'                 => $uri,
 			':latest_seen'         => $latest_seen,
@@ -394,7 +290,7 @@ class Pdo_Data_Model extends NullDataModel {
 		 oauth_access_token = :oauth_access_token, oauth_expires = :oauth_expires,
 		 oauth_refresh_token = :oauth_refresh_token WHERE id = :id';
 		$sth   = $this->pdo->prepare( $query );
-		if ( !$sth ) {
+		if ( ! $sth ) {
 			$error_info = print_r( $this->pdo->errorInfo(), true );
 			throw new \Exception( $error_info );
 		}
