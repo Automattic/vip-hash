@@ -25,7 +25,7 @@ class Pdo_Data_Model extends NullDataModel {
 		if ( ! $this->pdo ) {
 			$this->pdo = new PDO( 'sqlite:' . $this->getDBDir() . 'db.sqlite' );
 		}
-		$helper = new pdo\DB_Helper( $this->pdo );
+		$helper = new \automattic\vip\hash\pdo\DB_Helper( $this->pdo );
 		$helper->create_tables();
 	}
 
