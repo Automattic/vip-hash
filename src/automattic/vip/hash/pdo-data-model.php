@@ -34,7 +34,7 @@ class Pdo_Data_Model extends NullDataModel {
 	 * @return bool did it succeed?
 	 */
 	public function copy_and_upgrade() {
-		$helper = new pdo\DB_Helper( $this->pdo );
+		$helper = new \automattic\vip\hash\pdo\DB_Helper( $this->pdo );
 		return $helper->copy_and_upgrade();
 	}
 
