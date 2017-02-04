@@ -10,10 +10,7 @@ class Remote {
 	private $last_sent = 0;
 	private $latest_seen = 0;
 
-	private $oauth2_access_token = '';
-	private $oauth2_expires = 0;
-	private $oauth2_refresh_token = '';
-
+	private $oauth_details = '';
 	/**
 	 * @param $data
 	 */
@@ -24,9 +21,7 @@ class Remote {
 			$this->uri = $data['uri'];
 			$this->last_sent = $data['last_sent'];
 			$this->latest_seen = $data['latest_seen'];
-			$this->oauth2_access_token = $data['oauth2_access_token'];
-			$this->oauth2_expires = $data['oauth2_expires'];
-			$this->oauth2_refresh_token = $data['oauth2_refresh_token'];
+			$this->oauth_details = $data['oauth_details'];
 		}
 	}
 
@@ -94,43 +89,15 @@ class Remote {
 	/**
 	 * @return string
 	 */
-	public function getOauth2AccessToken() {
-		return $this->oauth2_access_token;
+	public function getOauthDetails() {
+		return $this->oauth_details;
 	}
 
 	/**
 	 * @param string $oauth2_access_token
 	 */
-	public function setOauth2AccessToken( $oauth2_access_token ) {
-		$this->oauth2_access_token = $oauth2_access_token;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getOauth2Expires() {
-		return $this->oauth2_expires;
-	}
-
-	/**
-	 * @param int $oauth2_expires
-	 */
-	public function setOauth2Expires( $oauth2_expires ) {
-		$this->oauth2_expires = $oauth2_expires;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getOauth2RefreshToken() {
-		return $this->oauth2_refresh_token;
-	}
-
-	/**
-	 * @param string $oauth2_refresh_token
-	 */
-	public function setOauth2RefreshToken( $oauth2_refresh_token ) {
-		$this->oauth2_refresh_token = $oauth2_refresh_token;
+	public function setOauthDetails( $oauth_details ) {
+		$this->oauth_details = $oauth_details;
 	}
 
 	/**
