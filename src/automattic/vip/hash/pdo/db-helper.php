@@ -33,6 +33,11 @@ class DB_Helper {
 		)' );
 	}
 
+	/**
+	 * Copies the tables and uses the latest schema to do so
+	 *
+	 * @return bool did PDO commit succeed?
+	 */
 	public function copy_and_upgrade() {
 		// start a transaction
 		$this->pdo->beginTransaction();
@@ -56,7 +61,7 @@ class DB_Helper {
 		$this->drop_table( 'wpcom_temp_vip_hash_remotes' );
 
 		// end transaction
-		$this->pdo->commit();
+		return $this->pdo->commit();
 	}
 
 	public function drop_table( $table_name ) {

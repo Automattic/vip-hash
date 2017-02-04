@@ -29,9 +29,13 @@ class Pdo_Data_Model extends NullDataModel {
 		$helper->create_tables();
 	}
 
+	/**
+	 * Attempts to upgrade the database table scheme
+	 * @return bool did it succeed?
+	 */
 	public function copy_and_upgrade() {
 		$helper = new pdo\DB_Helper( $this->pdo );
-		$helper->copy_and_upgrade();
+		return $helper->copy_and_upgrade();
 	}
 
 	/**
