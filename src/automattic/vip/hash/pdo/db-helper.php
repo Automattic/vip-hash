@@ -46,19 +46,19 @@ class DB_Helper {
 		$this->create_tables( 'wpcom_temp_' );
 
 		//copy data over to temporary tables
-		$this->copy_table( 'wpcom_vip_hashes', 'wpcom_temp_vip_hashes' );
-		//$this->copy_table( 'wpcom_vip_hash_remotes', 'wpcom_temp_vip_hash_remotes' );
+		$this->copy_hash_table( 'wpcom_vip_hashes', 'wpcom_temp_vip_hashes' );
+		$this->copy_remotes_table( 'wpcom_vip_hash_remotes', 'wpcom_temp_vip_hash_remotes' );
 		//
 
 		// drop original tables
 		$this->drop_table( 'wpcom_vip_hashes' );
-		//$this->drop_table( 'wpcom_vip_hash_remotes' );
+		$this->drop_table( 'wpcom_vip_hash_remotes' );
 
 		// rename copies to original
 		$this->rename_table( 'wpcom_temp_vip_hashes', 'wpcom_vip_hashes' );
 
-		//$this->rename_table( 'wpcom_temp_vip_hash_remotes', 'wpcom_vip_hash_remotes' );
-		$this->drop_table( 'wpcom_temp_vip_hash_remotes' );
+		$this->rename_table( 'wpcom_temp_vip_hash_remotes', 'wpcom_vip_hash_remotes' );
+		//$this->drop_table( 'wpcom_temp_vip_hash_remotes' );
 
 		// end transaction
 		return $this->pdo->commit();
@@ -74,7 +74,7 @@ class DB_Helper {
 		$st->execute();
 	}
 
-	public function copy_table( $source, $target ) {
+	public function copy_hash_table( $source, $target ) {
 		// INSERT INTO new_X SELECT ... FROM X
 		// get rid of duplicate identifiers
 		$sql = "delete from $source where rowid not in
@@ -83,6 +83,46 @@ class DB_Helper {
 		 from    $source
 		 group by
 				 identifier
+		 )";
+		print_r( $sql."\n" );
+		$st = $this->pdo->prepare( $sql );
+		if ( ! $st ) {
+			$error_info = print_r( $this->pdo->errorInfo(), true );
+			throw new \Exception( $error_info );
+		}
+		$st->execute();
+
+		$columns = implode( ', ', [
+			'id',
+			'identifier',
+			'user',
+			'hash',
+			'date',
+			'seen',
+			'status',
+			'notes',
+			'""',
+		] );
+		$sql = 'INSERT INTO '.$target.' SELECT '.$columns.' FROM '.$source ;
+		print_r( $sql."\n" );
+		$st = $this->pdo->prepare( $sql );
+		if ( ! $st ) {
+			$error_info = print_r( $this->pdo->errorInfo(), true );
+			throw new \Exception( $error_info );
+		}
+		$st->execute();
+	}
+
+	public function copy_remotes_table( $source, $target ) {
+		throw new \Exception( 'Copying the remotes table is not supported at the moment, WIP' );
+		// INSERT INTO new_X SELECT ... FROM X
+		// get rid of duplicate identifiers
+		$sql = "delete from $source where rowid not in
+		 (
+		 select  min(rowid)
+		 from    $source
+		 group by
+				 id
 		 )";
 		print_r( $sql."\n" );
 		$st = $this->pdo->prepare( $sql );
