@@ -29,9 +29,7 @@ class DB_Helper {
 			uri CHAR(255) NOT NULL,
 			latest_seen INT NOT NULL,
 			last_sent INT NOT NULL,
-			oauth_access_token CHAR(255),
-			oauth_expires CHAR(255),
-			oauth_refresh_token CHAR(255)
+			oauth_details CHAR(1024)
 		)' );
 	}
 
