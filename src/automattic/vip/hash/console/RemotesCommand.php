@@ -17,7 +17,7 @@ class RemotesCommand extends Command {
 	 */
 	protected function configure() {
 		$this->setName( 'remote' )
-			->setDescription( 'Managing remotes' )
+			->setDescription( "A subcommand for managing remote data sources. This will allow sending, recieving and syncing to remote servers using OAuth1a\n\nExamples:\n\nviphash remote add origin example.com secret key\n\nviphash remote list" )
 			->addArgument(
 				'subcommand',
 				InputArgument::REQUIRED,
@@ -30,6 +30,14 @@ class RemotesCommand extends Command {
 				'uri',
 				InputArgument::OPTIONAL,
 				'the uri of the remote to add'
+			)->addArgument(
+				'secret',
+				InputArgument::OPTIONAL,
+				'An OAuth1a secret'
+			)->addArgument(
+				'key',
+				InputArgument::OPTIONAL,
+				'An OAuth1a key'
 			);
 	}
 
@@ -65,6 +73,8 @@ class RemotesCommand extends Command {
 	public function add_remote( OutputInterface $output, DataModel $data ) {
 		$name = $input->getArgument( 'name' );
 		$uri = $input->getArgument( 'uri' );
+		$secret = $input->getArgument( 'secret' );
+		$key = $input->getArgument( 'key' );
 		$remote = new Remote();
 		$remote->setName( $name );
 		$remote->setUri( $uri );
