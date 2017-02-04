@@ -116,7 +116,7 @@ class RemotesCommand extends Command {
 
 			$output->writeln( 'Interesting response, wrangling...' );
 
-			$token = new OAuthToken( $token_args['oauth_token'], $token_args['oauth_token_secret'] );
+			$token = new \OAuthToken( $token_args['oauth_token'], $token_args['oauth_token_secret'] );
 			$auth->set_token( $token );
 
 			$output->writeln( 'Building the auth URL' );
@@ -148,7 +148,7 @@ class RemotesCommand extends Command {
 			$response = $auth->get_access_token( $session, $index_data->authentication->oauth1->access, $code );
 			parse_str( $response->body, $token_args );
 
-			$token = new OAuthToken( $token_args['oauth_token'], $token_args['oauth_token_secret'] );
+			$token = new \OAuthToken( $token_args['oauth_token'], $token_args['oauth_token_secret'] );
 			$auth->set_token( $token );
 
 			$remote = new Remote();
@@ -158,7 +158,7 @@ class RemotesCommand extends Command {
 			$result = $data->addRemote( $remote );
 
 			if ( ! $result ) {
-				$output->writeln( '<error>Saving the new remote failed</error>');
+				$output->writeln( '<error>Saving the new remote failed</error>' );
 				return;
 			}
 
