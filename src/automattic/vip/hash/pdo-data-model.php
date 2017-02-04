@@ -70,7 +70,7 @@ class Pdo_Data_Model extends NullDataModel {
 		$sth = $pdo->prepare( $query );
 		if ( ! $sth ) {
 			$error_info = print_r( $pdo->errorInfo(), true );
-			throw new \Exception( "Error creating insert statement ".$error_info );
+			throw new \Exception( 'Error creating insert statement '.$error_info );
 		}
 		$result = $sth->execute( array(
 			':id'         => null,
@@ -149,7 +149,32 @@ class Pdo_Data_Model extends NullDataModel {
 		if ( ! empty( $this->dbdir ) ) {
 			return $this->dbdir;
 		}
-		$folders = array();
+		$folders = $this->searchDBFolders();
+
+		$folder = '';
+		if ( ! empty( $folders ) ) {
+			foreach ( $folders as $f ) {
+				if ( ! is_writable( $f ) ) {
+					continue;
+				}
+				if ( ( ! file_exists( $f ) ) && ( ! mkdir( $f, 0777, true ) ) ) {
+					continue;
+				}
+				$folder = $f;
+				break;
+			}
+		}
+		$this->dbdir = $folder;
+		return $folder;
+	}
+
+	/**
+	 * Search for various folders that could contain the database
+	 * 
+	 * @return array an array of strings representing folder paths
+	 */
+	protected function searchDBFolders() {
+		$folders = [];
 		if ( ! empty( $_SERVER['HOME'] ) ) {
 			$folders[] = $_SERVER['HOME'].DIRECTORY_SEPARATOR.'.viphash'.DIRECTORY_SEPARATOR;
 		}
@@ -163,22 +188,8 @@ class Pdo_Data_Model extends NullDataModel {
 		if ( ! empty( $_SERVER['HOMEDRIVE'] ) && ! empty( $_SERVER['HOMEPATH'] ) ) {
 			$folders[] = $_SERVER['HOMEDRIVE']. $_SERVER['HOMEPATH'].DIRECTORY_SEPARATOR.'.viphash'.DIRECTORY_SEPARATOR;
 		}
-		$folder[] = '.viphash'.DIRECTORY_SEPARATOR;
-
-		$folder = '';
-		foreach ( $folders as $f ) {
-			if ( ! is_writable( $f ) ) {
-				continue;
-			}
-			if ( ( ! file_exists( $f ) ) &&
-				( ! mkdir( $f, 0777, true ) ) ) {
-				continue;
-			}
-			$folder = $f;
-			break;
-		}
-		$this->dbdir = $folder;
-		return $folder;
+		$folders[] = '.viphash'.DIRECTORY_SEPARATOR;
+		return $folders;
 	}
 
 	public function getNewestSeenHash() {
@@ -241,13 +252,10 @@ class Pdo_Data_Model extends NullDataModel {
 		$uri = $remote->getUri();
 		$latest_seen = $remote->getLatestSeen();
 		$last_sent = $remote->getLastSent();
-
-		$oauth_access_token = $remote->getOauth2AccessToken();
-		$oauth_expires = $remote->getOauth2Expires();
-		$oauth_refresh_token = $remote->getOauth2RefreshToken();
+		$oauth_details = $remote->getOauthDetails();
 
 		$query = 'INSERT INTO wpcom_vip_hash_remotes VALUES
-			( :id, :name, :uri, :latest_seen, :last_sent,:oauth_access_token, :oauth_expires, :oauth_refresh_token )';
+			( :id, :name, :uri, :latest_seen, :last_sent, :oauth_details )';
 		$sth = $this->pdo->prepare( $query );
 		if ( ! $sth ) {
 			$error_info = print_r( $this->pdo->errorInfo(), true );
@@ -260,9 +268,7 @@ class Pdo_Data_Model extends NullDataModel {
 			':uri'                 => $uri,
 			':latest_seen'         => $latest_seen,
 			':last_sent'           => $last_sent,
-			':oauth_access_token'  => $oauth_access_token,
-			':oauth_expires'       => $oauth_expires,
-			':oauth_refresh_token' => $oauth_refresh_token,
+			':oauth_details'       => serialize( $oauth_details ),
 		) );
 
 		if ( ! $result ) {
