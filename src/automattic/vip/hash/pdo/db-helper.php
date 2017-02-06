@@ -9,10 +9,15 @@ class DB_Helper {
 	private $pdo;
 	public function __construct( \PDO $pdo ) {
 		$this->pdo = $pdo;
+		$this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 	}
 
-	public function create_tables( $prefix = 'wpcom_' ) {
-		$this->pdo->query( 'CREATE TABLE IF NOT EXISTS '.$prefix.'vip_hashes (
+	public function create_tables( $prefix = 'wpcom_', $conditional = true ) {
+		$not_exists = '';
+		if ( true === $conditional ) {
+			$not_exists = 'IF NOT EXISTS ';
+		}
+		$this->pdo->query( 'CREATE TABLE '.$not_exists.$prefix.'vip_hashes (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			identifier CHAR(100) NOT NULL UNIQUE,
 			user CHAR(50) NOT NULL,
@@ -23,13 +28,14 @@ class DB_Helper {
 			notes TEXT,
 			human_note TEXT
 		)' );
-		$this->pdo->query( 'CREATE TABLE IF NOT EXISTS '.$prefix.'vip_hash_remotes (
+
+		$this->pdo->query( 'CREATE TABLE '.$not_exists.$prefix.'vip_hash_remotes (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			name CHAR(60) NOT NULL UNIQUE,
 			uri CHAR(255) NOT NULL,
 			latest_seen INT NOT NULL,
 			last_sent INT NOT NULL,
-			oauth_details CHAR(1024)
+			oauth_details TEXT
 		)' );
 	}
 
@@ -43,7 +49,7 @@ class DB_Helper {
 		$this->pdo->beginTransaction();
 
 		// create copies
-		$this->create_tables( 'wpcom_temp_' );
+		$this->create_tables( 'wpcom_temp_', false );
 
 		//copy data over to temporary tables
 		$this->copy_hash_table( 'wpcom_vip_hashes', 'wpcom_temp_vip_hashes' );
@@ -114,33 +120,12 @@ class DB_Helper {
 	}
 
 	public function copy_remotes_table( $source, $target ) {
-		throw new \Exception( 'Copying the remotes table is not supported at the moment, WIP' );
-		// INSERT INTO new_X SELECT ... FROM X
-		// get rid of duplicate identifiers
-		$sql = "delete from $source where rowid not in
-		 (
-		 select  min(rowid)
-		 from    $source
-		 group by
-				 id
-		 )";
-		print_r( $sql."\n" );
-		$st = $this->pdo->prepare( $sql );
-		if ( ! $st ) {
-			$error_info = print_r( $this->pdo->errorInfo(), true );
-			throw new \Exception( $error_info );
-		}
-		$st->execute();
-
 		$columns = implode( ', ', [
 			'id',
-			'identifier',
-			'user',
-			'hash',
-			'date',
-			'seen',
-			'status',
-			'notes',
+			'name',
+			'uri',
+			'latest_seen',
+			'last_sent',
 			'""',
 		] );
 		$sql = 'INSERT INTO '.$target.' SELECT '.$columns.' FROM '.$source ;
