@@ -6,13 +6,10 @@ use automattic\vip\hash\DataModel;
 use automattic\vip\hash\HashRecord;
 use automattic\vip\hash\Pdo_Data_Model;
 use automattic\vip\hash\Remote;
-use GuzzleHttp\Exception\ParseException;
-use GuzzleHttp\Exception\ServerException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use GuzzleHttp\Client;
 
 /**
  * Handle syncing hashes with a remote source
@@ -54,8 +51,8 @@ class SyncCommand extends Command {
 
 		$output->writeln( '<comment>Fetching new remote hashes</comment>' );
 		$hashes = $this->fetchHashes( $remote );
-		if ( $hashes === false ) {
-			$output->writeln( "<error>Fetching hashes failed</error>" );
+		if ( false === $hashes ) {
+			$output->writeln( '<error>Fetching hashes failed</error>' );
 			return;
 		}
 		if ( count( $hashes ) == 0 ) {
@@ -71,8 +68,8 @@ class SyncCommand extends Command {
 			return;
 		}
 
-		if ( !empty( $hashes ) ) {
-			$output->writeln( "<comment>Saving the new hashes</comment>" );
+		if ( ! empty( $hashes ) ) {
+			$output->writeln( '<comment>Saving the new hashes</comment>' );
 			$this->saveHashes( $hashes, $output, $data );
 		}
 
@@ -105,11 +102,19 @@ class SyncCommand extends Command {
 		 * Finish by retrieving the data from the remote end that we don't have
 		 */
 
+		$response = \Request::get( $remote->getUri() . 'hashes?since=' . $i_saw );
+		if ( 200 !== $response->status_code ) {
+			echo "Problem response code? ".$response->status_code."\n";
+			return false;
+		}
+		$new_items = json_encode( $response->body );
+		return $new_items;
+
 		/**
 		 * @var: $response \GuzzleHttp\Message\ResponseInterface
 		 */
 		$response = $client->get( $remote->getUri() . 'hashes?since=' . $i_saw );
-		if ( $response->getStatusCode() != 200 ) {
+		if ( 200 !== $response->getStatusCode() ) {
 			echo "Problem response code? ".$response->getStatusCode()."\n";
 			return false;
 		}
@@ -159,7 +164,7 @@ class SyncCommand extends Command {
 			$output->writeln( '<info>No hashes to send</info>' );
 			return true;
 		}
-		$output->writeln( '<info>Hashes to send: '. count( $send_data )."</info>" );
+		$output->writeln( '<info>Hashes to send: '. count( $send_data ).'</info>' );
 
 		// don't send a request with thousands of hashes all at once,
 		// some servers have request size limits
@@ -170,11 +175,11 @@ class SyncCommand extends Command {
 		$counter = 0;
 		foreach ( $chunks as $chunk ) {
 			$counter ++;
-			$output->writeln( '<info>Sending chunk : '. $counter .' of '. count( $chunks )."</info>" );
+			$output->writeln( '<info>Sending chunk : '. $counter .' of '. count( $chunks ).'</info>' );
 			$sent = $this->sendHashChunk( $chunk, $remote, $output );
 			// if something went wrong, don't continue sending chunks
 			if ( ! $sent ) {
-				$output->writeln( "<error>Chunk ". $counter .' of '. count( $chunks ) ." failed to send</error>" );
+				$output->writeln( '<error>Chunk '. $counter .' of '. count( $chunks ) .' failed to send</error>' );
 				return false;
 			}
 		}
@@ -203,8 +208,8 @@ class SyncCommand extends Command {
 			// @TODO: do something with the response
 			//$json = $response->json();
 			if ( $response->getStatusCode() != 200 ) {
-				echo "Problem response code? ".$response->getStatusCode()."--\n";
-				echo $response->getBody()->getContents()."|";
+				echo 'Problem response code? '.$response->getStatusCode()."--\n";
+				echo $response->getBody()->getContents().'|';
 				return false;
 			}
 			$remote->setLastSent( time() );
