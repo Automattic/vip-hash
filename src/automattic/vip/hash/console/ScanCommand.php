@@ -99,7 +99,11 @@ class ScanCommand extends FileSystemCommand {
 		$notes = '';
 		foreach ( $node['hashes'] as $hash ) {
 			if ( 'false' == $hash['status']  ) {
-				$notes .= PHP_EOL.'Notes';
+				if ( ! empty( $hash['human_note'] ) ) {
+					$notes .= PHP_EOL.$hash['human_note'];
+				} else {
+					$notes .= PHP_EOL.'@TODO: Notes';
+				}
 				$notes .= PHP_EOL.PHP_EOL.'```'.PHP_EOL.$hash['notes'].PHP_EOL.'```'.PHP_EOL;
 			}
 		}
