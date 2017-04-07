@@ -54,7 +54,12 @@ class ScanCommand extends FileSystemCommand {
 				$output->writeln("<info>".implode(', ', FileSystemCommand::$allowed_file_types )."</info>");
 				return;
 			}
-			$markdown = '';
+			$markdown = '# Feedback'.PHP_EOL.PHP_EOL;
+			$markdown .= '## General Feedback'.PHP_EOL.PHP_EOL;
+			$markdown .= '@TODO: General notes'.PHP_EOL.PHP_EOL;
+
+			$markdown .= '## Line by Line Feedback'.PHP_EOL.PHP_EOL;
+			$markdown .= 'Note: Issues may appear more than once in a file, a search replace in your editor will reveal all instances of an issue and their line numbers'.PHP_EOL.PHP_EOL;
 			$markdown .= $this->displayMarkdown( $data );
 
 			// use relative paths rather than full paths
@@ -73,9 +78,9 @@ class ScanCommand extends FileSystemCommand {
 		} else if ( ! empty( $node['file'] ) ) {
 			$md = $this->displayFileMarkdown( $node );//
 		}
-		if ( ! empty( $md ) ) {
+		/*if ( ! empty( $md ) ) {
 			$md .= PHP_EOL;
-		}
+		}*/
 		return $md;
 	}
 
@@ -108,7 +113,7 @@ class ScanCommand extends FileSystemCommand {
 			}
 		}
 		if ( ! empty( $notes ) ) {
-			$md .= '## '.$node['file'].PHP_EOL.$notes;
+			$md .= '### '.$node['file'].PHP_EOL.$notes.PHP_EOL;
 		}
 		return $md;
 	}
