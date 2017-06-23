@@ -16,12 +16,17 @@ class HashRecord {
 	/**
 	 * HashRecord constructor.
 	 */
-	function __construct() {
+	function __construct( $file = '' ) {
+
+		$hash = '';
+		if ( ! empty( $file ) ) {
+			$hash = $this->hashFile( $file );
+		}
 		$this->data = array(
 			'date' => time(),
 			'username' => '',
 			'status' => false,
-			'hash' => '',
+			'hash' => $hash,
 			'notes' => '',
 			'human_note' => '',
 		);
@@ -123,5 +128,26 @@ class HashRecord {
 	 */
 	public function setData( $data ) {
 		$this->data = $data;
+	}
+
+	/**
+	 * @param $file
+	 *
+	 * @return string
+	 * @throws \Exception
+	 */
+	public function hashFile( $file ) {
+		if ( ! file_exists( $file ) ) {
+			throw new \Exception( 'File does not exist' );
+		}
+		if ( is_dir( $file ) ) {
+			throw new \Exception( 'You cannot hash a folder "' . $file . '"' );
+		}
+		if ( ! is_file( $file ) ) {
+			throw new \Exception( 'Only files can be hashed' );
+		}
+		$code = php_strip_whitespace( $file );
+		$hash = sha1( $code );
+		return $hash;
 	}
 }
