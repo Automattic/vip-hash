@@ -23,7 +23,7 @@ class StatusCommand extends FileSystemCommand {
 	private $status_markup = [
 		'?' => '<comment>%s</comment>',
 		'~' => '<mixed>%s</mixed>',
-		'x' => '<bad>%s</bad>',
+		'x' => '<problem>%s</problem>',
 		'✓' => '<info>%s</info>',
 	];
 
@@ -33,7 +33,7 @@ class StatusCommand extends FileSystemCommand {
 	private $status_names = [
 		'?' => 'Not seen',
 		'~' => 'Mixed',
-		'x' => 'Bad',
+		'x' => 'Problematic',
 		'✓' => 'Good',
 	];
 
@@ -42,7 +42,7 @@ class StatusCommand extends FileSystemCommand {
 	 */
 	protected function configure() {
 		$this->setName( 'status' )
-			->setDescription( 'take a folder and generates a status report of good bad and unknown file hashes' )
+			->setDescription( 'take a folder and generates a status report of good problematic and unknown file hashes' )
 			->addArgument(
 				'folder',
 				InputArgument::OPTIONAL,
@@ -58,24 +58,24 @@ class StatusCommand extends FileSystemCommand {
 	 */
 	protected function execute( InputInterface $input, OutputInterface $output ) {
 		$folder = $input->getArgument( 'folder' );
-		if ( empty( $folder ) || $folder === '.' ) {
+		if ( empty( $folder ) || '.' === $folder ) {
 			$folder = getcwd();
-		} elseif ( $folder === '..' ) {
+		} elseif ( '..' === $folder ) {
 			$folder = dirname( getcwd() );
 		}
-		$mixed_style = new OutputFormatterStyle('magenta', null );
-		$bad_style = new OutputFormatterStyle('red', null );
-		$bold_style = new OutputFormatterStyle('white', null );
-		$output->getFormatter()->setStyle('mixed', $mixed_style );
-		$output->getFormatter()->setStyle('bad', $bad_style );
-		$output->getFormatter()->setStyle('bold', $bold_style );
+		$mixed_style = new OutputFormatterStyle( 'magenta', null );
+		$problem_style = new OutputFormatterStyle( 'red', null );
+		$bold_style = new OutputFormatterStyle( 'white', null );
+		$output->getFormatter()->setStyle( 'mixed', $mixed_style );
+		$output->getFormatter()->setStyle( 'problem', $problem_style );
+		$output->getFormatter()->setStyle( 'bold', $bold_style );
 
 		$data_model = new Pdo_Data_Model();
 		$fileInfo = new SplFileInfo( $folder );
 		$data = $this->processNode( $fileInfo, $data_model );
 		if ( empty( $data ) ) {
-			$output->writeln("<info>There are no reviewable files to check the status for. The tools scan/status commands look for these file extensions:</info>");
-			$output->writeln("<info>".implode(', ', FileSystemCommand::$allowed_file_types )."</info>");
+			$output->writeln( '<info>There are no reviewable files to check the status for. The tools scan/status commands look for these file extensions:</info>' );
+			$output->writeln( '<info>'.implode( ', ', FileSystemCommand::$allowed_file_types ).'</info>' );
 			return;
 		}
 		$this->display_tree( $output, $data );
@@ -286,5 +286,4 @@ class StatusCommand extends FileSystemCommand {
 		}
 		return $result;
 	}
-
 }
