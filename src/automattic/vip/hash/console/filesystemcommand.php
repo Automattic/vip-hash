@@ -13,6 +13,7 @@ abstract class FileSystemCommand extends Command {
 		'php',
 		'php5',
 		'js',
+		'svg',
 		'html',
 		'htm',
 		'twig',
