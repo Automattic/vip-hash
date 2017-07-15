@@ -69,10 +69,10 @@ class SyncCommand extends Command {
 		}
 
 		if ( ! empty( $hashes ) ) {
-			$output->writeln( '<comment>Saving the new hashes</comment>' );
 			if ( empty( $hashes ) ) {
-				$output->writeln( 'No new hashes recieved' );
+				$output->writeln( '<comment>No new hashes recieved</comment>' );
 			} else {
+				$output->writeln( '<comment>Saving the new hashes</comment>' );
 				$output->writeln( 'Saving ' . count( $hashes ) . ' new hashes' );
 				$this->saveHashes( $hashes );
 			}
@@ -89,7 +89,7 @@ class SyncCommand extends Command {
 		}
 		$output->writeln( $message );
 
-		$output->writeln( 'Synchronised hashes with ' . $remote->getName() . ' - ' . $remote->getUri() );
+		$output->writeln( '<info>Synchronised hashes with ' . $remote->getName() . ' - ' . $remote->getUri() . '</info>');
 	}
 
 	/**
