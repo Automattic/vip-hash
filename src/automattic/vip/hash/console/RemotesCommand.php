@@ -22,7 +22,7 @@ class RemotesCommand extends Command {
 			->addArgument(
 				'subcommand',
 				InputArgument::REQUIRED,
-				'add, auth, list or rm'
+				'add, list or rm'
 			)->addArgument(
 				'name',
 				InputArgument::OPTIONAL,
@@ -54,11 +54,6 @@ class RemotesCommand extends Command {
 		}
 		if ( 'list' === $sub_command ) {
 			$this->list_remotes( $output, $data );
-			return;
-		}
-		if ( 'auth' == $sub_command ) {
-			// authenticate a remote
-			$this->authenticate( $input, $output, $data );
 			return;
 		}
 
@@ -192,15 +187,6 @@ class RemotesCommand extends Command {
 			);
 		}
 		return $result;
-	}
-
-	/**
-	 * @param InputInterface  $input
-	 * @param OutputInterface $output
-	 * @param DataModel       $data
-	 */
-	public function authenticate( InputInterface $input, OutputInterface $output, DataModel $data ) {
-		$output->writeln( "<error>Not supported yet</error>" );
 	}
 
 	/**
