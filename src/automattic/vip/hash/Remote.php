@@ -120,12 +120,13 @@ class Remote {
 	 * @return mixed
 	 *
 	 */
-	protected function fetchHashes( ) {
+	public function fetchHashes( ) {
 		/**
 		 * Finish by retrieving the data from the remote end that we don't have
 		 */
+		$oauth = $this->getOauthDetails();
 		$i_saw = $this->getLatestSeen();
-		$response = \Request::get( $remote->getUri() . 'hashes?since=' . $i_saw );
+		$response = \Requests::get( $this->getUri() . 'hashes?since=' . $i_saw );
 		if ( 200 !== $response->status_code ) {
 			//echo "Problem response code? ".$response->status_code."\n";
 			return false;
@@ -141,13 +142,15 @@ class Remote {
 	 *
 	 * @return bool
 	 */
-	protected function sendHashChunk( array $data ) {
+	public function sendHashChunk( array $data ) {
 		$send_data = json_encode( $data );
+
+		$oauth = $this->getOauthDetails();
 
 		/**
 		 * @var: $response \Requests_Response
 		 */
-		$response = \Request::post( $this->getUri() . 'hashes', array(), $send_data, array() );
+		$response = \Requests::post( $this->getUri() . 'hashes', array(), $send_data, array() );
 
 		if ( 200 !== $response->status_code ) {
 			/*echo 'Problem response code? '.$response->getStatusCode()."--\n";
