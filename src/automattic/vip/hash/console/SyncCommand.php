@@ -47,7 +47,7 @@ class SyncCommand extends Command {
 			throw new \Exception( 'There was an issue trying to get the remotes information, does this remote name exist?' );
 		}
 
-		$output->writeln( '<comment>Synchronising hashes with ' . $remote->getName() . ' - ' . $remote->getUri().'</comment>' );
+		$output->writeln( '<comment>Synchronising hashes with ' . $remote->getName() . ' - ' . $remote->getUri() . '</comment>' );
 
 		$output->writeln( '<comment>Fetching new remote hashes</comment>' );
 		$hashes = $remote->fetchHashes();
@@ -73,7 +73,7 @@ class SyncCommand extends Command {
 			if ( empty( $hashes ) ) {
 				$output->writeln( 'No new hashes recieved' );
 			} else {
-				$output->writeln( 'Saving '. count( $hashes ). ' new hashes' );
+				$output->writeln( 'Saving ' . count( $hashes ) . ' new hashes' );
 				$this->saveHashes( $hashes, $data );
 			}
 		}
@@ -129,7 +129,7 @@ class SyncCommand extends Command {
 			$output->writeln( '<info>No hashes to send</info>' );
 			return true;
 		}
-		$output->writeln( '<info>Hashes to send: '. count( $send_data ).'</info>' );
+		$output->writeln( '<info>Hashes to send: ' . count( $send_data ) . '</info>' );
 
 		// don't send a request with thousands of hashes all at once,
 		// some servers have request size limits
@@ -140,11 +140,11 @@ class SyncCommand extends Command {
 		$counter = 0;
 		foreach ( $chunks as $chunk ) {
 			$counter ++;
-			$output->writeln( '<info>Sending chunk : '. $counter .' of '. count( $chunks ).'</info>' );
+			$output->writeln( '<info>Sending chunk : ' . $counter . ' of ' . count( $chunks ) . '</info>' );
 			$sent = $remote->sendHashChunk( $chunk, $output );
 			// if something went wrong, don't continue sending chunks
 			if ( ! $sent ) {
-				$output->writeln( '<error>Chunk '. $counter .' of '. count( $chunks ) .' failed to send</error>' );
+				$output->writeln( '<error>Chunk ' . $counter . ' of ' . count( $chunks ) . ' failed to send</error>' );
 				return false;
 			}
 		}
