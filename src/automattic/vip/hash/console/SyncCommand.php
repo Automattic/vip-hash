@@ -50,7 +50,7 @@ class SyncCommand extends Command {
 		$output->writeln( '<comment>Synchronising hashes with ' . $remote->getName() . ' - ' . $remote->getUri().'</comment>' );
 
 		$output->writeln( '<comment>Fetching new remote hashes</comment>' );
-		$hashes = $this->fetchHashes( $remote );
+		$hashes = $remote->fetchHashes();
 		if ( false === $hashes ) {
 			$output->writeln( '<error>Fetching hashes failed</error>' );
 			return;
@@ -70,7 +70,12 @@ class SyncCommand extends Command {
 
 		if ( ! empty( $hashes ) ) {
 			$output->writeln( '<comment>Saving the new hashes</comment>' );
-			$this->saveHashes( $hashes, $output, $data );
+			if ( empty( $hashes ) ) {
+				$output->writeln( 'No new hashes recieved' );
+			} else {
+				$output->writeln( 'Saving '. count( $hashes ). ' new hashes' );
+				$this->saveHashes( $hashes, $data );
+			}
 		}
 
 		$output->writeln( '<comment>Updating remote record</comment>' );
@@ -88,51 +93,11 @@ class SyncCommand extends Command {
 	}
 
 	/**
-	 * @param Remote $remote
-	 *
-	 * @return mixed
-	 *
-	 */
-	protected function fetchHashes( Remote $remote ) {
-		$i_saw = $remote->getLatestSeen();
-
-		$client = new Client();
-
-		/**
-		 * Finish by retrieving the data from the remote end that we don't have
-		 */
-
-		$response = \Request::get( $remote->getUri() . 'hashes?since=' . $i_saw );
-		if ( 200 !== $response->status_code ) {
-			echo "Problem response code? ".$response->status_code."\n";
-			return false;
-		}
-		$new_items = json_encode( $response->body );
-		return $new_items;
-
-		/**
-		 * @var: $response \GuzzleHttp\Message\ResponseInterface
-		 */
-		$response = $client->get( $remote->getUri() . 'hashes?since=' . $i_saw );
-		if ( 200 !== $response->getStatusCode() ) {
-			echo "Problem response code? ".$response->getStatusCode()."\n";
-			return false;
-		}
-		$new_items = $response->json();
-		return $new_items;
-	}
-
-	/**
 	 * @param array           $hashes
 	 * @param OutputInterface $output
 	 * @param DataModel       $data
 	 */
-	protected function saveHashes( array $hashes, OutputInterface $output, DataModel $data ) {
-		if ( empty( $hashes ) ) {
-			$output->writeln( 'No new hashes recieved' );
-			return;
-		}
-		$output->writeln( 'Saving '. count( $hashes ). ' new hashes' );
+	protected function saveHashes( array $hashes, DataModel $data ) {
 		foreach ( $hashes as $item ) {
 			// process each item and save
 			$hash = new HashRecord();
@@ -176,50 +141,12 @@ class SyncCommand extends Command {
 		foreach ( $chunks as $chunk ) {
 			$counter ++;
 			$output->writeln( '<info>Sending chunk : '. $counter .' of '. count( $chunks ).'</info>' );
-			$sent = $this->sendHashChunk( $chunk, $remote, $output );
+			$sent = $remote->sendHashChunk( $chunk, $output );
 			// if something went wrong, don't continue sending chunks
 			if ( ! $sent ) {
 				$output->writeln( '<error>Chunk '. $counter .' of '. count( $chunks ) .' failed to send</error>' );
 				return false;
 			}
-		}
-		return true;
-	}
-
-	/**
-	 * @param array           $data
-	 * @param Remote          $remote
-	 * @param OutputInterface $output
-	 *
-	 * @return bool
-	 */
-	protected function sendHashChunk( array $data, Remote $remote, OutputInterface $output ) {
-		$client = new Client();
-		$send_data = json_encode( $data );
-		try {
-			/**
-			 * @var: $response \GuzzleHttp\Message\ResponseInterface
-			 */
-			$response = $client->post( $remote->getUri() . 'hashes', [
-				'body' => [
-					'data' => $send_data,
-				],
-			] );
-			// @TODO: do something with the response
-			//$json = $response->json();
-			if ( $response->getStatusCode() != 200 ) {
-				echo 'Problem response code? '.$response->getStatusCode()."--\n";
-				echo $response->getBody()->getContents().'|';
-				return false;
-			}
-			$remote->setLastSent( time() );
-		} catch ( ServerException $e) {
-			$output->writeln( 'Guzzle ServerException: ' . $e->getResponse() );
-			$output->writeln( $e->getMessage() );
-			return false;
-		} catch ( ParseException $e ) {
-			$output->writeln( 'Guzzle JSON issue: ' . $e->getResponse() );
-			return false;
 		}
 		return true;
 	}

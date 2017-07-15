@@ -113,4 +113,63 @@ class Remote {
 	public function setId( $id ) {
 		$this->id = $id;
 	}
+
+		/**
+	 * @param Remote $remote
+	 *
+	 * @return mixed
+	 *
+	 */
+	protected function fetchHashes( ) {
+		/**
+		 * Finish by retrieving the data from the remote end that we don't have
+		 */
+		$i_saw = $this->getLatestSeen();
+		$response = \Request::get( $remote->getUri() . 'hashes?since=' . $i_saw );
+		if ( 200 !== $response->status_code ) {
+			//echo "Problem response code? ".$response->status_code."\n";
+			return false;
+		}
+		$new_items = json_encode( $response->body );
+		return $new_items;
+	}
+
+	/**
+	 * @param array           $data
+	 * @param Remote          $remote
+	 * @param OutputInterface $output
+	 *
+	 * @return bool
+	 */
+	protected function sendHashChunk( array $data, Remote $remote, OutputInterface $output ) {
+		// rewrite using Requests
+		$client = new Client();
+		$send_data = json_encode( $data );
+		try {
+			/**
+			 * @var: $response \GuzzleHttp\Message\ResponseInterface
+			 */
+			$response = $client->post( $remote->getUri() . 'hashes', [
+				'body' => [
+					'data' => $send_data,
+				],
+			] );
+			// @TODO: do something with the response
+			//$json = $response->json();
+			if ( $response->getStatusCode() != 200 ) {
+				echo 'Problem response code? '.$response->getStatusCode()."--\n";
+				echo $response->getBody()->getContents().'|';
+				return false;
+			}
+			$remote->setLastSent( time() );
+		} catch ( ServerException $e) {
+			$output->writeln( 'Guzzle ServerException: ' . $e->getResponse() );
+			$output->writeln( $e->getMessage() );
+			return false;
+		} catch ( ParseException $e ) {
+			$output->writeln( 'Guzzle JSON issue: ' . $e->getResponse() );
+			return false;
+		}
+		return true;
+	}
 }
