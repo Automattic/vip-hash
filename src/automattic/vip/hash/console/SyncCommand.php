@@ -74,7 +74,7 @@ class SyncCommand extends Command {
 			} else {
 				$output->writeln( '<comment>Saving the new hashes</comment>' );
 				$output->writeln( 'Saving ' . count( $hashes ) . ' new hashes' );
-				$this->saveHashes( $hashes );
+				$this->saveHashes( $hashes, $data );
 			}
 		}
 
@@ -97,7 +97,7 @@ class SyncCommand extends Command {
 	 * @param OutputInterface $output
 	 * @param DataModel       $data
 	 */
-	protected function saveHashes( array $hashes ) {
+	protected function saveHashes( array $hashes, DataModel $data ) {
 		foreach ( $hashes as $item ) {
 			// process each item and save
 			$hash = new HashRecord();
