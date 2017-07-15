@@ -63,7 +63,7 @@ class RemotesCommand extends Command {
 			return;
 		}
 
-		throw new \Exception( 'unknown subcommand '.$sub_command );
+		throw new \Exception( 'unknown subcommand ' . $sub_command );
 	}
 
 	public function add_remote( OutputInterface $output, InputInterface $input, DataModel $data ) {
@@ -73,6 +73,10 @@ class RemotesCommand extends Command {
 		$api_url = '';
 		$secret = $input->getArgument( 'secret' );
 		$key = $input->getArgument( 'key' );
+
+		if ( empty( $key ) || empty( $secret ) ) {
+			$output->writeln( 'Warning: OAuth1 secret/key pair not passed, you may recieve a 401 error' );
+		}
 
 		$consumer = new \OAuthConsumer( $key, $secret, null );
 		$token = null;
@@ -89,7 +93,7 @@ class RemotesCommand extends Command {
 
 			// First, locate the API
 			$api_url = $this->locate_url( $uri );
-			$output->writeln( '<info>Success! Found an API at '.$api_url.'</info>' );
+			$output->writeln( '<info>Success! Found an API at ' . $api_url . '</info>' );
 
 			$session = new \Requests_Session( $api_url . '/' );
 
@@ -118,18 +122,19 @@ class RemotesCommand extends Command {
 
 			// Build the authorization URL
 			$authorization = $index_data->authentication->oauth1->authorize;
+
+			$char = '?';
 			if ( strpos( $authorization, '?' ) ) {
-				$authorization .= '&';
-			} else {
-				$authorization .= '?';
+				$char = '&';
 			}
+			$authorization .= $char;
 			$authorization .= 'oauth_token=' . urlencode( $token_args['oauth_token'] );
 
 			if ( ! empty( $assoc_args['scope'] ) ) {
 				$authorization .= '&scope=' . urlencode( implode( ',', (array) $assoc_args['scope'] ) );
 			}
 
-			$output->writeln( '<question>Interesting! Perhaps you should visit '.$authorization.' and let me know what it said</question>' );
+			$output->writeln( '<question>Interesting! Perhaps you should visit ' . $authorization . ' and let me know what it said</question>' );
 			$helper = $this->getHelper( 'question' );
 
 			$question = new Question( "What did the site say? ( it should look like JSON )\n", '' );
@@ -158,11 +163,11 @@ class RemotesCommand extends Command {
 			}
 
 			$output->writeln( '<info>Authorisation Succeeded!</info>' );
-			$output->writeln( sprintf( "Key: %s", $token_args['oauth_token'] ) );
-			$output->writeln( sprintf( "Secret: %s", $token_args['oauth_token_secret'] ) );
+			$output->writeln( sprintf( 'Key: %s', $token_args['oauth_token'] ) );
+			$output->writeln( sprintf( 'Secret: %s', $token_args['oauth_token_secret'] ) );
 
 		} catch ( \Exception $e ) {
-			$output->writeln( '<error>Error: '.$e->getMessage().'</error>' );
+			$output->writeln( '<error>Error: ' . $e->getMessage() . '</error>' );
 			$output->writeln( '<info>Most unfortunate! See you soon :)</info>' );
 			return;
 		}
@@ -194,7 +199,7 @@ class RemotesCommand extends Command {
 	 * @param DataModel       $data
 	 */
 	public function remove_remote( OutputInterface $output, DataModel $data ) {
-		$output->writeln( "<error>Not supported yet</error>" );
+		$output->writeln( '<error>Not supported yet</error>' );
 	}
 
 	protected function locate_url( $raw_url ) {
