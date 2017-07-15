@@ -139,9 +139,9 @@ class SyncCommand extends Command {
 		}
 		$counter = 0;
 		foreach ( $chunks as $chunk ) {
-			$counter ++;
+			$counter++;
 			$output->writeln( '<info>Sending chunk : ' . $counter . ' of ' . count( $chunks ) . '</info>' );
-			$sent = $remote->sendHashChunk( $chunk, $output );
+			$sent = $remote->sendHashChunk( $chunk );
 			// if something went wrong, don't continue sending chunks
 			if ( ! $sent ) {
 				$output->writeln( '<error>Chunk ' . $counter . ' of ' . count( $chunks ) . ' failed to send</error>' );

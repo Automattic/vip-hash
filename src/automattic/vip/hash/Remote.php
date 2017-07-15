@@ -141,35 +141,20 @@ class Remote {
 	 *
 	 * @return bool
 	 */
-	protected function sendHashChunk( array $data, Remote $remote, OutputInterface $output ) {
-		// rewrite using Requests
-		$client = new Client();
+	protected function sendHashChunk( array $data ) {
 		$send_data = json_encode( $data );
-		try {
-			/**
-			 * @var: $response \GuzzleHttp\Message\ResponseInterface
-			 */
-			$response = $client->post( $remote->getUri() . 'hashes', [
-				'body' => [
-					'data' => $send_data,
-				],
-			] );
-			// @TODO: do something with the response
-			//$json = $response->json();
-			if ( $response->getStatusCode() != 200 ) {
-				echo 'Problem response code? '.$response->getStatusCode()."--\n";
-				echo $response->getBody()->getContents().'|';
-				return false;
-			}
-			$remote->setLastSent( time() );
-		} catch ( ServerException $e) {
-			$output->writeln( 'Guzzle ServerException: ' . $e->getResponse() );
-			$output->writeln( $e->getMessage() );
-			return false;
-		} catch ( ParseException $e ) {
-			$output->writeln( 'Guzzle JSON issue: ' . $e->getResponse() );
+
+		/**
+		 * @var: $response \Requests_Response
+		 */
+		$response = \Request::post( $this->getUri() . 'hashes', array(), $send_data, array() );
+
+		if ( 200 !== $response->status_code ) {
+			/*echo 'Problem response code? '.$response->getStatusCode()."--\n";
+			echo $response->getBody()->getContents().'|';*/
 			return false;
 		}
+		$this->setLastSent( time() );
 		return true;
 	}
 }
