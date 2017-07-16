@@ -126,7 +126,8 @@ class Remote {
 		 */
 		$oauth = $this->getOauthDetails();
 		$i_saw = $this->getLatestSeen();
-		$response = \Requests::get( $this->getUri() . 'hashes?since=' . $i_saw );
+		$options = [];
+		$response = \Requests::get( $this->getUri() . 'hashes?since=' . $i_saw, array(), $options );
 		if ( 200 !== $response->status_code ) {
 			//echo "Problem response code? ".$response->status_code."\n";
 			return false;
@@ -147,10 +148,12 @@ class Remote {
 
 		$oauth = $this->getOauthDetails();
 
+		$options = [];
+
 		/**
 		 * @var: $response \Requests_Response
 		 */
-		$response = \Requests::post( $this->getUri() . 'hashes', array(), $send_data, array() );
+		$response = \Requests::post( $this->getUri() . 'hashes', array(), $send_data, $options );
 
 		if ( 200 !== $response->status_code ) {
 			/*echo 'Problem response code? '.$response->getStatusCode()."--\n";
