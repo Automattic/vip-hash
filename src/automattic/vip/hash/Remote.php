@@ -125,7 +125,7 @@ class Remote {
 	 * @return mixed
 	 *
 	 */
-	public function fetchHashes( ) {
+	public function fetchHashes() {
 		/**
 		 * Finish by retrieving the data from the remote end that we don't have
 		 */
