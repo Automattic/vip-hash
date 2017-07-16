@@ -65,7 +65,7 @@ class Pdo_Data_Model extends NullDataModel {
 		$notes = $record->getNote();
 		$human_note = $record->getHumanNote();
 
-		$identifier = $hash.'-'.$username.'-'.$date;
+		$identifier = $hash . '-' . $username . '-' . $date;
 
 		$query = 'INSERT INTO wpcom_vip_hashes( id, identifier, user, hash, date, seen, status, notes, human_note )
 								SELECT :id, :identifier, :username, :hash, :date, :seen, :status, :notes, :human_note
@@ -74,7 +74,7 @@ class Pdo_Data_Model extends NullDataModel {
 		$sth = $pdo->prepare( $query );
 		if ( ! $sth ) {
 			$error_info = print_r( $pdo->errorInfo(), true );
-			throw new \Exception( 'Error creating insert statement '.$error_info );
+			throw new \Exception( 'Error creating insert statement ' . $error_info );
 		}
 		$result = $sth->execute( array(
 			':id'         => null,
@@ -92,9 +92,9 @@ class Pdo_Data_Model extends NullDataModel {
 			$error_info = print_r( $pdo->errorInfo(), true );
 			$error_info_sth = print_r( $sth->errorInfo(), true );
 			throw new \Exception(
-				"Error executing insert statement\nPDO: #".$pdo->errorCode().' '.$error_info.
-				"\n STH: #".$sth->errorCode().' '.$error_info_sth.
-				"\n identifier:".$identifier
+				"Error executing insert statement\nPDO: #" . $pdo->errorCode() . ' ' . $error_info .
+				"\n STH: #" . $sth->errorCode() . ' ' . $error_info_sth .
+				"\n identifier:" . $identifier
 			);
 		}
 		return true;
@@ -180,19 +180,19 @@ class Pdo_Data_Model extends NullDataModel {
 	protected function searchDBFolders() {
 		$folders = [];
 		if ( ! empty( $_SERVER['HOME'] ) ) {
-			$folders[] = $_SERVER['HOME'].DIRECTORY_SEPARATOR.'.viphash'.DIRECTORY_SEPARATOR;
+			$folders[] = $_SERVER['HOME'] . DIRECTORY_SEPARATOR . '.viphash' . DIRECTORY_SEPARATOR;
 		}
 		if ( function_exists( 'posix_getpwuid' ) ) {
 			$shell_user = posix_getpwuid( posix_getuid() );
 			$shell_home = $shell_user['dir'];
-			$folders[] = $shell_home.DIRECTORY_SEPARATOR.'.viphash'.DIRECTORY_SEPARATOR;
+			$folders[] = $shell_home . DIRECTORY_SEPARATOR . '.viphash' . DIRECTORY_SEPARATOR;
 		}
 
 		// Windows
 		if ( ! empty( $_SERVER['HOMEDRIVE'] ) && ! empty( $_SERVER['HOMEPATH'] ) ) {
-			$folders[] = $_SERVER['HOMEDRIVE']. $_SERVER['HOMEPATH'].DIRECTORY_SEPARATOR.'.viphash'.DIRECTORY_SEPARATOR;
+			$folders[] = $_SERVER['HOMEDRIVE'] . $_SERVER['HOMEPATH'] . DIRECTORY_SEPARATOR . '.viphash' . DIRECTORY_SEPARATOR;
 		}
-		$folders[] = '.viphash'.DIRECTORY_SEPARATOR;
+		$folders[] = '.viphash' . DIRECTORY_SEPARATOR;
 		return $folders;
 	}
 
@@ -289,16 +289,13 @@ class Pdo_Data_Model extends NullDataModel {
 		$latest_seen = $remote->getLatestSeen();
 		$last_sent = $remote->getLastSent();
 
-		$oauth_access_token = $remote->getOauth2AccessToken();
-		$oauth_expires = $remote->getOauth2Expires();
-		$oauth_refresh_token = $remote->getOauth2RefreshToken();
+		$oauth_details = $remote->getOauthDetails();
 
 		// it's old, update it
 		// //UPDATE Cars SET Name='Skoda Octavia' WHERE Id=3;
 		$query = 'UPDATE wpcom_vip_hash_remotes SET
 		 name= :name, uri = :uri, latest_seen = :latest_seen, last_sent = :last_sent,
-		 oauth_access_token = :oauth_access_token, oauth_expires = :oauth_expires,
-		 oauth_refresh_token = :oauth_refresh_token WHERE id = :id';
+		 oauth_details = :oauth_details WHERE id = :id';
 		$sth   = $this->pdo->prepare( $query );
 		if ( ! $sth ) {
 			$error_info = print_r( $this->pdo->errorInfo(), true );
@@ -310,9 +307,7 @@ class Pdo_Data_Model extends NullDataModel {
 			':uri'                 => $uri,
 			':latest_seen'         => $latest_seen,
 			':last_sent'           => $last_sent,
-			':oauth_access_token'  => $oauth_access_token,
-			':oauth_expires'       => $oauth_expires,
-			':oauth_refresh_token' => $oauth_refresh_token,
+			':oauth_details'       => $oauth_details,
 		) );
 
 		if ( ! $result ) {
