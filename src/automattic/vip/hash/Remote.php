@@ -10,7 +10,12 @@ class Remote {
 	private $last_sent = 0;
 	private $latest_seen = 0;
 
-	private $oauth_details = '';
+	/**
+	 * This is an auth object, deserialized from a db store
+	 *
+	 * @var Requests_Auth_OAuth1
+	 */
+	private $oauth_details = null;
 	/**
 	 * @param $data
 	 */
@@ -21,7 +26,7 @@ class Remote {
 			$this->uri = $data['uri'];
 			$this->last_sent = $data['last_sent'];
 			$this->latest_seen = $data['latest_seen'];
-			$this->oauth_details = $data['oauth_details'];
+			$this->oauth_details = unserialize( $data['oauth_details'] );
 		}
 	}
 
@@ -126,7 +131,11 @@ class Remote {
 		 */
 		$oauth = $this->getOauthDetails();
 		$i_saw = $this->getLatestSeen();
+		$oauth = $this->getOauthDetails();
 		$options = [];
+		if ( ! empty( $oauth ) ) {
+			$options['auth'] = $oauth;
+		}
 		$response = \Requests::get( $this->getUri() . 'hashes?since=' . $i_saw, array(), $options );
 		if ( 200 !== $response->status_code ) {
 			//echo "Problem response code? ".$response->status_code."\n";
@@ -147,8 +156,10 @@ class Remote {
 		$send_data = json_encode( $data );
 
 		$oauth = $this->getOauthDetails();
-
 		$options = [];
+		if ( ! empty( $oauth ) ) {
+			$options['auth'] = $oauth;
+		}
 
 		/**
 		 * @var: $response \Requests_Response
