@@ -155,6 +155,7 @@ class RemotesCommand extends Command {
 			$remote->setName( $name );
 			$remote->setUri( $api_url );
 			$remote->setOauthDetails( $auth );
+			$output->writeln( 'Saving remote to data store' );
 			$result = $data->addRemote( $remote );
 
 			if ( ! $result ) {
