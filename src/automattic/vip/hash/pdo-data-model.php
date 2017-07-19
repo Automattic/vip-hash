@@ -258,16 +258,17 @@ class Pdo_Data_Model extends NullDataModel {
 		$last_sent = $remote->getLastSent();
 		$oauth_details = $remote->getOauthDetails();
 
-		$query = 'INSERT INTO wpcom_vip_hash_remotes VALUES
-			( :id, :name, :uri, :latest_seen, :last_sent, :oauth_details )';
+		$query = 'INSERT INTO wpcom_vip_hash_remotes ( name, uri, latest_seen, last_sent, oauth_details )
+		VALUES
+			(  :name, :uri, :latest_seen, :last_sent, :oauth_details )';//:id,
 		$sth = $this->pdo->prepare( $query );
 		if ( ! $sth ) {
 			$error_info = print_r( $this->pdo->errorInfo(), true );
-			throw new \Exception( $error_info );
+			throw new \Exception( 'PDO: prepared statement error :' . $error_info );
 			//throw new \Exception( 'failed to prepare statement' );
 		}
 		$result = $sth->execute( array(
-			':id'                  => '',
+			/*':id'                  => '',*/
 			':name'                => $name,
 			':uri'                 => $uri,
 			':latest_seen'         => $latest_seen,
@@ -277,7 +278,7 @@ class Pdo_Data_Model extends NullDataModel {
 
 		if ( ! $result ) {
 			$error_info = print_r( $sth->errorInfo(), true );
-			throw new \Exception( $error_info );
+			throw new \Exception( 'PDO execution statement error: ' . $error_info );
 		}
 		return true;
 	}
