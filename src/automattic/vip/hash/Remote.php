@@ -136,7 +136,7 @@ class Remote {
 		if ( ! empty( $oauth ) ) {
 			$options['auth'] = $oauth;
 		}
-		$response = \Requests::get( $this->getUri() . 'hashes?since=' . $i_saw, array(), $options );
+		$response = \Requests::get( $this->getUri() . 'viphash/v1/hashes?since=' . $i_saw, array(), $options );
 		if ( 200 !== $response->status_code ) {
 			$response->throw_for_status();
 			return false;
