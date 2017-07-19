@@ -10,15 +10,13 @@
 		}
 	],
 	"require" : {
-		"php": ">=5.4",
+		"php": ">=5.6",
 		"symfony/console": "~2.5",
 		"symfony/finder": "~2.2",
         "symfony/process": "~2.1",
-		"guzzlehttp/guzzle": "~5.0",
-		"seld/phar-utils": "~1.0",
 		"ext-pdo_sqlite": "*",
 		"wp-cli/php-cli-tools": "*",
-		"adoy/oauth2": "*"
+		"rmccue/requests": "~1.6"
 	},
 	"autoload"    : {
 		"classmap": [
@@ -26,6 +24,6 @@
 		]
 	},
 	"require-dev": {
-		"clue/phar-composer": "^1.0"
+		"seld/phar-utils": "~1.0"
 	}
 }
