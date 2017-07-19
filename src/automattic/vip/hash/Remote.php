@@ -138,7 +138,7 @@ class Remote {
 		}
 		$response = \Requests::get( $this->getUri() . 'hashes?since=' . $i_saw, array(), $options );
 		if ( 200 !== $response->status_code ) {
-			//echo "Problem response code? ".$response->status_code."\n";
+			$response->throw_for_status();
 			return false;
 		}
 		$new_items = json_encode( $response->body );

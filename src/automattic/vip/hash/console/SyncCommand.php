@@ -50,46 +50,57 @@ class SyncCommand extends Command {
 		$output->writeln( '<comment>Synchronising hashes with ' . $remote->getName() . ' - ' . $remote->getUri() . '</comment>' );
 
 		$output->writeln( '<comment>Fetching new remote hashes</comment>' );
-		$hashes = $remote->fetchHashes();
-		if ( false === $hashes ) {
-			$output->writeln( '<error>Fetching hashes failed</error>' );
-			return;
-		}
-		if ( count( $hashes ) == 0 ) {
-			$output->writeln( '<info>No new hashes available</info>' );
-		}
-
-
-		$output->writeln( '<comment>Sending new local hashes</comment>' );
-		$success = $this->sendHashes( $remote, $output, $data );
-		if ( false === $success ) {
-			$output->writeln( '<error>Sending new local hashes failed</error>' );
-
-			return;
-		}
-
-		if ( ! empty( $hashes ) ) {
-			if ( empty( $hashes ) ) {
-				$output->writeln( '<comment>No new hashes recieved</comment>' );
-			} else {
-				$output->writeln( '<comment>Saving the new hashes</comment>' );
-				$output->writeln( 'Saving ' . count( $hashes ) . ' new hashes' );
-				$this->saveHashes( $hashes, $data );
+		try {
+			$hashes = $remote->fetchHashes();
+			if ( false === $hashes ) {
+				$output->writeln( '<error>Fetching hashes failed</error>' );
+				return;
 			}
-		}
 
-		$output->writeln( '<comment>Updating remote record</comment>' );
-		$latest_hash = $data->getNewestSeenHash();
-		$remote->setLatestSeen( $latest_hash['seen'] );
-		$remote->setLastSent( time() );
-		$saved = $remote->save( $data );
-		$message = '<error>Failed to save remote record</error>';
-		if ( $saved ) {
-			$message = '<info>Saved remote record</info>';
-		}
-		$output->writeln( $message );
+			if ( count( $hashes ) == 0 ) {
+				$output->writeln( '<info>No new hashes available</info>' );
+			}
 
-		$output->writeln( '<info>Synchronised hashes with ' . $remote->getName() . ' - ' . $remote->getUri() . '</info>');
+
+			$output->writeln( '<comment>Sending new local hashes</comment>' );
+			$success = $this->sendHashes( $remote, $output, $data );
+			if ( false === $success ) {
+				$output->writeln( '<error>Sending new local hashes failed</error>' );
+
+				return;
+			}
+
+			if ( ! empty( $hashes ) ) {
+				if ( empty( $hashes ) ) {
+					$output->writeln( '<comment>No new hashes recieved</comment>' );
+				} else {
+					$output->writeln( '<comment>Saving the new hashes</comment>' );
+					$output->writeln( 'Saving ' . count( $hashes ) . ' new hashes' );
+					$this->saveHashes( $hashes, $data );
+				}
+			}
+
+			$output->writeln( '<comment>Updating remote record</comment>' );
+			$latest_hash = $data->getNewestSeenHash();
+			$remote->setLatestSeen( $latest_hash['seen'] );
+			$remote->setLastSent( time() );
+			$saved = $remote->save( $data );
+			$message = '<error>Failed to save remote record</error>';
+			if ( $saved ) {
+				$message = '<info>Saved remote record</info>';
+			}
+			$output->writeln( $message );
+
+			$output->writeln( '<info>Synchronised hashes with ' . $remote->getName() . ' - ' . $remote->getUri() . '</info>');
+		} catch ( \Requests_Exception $e ) {
+			$output->writeln( '<error>Requests Error: ' . $e->getMessage() . '</error>' );
+			$output->writeln( '<info>Most unfortunate! See you soon :)</info>' );
+			return;
+		} catch ( \Exception $e ) {
+			$output->writeln( '<error>Error: ' . $e->getMessage() . '</error>' );
+			$output->writeln( '<info>Most unfortunate! See you soon :)</info>' );
+			return;
+		}
 	}
 
 	/**
