@@ -137,7 +137,7 @@ class RemotesCommand extends Command {
 			$output->writeln( '<question>Interesting! Perhaps you should visit ' . $authorization . ' and let me know what it said</question>' );
 			$helper = $this->getHelper( 'question' );
 
-			$question = new Question( "What did the site say? ( it should look like JSON )\n", '' );
+			$question = new Question( "What did the site say? ( it should look like a verification token )\n", '' );
 			$code = $helper->ask( $input, $output, $question );
 
 			$output->writeln( 'Really it said this?' );
