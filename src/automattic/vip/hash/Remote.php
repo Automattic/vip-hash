@@ -86,9 +86,9 @@ class Remote {
 		// check if we need to save or update the value
 		if ( empty( $this->id ) ) {
 			// it's new
-			return $data_model->addRemote( $this->name, $this->uri, $this->latest_seen, $this->last_sent );
+			return $data_model->addRemote( $this );//$this->name, $this->uri, $this->latest_seen, $this->last_sent );
 		}
-		return $data_model->updateRemote( $this->id, $this->name, $this->uri, $this->latest_seen, $this->last_sent );
+		return $data_model->updateRemote( $this );//this->id, $this->name, $this->uri, $this->latest_seen, $this->last_sent );
 	}
 
 	/**
@@ -141,7 +141,7 @@ class Remote {
 			$response->throw_for_status();
 			return false;
 		}
-		$new_items = json_encode( $response->body );
+		$new_items = json_decode( $response->body );
 		return $new_items;
 	}
 
