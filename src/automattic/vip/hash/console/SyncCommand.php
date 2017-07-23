@@ -112,12 +112,12 @@ class SyncCommand extends Command {
 		foreach ( $hashes as $item ) {
 			// process each item and save
 			$hash = new HashRecord();
-			$hash->setHash( $item['hash'] );
-			$hash->setUsername( $item['user'] );
-			$hash->setStatus( $item['status'] );
-			$hash->setNote( $item['notes'] );
-			$hash->setHumanNote( $item['human_note'] );
-			$hash->setDate( $item['date'] );
+			$hash->setHash( $item->hash );
+			$hash->setUsername( $item->user );
+			$hash->setStatus( $item->status );
+			$hash->setNote( $item->notes );
+			$hash->setHumanNote( $item->human_note );
+			$hash->setDate( $item->date );
 			$data->saveHash( $hash );
 		}
 
@@ -159,6 +159,8 @@ class SyncCommand extends Command {
 				return false;
 			}
 		}
+
+		$remote->setLastSent( time() );
 		return true;
 	}
 }
