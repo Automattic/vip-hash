@@ -167,8 +167,7 @@ class Remote {
 		$response = \Requests::post( $this->getUri() . 'viphash/v1/hashes', array(), $send_data, $options );
 
 		if ( 200 !== $response->status_code ) {
-			/*echo 'Problem response code? '.$response->getStatusCode()."--\n";
-			echo $response->getBody()->getContents().'|';*/
+			$response->throw_for_status();
 			return false;
 		}
 		$this->setLastSent( time() );
