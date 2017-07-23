@@ -153,7 +153,7 @@ class Remote {
 	 * @return bool
 	 */
 	public function sendHashChunk( array $data ) {
-		$send_data = json_encode( $data );
+		$send_data = [ 'data' => json_encode( $data ) ];
 
 		$oauth = $this->getOauthDetails();
 		$options = [];
@@ -170,7 +170,6 @@ class Remote {
 			$response->throw_for_status();
 			return false;
 		}
-		$this->setLastSent( time() );
 		return true;
 	}
 }
