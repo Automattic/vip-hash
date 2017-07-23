@@ -308,7 +308,7 @@ class Pdo_Data_Model extends NullDataModel {
 			':uri'                 => $uri,
 			':latest_seen'         => $latest_seen,
 			':last_sent'           => $last_sent,
-			':oauth_details'       => $oauth_details,
+			':oauth_details'       => serialize( $oauth_details ),
 		) );
 
 		if ( ! $result ) {
