@@ -21,7 +21,7 @@ class DB_Helper {
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			identifier CHAR(100) NOT NULL UNIQUE,
 			user CHAR(50) NOT NULL,
-			hash CHAR(30) NOT NULL,
+			hash CHAR(100) NOT NULL,
 			date INT NOT NULL,
 			seen INT NOT NULL,
 			status CHAR(30) NOT NULL,
