@@ -59,7 +59,7 @@ class RemotesCommand extends Command {
 
 		if ( 'rm' == $sub_command ) {
 			// remove a remote
-			$this->remove_remote( $output, $data );
+			$this->remove_remote( $input, $output, $data );
 			return;
 		}
 
@@ -167,7 +167,12 @@ class RemotesCommand extends Command {
 			$output->writeln( sprintf( 'Key: %s', $token_args['oauth_token'] ) );
 			$output->writeln( sprintf( 'Secret: %s', $token_args['oauth_token_secret'] ) );
 
-		} catch ( \Exception $e ) {
+		} catch ( \Requests_Exception_HTTP $e ) {
+			$output->writeln( '<error>Error: ' . $e->getMessage() . '</error>' );
+			$output->writeln( '<error>Error: ' . $e->getType() . ' - ' . $e->getData()->url . ' ' . $e->getData()->body . '</error>' );
+			$output->writeln( '<info>Most unfortunate! See you soon :)</info>' );
+			return;
+		}catch ( \Exception $e ) {
 			$output->writeln( '<error>Error: ' . $e->getMessage() . '</error>' );
 			$output->writeln( '<info>Most unfortunate! See you soon :)</info>' );
 			return;
@@ -199,8 +204,12 @@ class RemotesCommand extends Command {
 	 * @param OutputInterface $output
 	 * @param DataModel       $data
 	 */
-	public function remove_remote( OutputInterface $output, DataModel $data ) {
-		$output->writeln( '<error>Not supported yet</error>' );
+	public function remove_remote( InputInterface $input, OutputInterface $output, DataModel $data ) {
+		//$output->writeln( '<error>Not supported yet</error>' );
+		$name = $input->getArgument( 'name' );
+		$r = new Remote();
+		$r->setName( $name );
+		$result = $data->removeRemote( $r );
 	}
 
 	protected function locate_url( $raw_url ) {
