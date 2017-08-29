@@ -51,27 +51,25 @@ interface DataModel {
 	/**
 	 * @param Remote $remote
 	 *
+	 * @param  Remote $remote the remote data store to add
 	 * @return bool
-	 * @internal param $name
-	 * @internal param $uri
-	 * @internal param int $latest_seen
-	 * @internal param int $last_sent
-	 *
 	 */
 	public function addRemote( Remote $remote );
 
 	/**
 	 * @param Remote $remote
 	 *
+	 * @param  Remote $remote the remote datastore to update
 	 * @return bool
-	 * @internal param $id
-	 * @internal param $name
-	 * @internal param $uri
-	 * @internal param int $latest_seen
-	 * @internal param int $last_sent
-	 *
 	 */
 	public function updateRemote( Remote $remote );
+
+	/**
+	 * remove a remote
+	 * @param  Remote $remote [description]
+	 * @return bool
+	 */
+	public function removeRemote( Remote $remote );
 
 	/**
 	 * @return Remote[]

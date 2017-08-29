@@ -109,6 +109,10 @@ class NullDataModel implements DataModel {
 		return false;
 	}
 
+	public function removeRemote( Remote $remote ) {
+		return false;
+	}
+
 	/**
 	 * @return Remote[]
 	 * @throws \Exception

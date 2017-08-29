@@ -318,6 +318,27 @@ class Pdo_Data_Model extends NullDataModel {
 		return true;
 	}
 
+	public function removeRemote( Remote $remote ) {
+		$name = $remote->getName();
+		// it's old, update it
+		// //UPDATE Cars SET Name='Skoda Octavia' WHERE Id=3;
+		$query = 'DELETE FROM wpcom_vip_hash_remotes WHERE name= :name';
+		$sth   = $this->pdo->prepare( $query );
+		if ( ! $sth ) {
+			$error_info = print_r( $this->pdo->errorInfo(), true );
+			throw new \Exception( $error_info );
+		}
+		$result = $sth->execute( [
+			':name' => $name
+		] );
+
+		if ( ! $result ) {
+			$error_info = print_r( $sth->errorInfo(), true );
+			throw new \Exception( $error_info );
+		}
+		return true;
+	}
+
 	/**
 	 * @return array
 	 * @throws \Exception
