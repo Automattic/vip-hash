@@ -73,6 +73,8 @@ class RemotesCommand extends Command {
 		$api_url = '';
 		$secret = $input->getArgument( 'secret' );
 		$key = $input->getArgument( 'key' );
+		$output->writeln( 'key: ' . $key );
+		$output->writeln( 'secret: ' . $secret );
 
 		if ( empty( $key ) || empty( $secret ) ) {
 			$output->writeln( 'Warning: OAuth1 secret/key pair not passed, you may recieve a 401 error' );
