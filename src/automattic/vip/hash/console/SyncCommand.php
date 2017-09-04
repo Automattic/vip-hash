@@ -92,6 +92,11 @@ class SyncCommand extends Command {
 			$output->writeln( $message );
 
 			$output->writeln( '<info>Synchronised hashes with ' . $remote->getName() . ' - ' . $remote->getUri() . '</info>');
+		} catch ( \Requests_Exception_HTTP $e ) {
+			$output->writeln( '<error>Error: ' . $e->getMessage() . '</error>' );
+			$output->writeln( '<error>Error: ' . $e->getType() . ' - ' . $e->getData()->url . ' ' . $e->getData()->body . '</error>' );
+			$output->writeln( '<info>Most unfortunate! See you soon :)</info>' );
+			return;
 		} catch ( \Requests_Exception $e ) {
 			$output->writeln( '<error>Requests Error: ' . $e->getMessage() . '</error>' );
 			$output->writeln( '<info>Most unfortunate! See you soon :)</info>' );
@@ -158,6 +163,7 @@ class SyncCommand extends Command {
 				$output->writeln( '<error>Chunk ' . $counter . ' of ' . count( $chunks ) . ' failed to send</error>' );
 				return false;
 			}
+			usleep(5);
 		}
 
 		$remote->setLastSent( time() );
