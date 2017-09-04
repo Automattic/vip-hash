@@ -318,9 +318,7 @@ class OAuthRequest {
 			$defaults['oauth_token'] = $token->key;
 		}
 
-		if ( ! empty( $parameters ) && is_array( $parameters ) ) {
-			$parameters = array_merge( $defaults, $parameters );
-		}
+		$parameters = array_merge( $defaults, $parameters );
 
 		return new OAuthRequest( $http_method, $http_url, $parameters );
 	}
@@ -439,7 +437,7 @@ class OAuthRequest {
 	public function to_header( $realm = null ) {
 		$first = true;
 		if ( $realm ) {
-			$out = 'Authorization: OAuth realm = "' . OAuthUtil::urlencode_rfc3986( $realm ) . '"';
+			$out = 'Authorization: OAuth realm="' . OAuthUtil::urlencode_rfc3986( $realm ) . '"';
 			$first = false;
 		} else {
 			$out = 'Authorization: OAuth';
@@ -453,7 +451,7 @@ class OAuthRequest {
 			}
 			$out .= ( $first ) ? ' ' : ',';
 			$out .= OAuthUtil::urlencode_rfc3986( $k ) .
-			' = "' .
+			'="' .
 			OAuthUtil::urlencode_rfc3986( $v ) .
 			'"';
 			$first = false;
@@ -511,8 +509,7 @@ class OAuthServer {
 	}
 
 	public function add_signature_method( $signature_method ) {
-		$this->signature_methods[ $signature_method->get_name()] = 
-		$signature_method;
+		$this->signature_methods[ $signature_method->get_name()] = $signature_method;
 	}
 
 	// high level functions
@@ -577,8 +574,8 @@ class OAuthServer {
 	private function get_version( &$request ) {
 		$version = $request->get_parameter( "oauth_version" );
 		if ( ! $version ) {
-	// Service Providers MUST assume the protocol version to be 1.0 if this parameter is not present.
-	// Chapter 7.0 ( "Accessing Protected Ressources" )
+			// Service Providers MUST assume the protocol version to be 1.0 if this parameter is not present.
+			// Chapter 7.0 ( "Accessing Protected Ressources" )
 			$version = '1.0';
 		}
 		if ( $version !== $this->version ) {
@@ -617,8 +614,8 @@ class OAuthServer {
 	*/
 	private function get_consumer( $request ) {
 		$consumer_key = $request instanceof OAuthRequest
-		? $request->get_parameter( "oauth_consumer_key" )
-		: null;
+			? $request->get_parameter( "oauth_consumer_key" )
+			: null;
 
 		if ( ! $consumer_key ) {
 			throw new OAuthException( "Invalid consumer key" );
@@ -850,7 +847,7 @@ class OAuthUtil {
 
 		$parsed_parameters = array();
 		foreach ( $pairs as $pair ) {
-			$split = explode( ' = ', $pair, 2 );
+			$split = explode( '=', $pair, 2 );
 			$parameter = OAuthUtil::urldecode_rfc3986( $split[0] );
 			$value = isset( $split[1] ) ? OAuthUtil::urldecode_rfc3986( $split[1] ) : '';
 
@@ -894,10 +891,10 @@ class OAuthUtil {
 				// June 12th, 2010 - changed to sort because of issue 164 by hidetaka
 				sort( $value, SORT_STRING );
 				foreach ( $value as $duplicate_value ) {
-					$pairs[] = $parameter . ' = ' . $duplicate_value;
+					$pairs[] = $parameter . '=' . $duplicate_value;
 				}
 			} else {
-				$pairs[] = $parameter . ' = ' . $value;
+				$pairs[] = $parameter . '=' . $value;
 			}
 		}
 		// For each parameter, the name is separated from the corresponding value by an ' = ' character ( aSCII code 61)
