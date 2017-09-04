@@ -132,9 +132,6 @@ class RemotesCommand extends Command {
 			$authorization .= $char;
 			$authorization .= 'oauth_token=' . urlencode( $token_args['oauth_token'] );
 
-			if ( ! empty( $assoc_args['scope'] ) ) {
-				$authorization .= '&scope=' . urlencode( implode( ',', (array) $assoc_args['scope'] ) );
-			}
 
 			$output->writeln( '<question>Interesting! Perhaps you should visit ' . $authorization . ' and let me know what it said</question>' );
 			$helper = $this->getHelper( 'question' );
