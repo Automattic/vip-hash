@@ -153,7 +153,8 @@ class Remote {
 	 * @return bool
 	 */
 	public function sendHashChunk( array $data ) {
-		$send_data = [ 'data' => json_encode( $data ) ];
+		$json = base64_encode( json_encode( $data ) );
+		$send_data = [ 'data' => $json ];
 
 		$oauth = $this->getOauthDetails();
 		$options = [];
