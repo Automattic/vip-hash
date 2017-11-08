@@ -97,7 +97,7 @@ class RemotesCommand extends Command {
 			$api_url = $this->locate_url( $uri );
 			$output->writeln( '<info>Success! Found an API at ' . $api_url . '</info>' );
 
-			$session = new \Requests_Session( $api_url . '/' );
+			$session = new \Requests_Session( $api_url . '/', [],[], ['verify'=>false] );
 
 			$index = $session->get( '' );
 			$index_data = json_decode( $index->body );
@@ -214,7 +214,7 @@ class RemotesCommand extends Command {
 	protected function locate_url( $raw_url ) {
 		// First, locate the API
 		$url = '';
-		$page = \Requests::head( $raw_url );
+		$page = \Requests::head( $raw_url, null, [ 'verify' => false ] );
 		$links = $page->headers['Link'];
 		if ( empty( $links ) ) {
 			throw new \Exception( "Could not locate API; are you sure it's enabled?" );
