@@ -6,6 +6,16 @@ This tool allows WordPress.com users to hash files and mark those files as ready
 
 Run `php bin/compile` to build the `viphash.phar` file, rename to `viphash`, flag as executable, and place somewhere you can access it from anywhere. Be sure to repeat this process with newer versions of the tool.
 
+TLDR:
+
+```
+git clone git@github.com:Automattic/vip-hash.git
+cd vip-hash
+php bin/compile
+chmod +x viphash.phar
+mv viphash.phar /usr/local/bin/viphash
+```
+
 ## Commands
 
 The tool has the following commands:
