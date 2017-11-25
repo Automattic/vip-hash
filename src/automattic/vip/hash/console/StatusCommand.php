@@ -10,6 +10,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\StreamOutput;
 
 /**
  * Class ScanCommand
@@ -80,6 +81,7 @@ class StatusCommand extends FileSystemCommand {
 		}
 		$this->display_tree( $output, $data );
 		$this->display_totals( $output, $data );
+		$this->save_status( $data );
 	}
 
 	/**
@@ -132,6 +134,42 @@ class StatusCommand extends FileSystemCommand {
 		$final = implode( $parts, ', ' );
 		$output->writeln( '<bold>Results:</bold> '.$final );
 		$output->writeln( '<bold>Seen:</bold> '.( $total - $statuses['?'] ).'/'.$total.' files ( '.number_format( ( $total - $statuses['?'] ) / $total * 100, 1 ).'% )' );
+	}
+
+	
+	/**
+	 * @param array           $data
+	 */
+	function save_status( array $data ) {
+		$file   = 'status.json';
+		$handle = fopen($file, 'w+');
+		$output = new StreamOutput($handle);
+		
+		$statuses = $this->count_tree( $data );
+
+		$total = 0;
+		$parts = [];
+		foreach ( $statuses as $status => $count ) {
+			$part = $status.': '.$this->status_names[ $status ];
+			$parts[] = sprintf( $this->status_markup[ $status ], $part );
+			$total += $count;
+		}
+		if ( empty( $total ) ) {
+			// nothing found
+			$output->writeln( 'No reviewable files found' );
+			return;
+		}
+		
+		$parts = [];
+		foreach ( $statuses as $status => $count ) {
+			if ( $count > 0 ) {
+				$parts[] = '"'.$status.'":'.$count;
+			}
+		}
+		$final = "[{".implode($parts, ',')."}]";
+		$output->write($final);
+		fclose($handle);
+	
 	}
 
 	/**
