@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\Input\InputOption;
 
 /**
  * Class ScanCommand
@@ -48,6 +49,12 @@ class StatusCommand extends FileSystemCommand {
 				'folder',
 				InputArgument::OPTIONAL,
 				'A file hash to find, or a file to be hashed. Assumes hash if the given value is not a locatable file'
+			)->addOption(
+				'status-file',
+				null,
+				InputOption::VALUE_OPTIONAL,
+				'Add this flag to create viphash-status.json file. False by default.',
+				true
 			);
 	}
 
@@ -81,7 +88,10 @@ class StatusCommand extends FileSystemCommand {
 		}
 		$this->display_tree( $output, $data );
 		$this->display_totals( $output, $data );
-		$this->save_status( $data );
+		if($input->getOption( 'status-file' ) === true || $input->getOption( 'status-file' ) === "1" || $input->getOption( 'status-file' ) === "true"){
+			$this->save_status( $data );
+		}
+		
 	}
 
 	/**
@@ -141,33 +151,21 @@ class StatusCommand extends FileSystemCommand {
 	 * @param array           $data
 	 */
 	function save_status( array $data ) {
-		$file   = 'status.json';
+	
+		$file   = 'viphash-status.json';
 		$handle = fopen($file, 'w+');
 		$output = new StreamOutput($handle);
 		
 		$statuses = $this->count_tree( $data );
+		$total = array_sum( $statuses );
 
-		$total = 0;
-		$parts = [];
-		foreach ( $statuses as $status => $count ) {
-			$part = $status.': '.$this->status_names[ $status ];
-			$parts[] = sprintf( $this->status_markup[ $status ], $part );
-			$total += $count;
-		}
 		if ( empty( $total ) ) {
-			// nothing found
 			$output->writeln( 'No reviewable files found' );
 			return;
 		}
-		
-		$parts = [];
-		foreach ( $statuses as $status => $count ) {
-			if ( $count > 0 ) {
-				$parts[] = '"'.$status.'":'.$count;
-			}
-		}
-		$final = "[{".implode($parts, ',')."}]";
-		$output->write($final);
+
+		$json = json_encode( $statuses );
+		$output->write( $json );
 		fclose($handle);
 	
 	}
