@@ -10,6 +10,8 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\Input\InputOption;
 
 /**
  * Class ScanCommand
@@ -47,6 +49,12 @@ class StatusCommand extends FileSystemCommand {
 				'folder',
 				InputArgument::OPTIONAL,
 				'A file hash to find, or a file to be hashed. Assumes hash if the given value is not a locatable file'
+			)->addOption(
+				'status-file',
+				null,
+				InputOption::VALUE_OPTIONAL,
+				'Add this flag to create viphash-status.json file. False by default.',
+				true
 			);
 	}
 
@@ -80,6 +88,10 @@ class StatusCommand extends FileSystemCommand {
 		}
 		$this->display_tree( $output, $data );
 		$this->display_totals( $output, $data );
+		if($input->getOption( 'status-file' ) === true || $input->getOption( 'status-file' ) === "1" || $input->getOption( 'status-file' ) === "true"){
+			$this->save_status( $data );
+		}
+		
 	}
 
 	/**
@@ -132,6 +144,30 @@ class StatusCommand extends FileSystemCommand {
 		$final = implode( $parts, ', ' );
 		$output->writeln( '<bold>Results:</bold> '.$final );
 		$output->writeln( '<bold>Seen:</bold> '.( $total - $statuses['?'] ).'/'.$total.' files ( '.number_format( ( $total - $statuses['?'] ) / $total * 100, 1 ).'% )' );
+	}
+
+	
+	/**
+	 * @param array           $data
+	 */
+	function save_status( array $data ) {
+	
+		$file   = 'viphash-status.json';
+		$handle = fopen($file, 'w+');
+		$output = new StreamOutput($handle);
+		
+		$statuses = $this->count_tree( $data );
+		$total = array_sum( $statuses );
+
+		if ( empty( $total ) ) {
+			$output->writeln( 'No reviewable files found' );
+			return;
+		}
+
+		$json = json_encode( $statuses );
+		$output->write( $json );
+		fclose($handle);
+	
 	}
 
 	/**
