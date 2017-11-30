@@ -32,6 +32,6 @@ class JSONConfig implements Config {
 
 	private function save() {
 		$json = json_encode( $this->data, JSON_PRETTY_PRINT );
-		file_put_contents( $this->file );
+		file_put_contents( $this->file, $json );
 	}
 }
