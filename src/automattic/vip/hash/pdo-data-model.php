@@ -30,7 +30,7 @@ class Pdo_Data_Model extends NullDataModel {
 		$helper = new \automattic\vip\hash\pdo\DB_Helper( $this->pdo );
 		$helper->create_tables();
 
-		$path = $this->getDBDir().'/config.json';
+		$path = $this->getDBDir().'config.json';
 		$this->config = new \automattic\vip\hash\config\JSONConfig( $path );
 	}
 
