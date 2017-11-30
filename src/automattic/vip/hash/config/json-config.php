@@ -11,13 +11,11 @@ class JSONConfig implements Config {
 		$this->file = $json_file_path;
 		if ( file_exists( $json_file_path ) && is_readable( $json_file_path ) ) {
 			$contents = file_get_contents( $json_file_path );
-			$this->data = json_decode( $contents );
+			$this->data = json_decode( $contents, true );
 			return;
 		}
 		$this->data = [];
-		if ( is_writable( $json_file_path ) ) {
-			touch( $json_file_path );
-		}
+		touch( $json_file_path );
 	}
 
 	public function set( string $key, $value ) {
@@ -33,7 +31,7 @@ class JSONConfig implements Config {
 	}
 
 	private function save() {
-		$json = json_encode( $this->data );
+		$json = json_encode( $this->data, JSON_PRETTY_PRINT );
 		file_put_contents( $this->file );
 	}
 }
