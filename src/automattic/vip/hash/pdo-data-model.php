@@ -389,7 +389,7 @@ class Pdo_Data_Model extends NullDataModel {
 	/**
 	 * @inherit
 	 */
-	public function getConfig() : config\Config {
+	public function config() : config\Config {
 		return $this->config;
 	}
 }

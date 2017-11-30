@@ -89,5 +89,5 @@ interface DataModel {
 	 * Returns a config object
 	 * @return Config the config object
 	 */
-	public function getConfig() : config\Config;
+	public function config() : config\Config;
 }
