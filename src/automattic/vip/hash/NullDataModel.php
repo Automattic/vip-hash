@@ -132,8 +132,7 @@ class NullDataModel implements DataModel {
 	}
 
 	/**
-	 * Returns a config object
-	 * @return Config\Config the config object
+	 * @inherit
 	 */
 	public function getConfig() : config\Config {
 		return new config\NullConfig();
