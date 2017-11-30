@@ -18,7 +18,7 @@ class RemotesCommand extends Command {
 	 */
 	protected function configure() {
 		$this->setName( 'remote' )
-			->setDescription( "A subcommand for managing remote data sources. This will allow sending, recieving and syncing to remote servers using OAuth1a\n\nExamples:\n\nviphash remote add origin example.com secret key\n\nviphash remote list" )
+			->setDescription( "A subcommand for managing remote data sources. This will allow sending, receiving and syncing to remote servers using OAuth1a\n\nExamples:\n\nviphash remote add origin example.com secret key\n\nviphash remote list" )
 			->addArgument(
 				'subcommand',
 				InputArgument::REQUIRED,
@@ -77,7 +77,7 @@ class RemotesCommand extends Command {
 		$output->writeln( 'secret: ' . $secret );
 
 		if ( empty( $key ) || empty( $secret ) ) {
-			$output->writeln( 'Warning: OAuth1 secret/key pair not passed, you may recieve a 401 error' );
+			$output->writeln( 'Warning: OAuth1 secret/key pair not passed, you may receive a 401 error' );
 		}
 
 		$consumer = new \OAuthConsumer( $key, $secret, null );
