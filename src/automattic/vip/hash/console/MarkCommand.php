@@ -25,17 +25,13 @@ class MarkCommand extends Command {
 		$this->setName( 'mark' )
 			->setDescription( 'take a hash or file and mark it\'s VIP worthiness as <info>true</info> or <error>false</error>, other values accepted' )
 			->addArgument(
-				'hash',
-				InputArgument::REQUIRED,
-				'A string hash to be marked, if a file is passed instead a hash will be generated for it'
-			)->addArgument(
-				'username',
-				InputArgument::REQUIRED,
-				'Your username'
-			)->addArgument(
 				'status',
 				InputArgument::REQUIRED,
 				'The status to mark this hash with'
+			)->addArgument(
+				'hash',
+				InputArgument::REQUIRED,
+				'A string hash to be marked, if a file is passed instead a hash will be generated for it'
 			)->addArgument(
 				'note',
 				InputArgument::OPTIONAL,
@@ -110,14 +106,12 @@ class MarkCommand extends Command {
 		if ( file_exists( $hash ) ) {
 			$hash = $data->hashFile( $hash );
 		}
-		$username = $input->getArgument( 'username' );
+
+		$username = $data->config()->get( 'username' );
 		if ( empty( $username ) ) {
-			$username = $data->config()->get( 'username' );
-			echo $username; exit;
-			if ( empty( $username ) ) {
-				throw new \Exception( 'Empty username parameter' );
-			}
+			throw new \Exception( 'Username has not been set, please use the config command to set a username, e.g. viphash config set username test' );
 		}
+
 		$status = $input->getArgument( 'status' );
 		if ( empty( $status ) ) {
 			throw new \Exception( 'Empty status parameter' );
