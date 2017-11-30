@@ -2,6 +2,7 @@
 
 namespace automattic\vip\hash;
 
+use automattic\vip\hash\console\ConfigCommand;
 use automattic\vip\hash\console\GetCommand;
 use automattic\vip\hash\console\HashCommand;
 use automattic\vip\hash\console\MarkCommand;
@@ -51,6 +52,7 @@ class Application extends BaseApplication {
 		// which is used when using the --help option
 		$defaultCommands = parent::getDefaultCommands();
 
+		$defaultCommands[] = new ConfigCommand();
 		$defaultCommands[] = new HashCommand();
 		$defaultCommands[] = new MarkCommand();
 		$defaultCommands[] = new GetCommand();
