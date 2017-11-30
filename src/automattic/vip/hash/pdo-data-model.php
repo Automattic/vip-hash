@@ -16,6 +16,8 @@ class Pdo_Data_Model extends NullDataModel {
 
 	private $dbdir = '';
 
+	private $config;
+
 	public function __construct( $dbdir = '' ) {
 		$this->dbdir = $dbdir;
 		$this->init();
@@ -27,6 +29,9 @@ class Pdo_Data_Model extends NullDataModel {
 		}
 		$helper = new \automattic\vip\hash\pdo\DB_Helper( $this->pdo );
 		$helper->create_tables();
+
+		$path = $this->getDBDir().'/config.json';
+		$this->config = new \automattic\vip\hash\config\JSONConfig( $path );
 	}
 
 	/**
@@ -379,5 +384,12 @@ class Pdo_Data_Model extends NullDataModel {
 			return new Remote( $row );
 		}
 		return false;
+	}
+
+	/**
+	 * @inherit
+	 */
+	public function getConfig() : config\Config {
+		return $this->config;
 	}
 }
