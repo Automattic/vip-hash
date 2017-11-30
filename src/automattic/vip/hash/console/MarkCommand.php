@@ -31,7 +31,7 @@ class MarkCommand extends Command {
 			)->addArgument(
 				'username',
 				InputArgument::REQUIRED,
-				'A WordPress.com username'
+				'Your username'
 			)->addArgument(
 				'status',
 				InputArgument::REQUIRED,
@@ -112,7 +112,11 @@ class MarkCommand extends Command {
 		}
 		$username = $input->getArgument( 'username' );
 		if ( empty( $username ) ) {
-			throw new \Exception( 'Empty username parameter' );
+			$username = $data->config()->get( 'username' );
+			echo $username; exit;
+			if ( empty( $username ) ) {
+				throw new \Exception( 'Empty username parameter' );
+			}
 		}
 		$status = $input->getArgument( 'status' );
 		if ( empty( $status ) ) {
