@@ -1,6 +1,6 @@
 <?php
 
-namespace automattic\vip\hash;
+namespace automattic\vip\hash\config;
 
 class JSONConfig implements Config {
 
