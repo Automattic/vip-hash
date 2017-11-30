@@ -130,4 +130,12 @@ class NullDataModel implements DataModel {
 	public function getRemote( $name ) {
 		return false;
 	}
+
+	/**
+	 * Returns a config object
+	 * @return Config\Config the config object
+	 */
+	public function getConfig() : config\Config {
+		return new config\NullConfig();
+	}
 }

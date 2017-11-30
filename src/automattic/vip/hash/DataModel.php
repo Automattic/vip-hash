@@ -84,4 +84,10 @@ interface DataModel {
 	 * @return bool|Remote
 	 */
 	public function getRemote( $name );
+
+	/**
+	 * Returns a config object
+	 * @return Config the config object
+	 */
+	public function getConfig() : config\Config;
 }

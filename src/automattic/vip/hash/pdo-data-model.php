@@ -65,6 +65,10 @@ class Pdo_Data_Model extends NullDataModel {
 		$notes = $record->getNote();
 		$human_note = $record->getHumanNote();
 
+		/*if ( empty( $username ) ) {
+			throw new \Exception( 'Empty username' );
+		}*/
+
 		$identifier = $hash . '-' . $username . '-' . $date;
 
 		$query = 'INSERT INTO wpcom_vip_hashes( id, identifier, user, hash, date, seen, status, notes, human_note )
