@@ -137,13 +137,24 @@ class Remote {
 			$options['auth'] = $oauth;
 		}
 		$options['verify'] = false;
-		$response = \Requests::get( $this->getUri() . 'viphash/v1/hashes?since=' . $i_saw, array(), $options );
-		if ( 200 !== $response->status_code ) {
-			$response->throw_for_status();
-			return false;
+		$final_items = [];
+		$page = 0;
+		$max_page = 1;
+		while ( $page <= $max_page ) {
+			$response = \Requests::get( $this->getUri() . 'viphash/v1/hashes?since=' . $i_saw.'&page='.$page, array(), $options );
+			if ( 200 !== $response->status_code ) {
+				$response->throw_for_status();
+				return false;
+			}
+			$max_page = $response0->headers->offsetGet( 'X-WP-TotalPages' );
+			if ( $max_page === null ) {
+				$max_page = 1;
+			}
+			$new_items = json_decode( $response->body );
+			$final_items = array_merge( $final_items, $new_items );
+			$page++;
 		}
-		$new_items = json_decode( $response->body );
-		return $new_items;
+		return $final_items;
 	}
 
 	/**
