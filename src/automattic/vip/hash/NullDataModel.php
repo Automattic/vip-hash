@@ -42,7 +42,14 @@ class NullDataModel implements DataModel {
 		if ( ! is_file( $file ) ) {
 			throw new \Exception( 'Only files can be hashed' );
 		}
-		$code = php_strip_whitespace( $file );
+		$code = '';
+		$file_parts = pathinfo( $file );
+		// only run php strip whitespace if it's a PHP file, else it's faster to just do file_get_contents
+		if ( in_array( $file_parts['extension'], [ 'php', 'php5', 'php3', 'php4', 'ph3', 'ph4' ] ) ) {
+			$code = php_strip_whitespace( $file );
+		} else {
+			$code = file_get_contents( $file );
+		}
 		$hash = sha1( $code );
 		return $hash;
 	}
