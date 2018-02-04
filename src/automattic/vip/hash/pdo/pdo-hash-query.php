@@ -2,7 +2,7 @@
 
 namespace automattic\vip\hash\pdo;
 
-class PDOHashQuery implements HashQuery {
+class PDOHashQuery implements \automattic\vip\hash\HashQuery {
 
 	/**
 	 * PDO
@@ -28,7 +28,7 @@ class PDOHashQuery implements HashQuery {
 		$this->arguments = $arguments;
 
 		$parameters = [];
-		$query = 'SELECT * FROM wpcom_vip_hashes ';
+		$query = '';
 		// figure out the WHERE clauses
 		$where = [];
 
@@ -53,24 +53,26 @@ class PDOHashQuery implements HashQuery {
 		// Figure out the Page/Limit clauses
 		$limits = '';
 		$query .= $limits;
+
+		$query = 'SELECT * FROM wpcom_vip_hashes '.$query;
 		
-		$sth = $pdo->prepare( $query );
+		$sth = $this->pdo->prepare( $query );
 		if ( ! $sth ) {
-			$error_info = print_r( $pdo->errorInfo(), true );
+			$error_info = print_r( $this->pdo->errorInfo(), true );
 			throw new \Exception( 'Error creating PDO Hash Query statement ' . $error_info );
 		}
 		$result = $sth->execute( $parameters );
 
 		if ( ! $result ) {
-			$error_info = print_r( $pdo->errorInfo(), true );
-			$error_info_sth = print_r( $sth->errorInfo(), true );
+			$error_info = print_r( $this->pdo->errorInfo(), true );
+			$error_info_sth = print_r( $this->sth->errorInfo(), true );
 			throw new \Exception(
-				"Error executing PDO HashQuery statement\nPDO: #" . $pdo->errorCode() . ' ' . $error_info .
+				"Error executing PDO HashQuery statement\nPDO: #" . $this->pdo->errorCode() . ' ' . $error_info .
 				"\n STH: #" . $sth->errorCode() . ' ' . $error_info_sth .
 				"\n identifier:" . $identifier
 			);
 		}
-		$this->hashes = $sth->fetchAll();
+		$this->hashes = $sth->fetchAll( \PDO::FETCH_ASSOC );
 		unset( $sth );
 		$this->hashes = array_map( function( $hash ) {
 			unset( $hash['id']);
