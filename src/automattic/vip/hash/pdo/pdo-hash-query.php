@@ -109,6 +109,7 @@ class PDOHashQuery implements \automattic\vip\hash\HashQuery {
 			unset( $hash['id']);
 			return $hash;
 		}, $this->hashes );
+		$this->pageCount = 1;
 
 		return true;
 	}
