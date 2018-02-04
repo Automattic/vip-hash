@@ -43,16 +43,44 @@ class PDOHashQuery implements \automattic\vip\hash\HashQuery {
 			$parameters[':user'] = $arguments['user'];
 			$where[] = 'user = :user';
 		}
-		// seen after
+
+		// date
+		if ( !empty( $arguments['date'] ) ) {
+			if ( !empty( $arguments['date']['after'] ) ) {
+				$parameters[':after_date'] = $arguments['date']['after'];
+				$where[] = 'date > :after_date';
+			}
+			if ( !empty( $arguments['date']['before'] ) ) {
+				$parameters[':before_date'] = $arguments['date']['before'];
+				$where[] = 'date < :before_date';
+			}
+		}
+
+		// seen date
+		if ( !empty( $arguments['seen'] ) ) {
+			if ( !empty( $arguments['seen']['after'] ) ) {
+				$parameters[':seen_after_date'] = $arguments['seen']['after'];
+				$where[] = 'seen > :seen_after_date';
+			}
+			if ( !empty( $arguments['seen']['before'] ) ) {
+				$parameters[':seen_before_date'] = $arguments['seen']['before'];
+				$where[] = 'seen < :seen_before_date';
+			}
+		}
 		
 
 		if ( !empty( $where ) ) {
 			$query .= 'WHERE '.implode( ' AND ', $where );
 		}
  
+ 		// order
+		$order = '';
+		$query .= $order;
+		
 		// Figure out the Page/Limit clauses
 		$limits = '';
 		$query .= $limits;
+
 
 		$query = 'SELECT * FROM wpcom_vip_hashes '.$query;
 		
