@@ -70,7 +70,7 @@ class PDOHashQuery implements \automattic\vip\hash\HashQuery {
 		
 
 		if ( !empty( $where ) ) {
-			$query .= 'WHERE '.implode( ' AND ', $where );
+			$query .= ' WHERE '.implode( ' AND ', $where );
 		}
  
  		// order
@@ -79,11 +79,42 @@ class PDOHashQuery implements \automattic\vip\hash\HashQuery {
 		
 		// Figure out the Page/Limit clauses
 		$limits = '';
+		$page = 0;
+		$per_page = 1000000; // lets not load any more than this, we're not crazy, use pagination if you want more
+		$has_pagination = false;
+		if ( !empty( $arguments['page'] ) ) {
+			$page = abs( intval( $arguments['page'] ) );
+			$has_pagination = true;
+		}
+		
+		if ( !empty( $arguments['per_page'] ) ) {
+			$per_page = min( max( intval( $arguments['per_page'] ), 0 ), 1000000);
+			$has_pagination = false;
+		}
+		if ( true === $has_pagination ) {
+			$offset = ( $page -1 ) * $per_page;
+			$limits = ' LIMIT :offset , :limit';
+			$parameters[':offset'] = $offset;
+			$parameters[':limit'] = $per_page;
+		}
 		$query .= $limits;
 
+		$hash_query = 'SELECT * FROM wpcom_vip_hashes '.$query;
 
-		$query = 'SELECT * FROM wpcom_vip_hashes '.$query;
+		$sth = $this->executeStatement( $hash_query, $parameters );
 		
+		$this->hashes = $sth->fetchAll( \PDO::FETCH_ASSOC );
+		unset( $sth );
+		$this->hashes = array_map( function( $hash ) {
+			unset( $hash['id']);
+			return $hash;
+		}, $this->hashes );
+
+		return true;
+	}
+
+
+	private function executeStatement( $query, $parameters ) : \PDOStatement {
 		$sth = $this->pdo->prepare( $query );
 		if ( ! $sth ) {
 			$error_info = print_r( $this->pdo->errorInfo(), true );
@@ -100,14 +131,7 @@ class PDOHashQuery implements \automattic\vip\hash\HashQuery {
 				"\n identifier:" . $identifier
 			);
 		}
-		$this->hashes = $sth->fetchAll( \PDO::FETCH_ASSOC );
-		unset( $sth );
-		$this->hashes = array_map( function( $hash ) {
-			unset( $hash['id']);
-			return $hash;
-		}, $this->hashes );
-
-		return true;
+		return $sth;
 	}
 
 	/**
