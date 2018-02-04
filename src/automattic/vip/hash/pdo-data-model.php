@@ -46,7 +46,7 @@ class Pdo_Data_Model extends NullDataModel {
 	/**
 	 * @return \PDO
 	 */
-	public function getPDO() {
+	public function getPDO() : \PDO {
 		return $this->pdo;
 	}
 
@@ -59,7 +59,7 @@ class Pdo_Data_Model extends NullDataModel {
 	 * @return bool
 	 * @throws \Exception
 	 */
-	public function saveHash( HashRecord $record ) {
+	public function saveHash( HashRecord $record ) : bool {
 		$pdo = $this->getPDO();
 
 		$username = $record->getUsername();
@@ -157,7 +157,7 @@ class Pdo_Data_Model extends NullDataModel {
 	/**
 	 * @return string the folder containing hash records with a trailing slash
 	 */
-	public function getDBDir() {
+	public function getDBDir() : string {
 
 		if ( ! empty( $this->dbdir ) ) {
 			return $this->dbdir;
@@ -186,7 +186,7 @@ class Pdo_Data_Model extends NullDataModel {
 	 * 
 	 * @return array an array of strings representing folder paths
 	 */
-	protected function searchDBFolders() {
+	protected function searchDBFolders() : array {
 		$folders = [];
 		if ( ! empty( $_SERVER['HOME'] ) ) {
 			$folders[] = $_SERVER['HOME'] . DIRECTORY_SEPARATOR . '.viphash' . DIRECTORY_SEPARATOR;
@@ -205,6 +205,9 @@ class Pdo_Data_Model extends NullDataModel {
 		return $folders;
 	}
 
+	/**
+	 * @inherit
+	 */
 	public function getNewestSeenHash() {
 		$results = $this->pdo->query( 'SELECT * FROM wpcom_vip_hashes ORDER BY seen DESC LIMIT 1' );
 		if ( ! $results ) {
@@ -259,7 +262,7 @@ class Pdo_Data_Model extends NullDataModel {
 	 * @return bool
 	 * @throws \Exception
 	 */
-	public function addRemote( Remote $remote ) {
+	public function addRemote( Remote $remote ) : bool {
 
 		$name = $remote->getName();
 		$uri = $remote->getUri();
@@ -292,7 +295,7 @@ class Pdo_Data_Model extends NullDataModel {
 		return true;
 	}
 
-	public function updateRemote( Remote $remote ) {
+	public function updateRemote( Remote $remote ) : bool {
 		$id = $remote->getId();
 		$name = $remote->getName();
 		$uri = $remote->getUri();
@@ -327,7 +330,7 @@ class Pdo_Data_Model extends NullDataModel {
 		return true;
 	}
 
-	public function removeRemote( Remote $remote ) {
+	public function removeRemote( Remote $remote ) : bool {
 		$name = $remote->getName();
 		// it's old, update it
 		// //UPDATE Cars SET Name='Skoda Octavia' WHERE Id=3;
