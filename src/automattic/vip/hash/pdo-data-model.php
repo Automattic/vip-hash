@@ -219,19 +219,13 @@ class Pdo_Data_Model extends NullDataModel {
 	}
 
 	public function getHashesSeenAfter( $date ) {
-		$date = intval( $date );
-		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hashes WHERE seen > $date ORDER BY seen ASC" );
-		if ( ! $results ) {
-			$error_info = print_r( $this->pdo->errorInfo(), true );
-			throw new \Exception( $error_info );
-		}
-
-		$output_data = array();
-		while ( $row = $results->fetch( PDO::FETCH_ASSOC ) ) {
-			unset( $row['id'] );
-			$output_data[] = $row;
-		}
-		return $output_data;
+		$query = $this->newQuery();
+		$query->fetch([
+			'seen' => [
+				'after' => intval( $date )
+			]
+		]);
+		return $query->hashes();
 	}
 
 
