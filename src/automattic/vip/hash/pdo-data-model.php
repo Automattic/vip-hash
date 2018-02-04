@@ -117,19 +117,13 @@ class Pdo_Data_Model extends NullDataModel {
 	 * @throws \Exception
 	 */
 	public function getHashStatusByUser( $hash, $username ) {
-		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hashes WHERE hash = '$hash' AND user = '$username'" );
 
-		if ( ! $results ) {
-			$error_info = print_r( $this->pdo->errorInfo(), true );
-			throw new \Exception( $error_info, $this->pdo->errorCode() );
-		}
-
-		$output_data = array();
-		while ( $row = $results->fetch( PDO::FETCH_ASSOC ) ) {
-			unset( $row['id'] );
-			$output_data[] = $row;
-		}
-		return $output_data;
+		$query = $this->newQuery();
+		$query->fetch([
+			'user' => $username,
+			'hash' => $hash
+		]);
+		return $query->hashes();
 	}
 
 	/**
@@ -394,5 +388,12 @@ class Pdo_Data_Model extends NullDataModel {
 	 */
 	public function config() : config\Config {
 		return $this->config;
+	}
+
+	/**
+	 * @inherit
+	 */
+	public function newQuery() : HashQuery {
+		return new \automattic\vip\hash\pdo\PDOHashQuery( $this->pdo );
 	}
 }
