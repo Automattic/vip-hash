@@ -74,8 +74,25 @@ class PDOHashQuery implements \automattic\vip\hash\HashQuery {
 		}
  
  		// order
-		$order = '';
-		$query .= $order;
+		$order_sql = '';
+		$orderby = 'date';
+		$order = 'ASC';
+		if ( !empty( $arguments['orderby'] ) ) {
+			$orderBY_whitelist = [ 'date', 'seen' ];
+			if ( in_array( $arguments['orderby'], $orderBY_whitelist ) ) {
+				$orderby = $arguments['orderby'];
+			}
+		}
+
+		if ( !empty( $arguments['order'] ) ) {
+			$order_whitelist = [ 'ASC', 'DESC' ];
+			if ( in_array( $arguments['order'], $order_whitelist ) ) {
+				$order = $arguments['order'];
+			}
+		}
+
+		$order_sql = ' ORDER BY '.$orderby.' '.$order;
+		$query .= $order_sql;
 		
 		// Figure out the Page/Limit clauses
 		$limits = '';
