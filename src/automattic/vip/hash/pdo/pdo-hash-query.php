@@ -89,7 +89,7 @@ class PDOHashQuery implements \automattic\vip\hash\HashQuery {
 		
 		if ( !empty( $arguments['per_page'] ) ) {
 			$per_page = min( max( intval( $arguments['per_page'] ), 0 ), 1000000);
-			$has_pagination = false;
+			$has_pagination = true;
 		}
 		if ( true === $has_pagination ) {
 			$offset = ( $page -1 ) * $per_page;
@@ -99,17 +99,20 @@ class PDOHashQuery implements \automattic\vip\hash\HashQuery {
 		}
 		$query .= $limits;
 
+		$count_query = 'SELECT count( * ) FROM wpcom_vip_hashes '.$query;
 		$hash_query = 'SELECT * FROM wpcom_vip_hashes '.$query;
 
+		$sth = $this->executeStatement( $count_query, $parameters );
+		$this->pageCount = intval( $sth->fetch( \PDO::FETCH_NUM)[0] );
+
 		$sth = $this->executeStatement( $hash_query, $parameters );
-		
-		$this->hashes = $sth->fetchAll( \PDO::FETCH_ASSOC );
+		$this->hashes = $sth->fetchAll( \PDO::FETCH_ASSOC);
+
 		unset( $sth );
 		$this->hashes = array_map( function( $hash ) {
 			unset( $hash['id']);
 			return $hash;
 		}, $this->hashes );
-		$this->pageCount = 1;
 
 		return true;
 	}
