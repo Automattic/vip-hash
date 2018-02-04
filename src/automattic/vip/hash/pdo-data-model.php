@@ -46,7 +46,7 @@ class Pdo_Data_Model extends NullDataModel {
 	/**
 	 * @return \PDO
 	 */
-	public function getPDO() {
+	public function getPDO() : \PDO {
 		return $this->pdo;
 	}
 
@@ -59,7 +59,7 @@ class Pdo_Data_Model extends NullDataModel {
 	 * @return bool
 	 * @throws \Exception
 	 */
-	public function saveHash( HashRecord $record ) {
+	public function saveHash( HashRecord $record ) : bool {
 		$pdo = $this->getPDO();
 
 		$username = $record->getUsername();
@@ -117,19 +117,12 @@ class Pdo_Data_Model extends NullDataModel {
 	 * @throws \Exception
 	 */
 	public function getHashStatusByUser( $hash, $username ) {
-		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hashes WHERE hash = '$hash' AND user = '$username'" );
-
-		if ( ! $results ) {
-			$error_info = print_r( $this->pdo->errorInfo(), true );
-			throw new \Exception( $error_info, $this->pdo->errorCode() );
-		}
-
-		$output_data = array();
-		while ( $row = $results->fetch( PDO::FETCH_ASSOC ) ) {
-			unset( $row['id'] );
-			$output_data[] = $row;
-		}
-		return $output_data;
+		$query = $this->newQuery();
+		$query->fetch([
+			'user' => $username,
+			'hash' => $hash
+		]);
+		return $query->hashes();
 	}
 
 	/**
@@ -139,25 +132,17 @@ class Pdo_Data_Model extends NullDataModel {
 	 * @return array
 	 */
 	public function getHashStatusAllUsers( $hash ) {
-		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hashes WHERE hash = '$hash'" );
-
-		if ( ! $results ) {
-			$error_info = print_r( $this->pdo->errorInfo(), true );
-			throw new \Exception( $error_info );
-		}
-
-		$output_data = array();
-		while ( $row = $results->fetch( PDO::FETCH_ASSOC ) ) {
-			unset( $row['id'] );
-			$output_data[] = $row;
-		}
-		return $output_data;
+		$query = $this->newQuery();
+		$query->fetch([
+			'hash' => $hash
+		]);
+		return $query->hashes();
 	}
 
 	/**
 	 * @return string the folder containing hash records with a trailing slash
 	 */
-	public function getDBDir() {
+	public function getDBDir() : string {
 
 		if ( ! empty( $this->dbdir ) ) {
 			return $this->dbdir;
@@ -186,7 +171,7 @@ class Pdo_Data_Model extends NullDataModel {
 	 * 
 	 * @return array an array of strings representing folder paths
 	 */
-	protected function searchDBFolders() {
+	protected function searchDBFolders() : array {
 		$folders = [];
 		if ( ! empty( $_SERVER['HOME'] ) ) {
 			$folders[] = $_SERVER['HOME'] . DIRECTORY_SEPARATOR . '.viphash' . DIRECTORY_SEPARATOR;
@@ -205,6 +190,9 @@ class Pdo_Data_Model extends NullDataModel {
 		return $folders;
 	}
 
+	/**
+	 * @inherit
+	 */
 	public function getNewestSeenHash() {
 		$results = $this->pdo->query( 'SELECT * FROM wpcom_vip_hashes ORDER BY seen DESC LIMIT 1' );
 		if ( ! $results ) {
@@ -221,35 +209,23 @@ class Pdo_Data_Model extends NullDataModel {
 	}
 
 	public function getHashesAfter( $date ) {
-		$date = intval( $date );
-		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hashes WHERE date > $date ORDER BY date ASC" );
-		if ( ! $results ) {
-			$error_info = print_r( $this->pdo->errorInfo(), true );
-			throw new \Exception( $error_info );
-		}
-
-		$output_data = array();
-		while ( $row = $results->fetch( PDO::FETCH_ASSOC ) ) {
-			unset( $row['id'] );
-			$output_data[] = $row;
-		}
-		return $output_data;
+		$query = $this->newQuery();
+		$query->fetch([
+			'date' => [
+				'after' => intval( $date )
+			]
+		]);
+		return $query->hashes();
 	}
 
 	public function getHashesSeenAfter( $date ) {
-		$date = intval( $date );
-		$results = $this->pdo->query( "SELECT * FROM wpcom_vip_hashes WHERE seen > $date ORDER BY seen ASC" );
-		if ( ! $results ) {
-			$error_info = print_r( $this->pdo->errorInfo(), true );
-			throw new \Exception( $error_info );
-		}
-
-		$output_data = array();
-		while ( $row = $results->fetch( PDO::FETCH_ASSOC ) ) {
-			unset( $row['id'] );
-			$output_data[] = $row;
-		}
-		return $output_data;
+		$query = $this->newQuery();
+		$query->fetch([
+			'seen' => [
+				'after' => intval( $date )
+			]
+		]);
+		return $query->hashes();
 	}
 
 
@@ -259,7 +235,7 @@ class Pdo_Data_Model extends NullDataModel {
 	 * @return bool
 	 * @throws \Exception
 	 */
-	public function addRemote( Remote $remote ) {
+	public function addRemote( Remote $remote ) : bool {
 
 		$name = $remote->getName();
 		$uri = $remote->getUri();
@@ -292,7 +268,7 @@ class Pdo_Data_Model extends NullDataModel {
 		return true;
 	}
 
-	public function updateRemote( Remote $remote ) {
+	public function updateRemote( Remote $remote ) : bool {
 		$id = $remote->getId();
 		$name = $remote->getName();
 		$uri = $remote->getUri();
@@ -327,7 +303,7 @@ class Pdo_Data_Model extends NullDataModel {
 		return true;
 	}
 
-	public function removeRemote( Remote $remote ) {
+	public function removeRemote( Remote $remote ) : bool {
 		$name = $remote->getName();
 		// it's old, update it
 		// //UPDATE Cars SET Name='Skoda Octavia' WHERE Id=3;
@@ -391,5 +367,12 @@ class Pdo_Data_Model extends NullDataModel {
 	 */
 	public function config() : config\Config {
 		return $this->config;
+	}
+
+	/**
+	 * @inherit
+	 */
+	public function newQuery() : HashQuery {
+		return new \automattic\vip\hash\pdo\PDOHashQuery( $this->pdo );
 	}
 }

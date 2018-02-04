@@ -14,7 +14,7 @@ interface DataModel {
 	 * @param  HashRecord $hash the hash to be saved
 	 * @return bool successful?
 	 */
-	public function saveHash( HashRecord $hash );
+	public function saveHash( HashRecord $hash ) : bool;
 
 	/**
 	 * @param $file
@@ -54,7 +54,7 @@ interface DataModel {
 	 * @param  Remote $remote the remote data store to add
 	 * @return bool
 	 */
-	public function addRemote( Remote $remote );
+	public function addRemote( Remote $remote ) : bool;
 
 	/**
 	 * @param Remote $remote
@@ -62,14 +62,14 @@ interface DataModel {
 	 * @param  Remote $remote the remote datastore to update
 	 * @return bool
 	 */
-	public function updateRemote( Remote $remote );
+	public function updateRemote( Remote $remote ) : bool;
 
 	/**
 	 * remove a remote
 	 * @param  Remote $remote [description]
 	 * @return bool
 	 */
-	public function removeRemote( Remote $remote );
+	public function removeRemote( Remote $remote ): bool;
 
 	/**
 	 * @return Remote[]
@@ -90,4 +90,10 @@ interface DataModel {
 	 * @return Config the config object
 	 */
 	public function config() : config\Config;
+
+	/**
+	 * Returns a Hash Query object
+	 * @return HashQuery a new query for fetching hashes
+	 */
+	public function newQuery() : HashQuery;
 }

@@ -22,7 +22,7 @@ class NullDataModel implements DataModel {
 	 *
 	 * @return bool successful?
 	 */
-	public function saveHash( HashRecord $hash ) {
+	public function saveHash( HashRecord $hash ) : bool {
 		return false;
 	}
 
@@ -97,7 +97,7 @@ class NullDataModel implements DataModel {
 	 * @internal param int $last_sent
 	 *
 	 */
-	public function addRemote( Remote $remote ) {
+	public function addRemote( Remote $remote ) : bool {
 		return false;
 	}
 
@@ -112,11 +112,11 @@ class NullDataModel implements DataModel {
 	 * @internal param int $last_sent
 	 *
 	 */
-	public function updateRemote( Remote $remote ) {
+	public function updateRemote( Remote $remote ) : bool {
 		return false;
 	}
 
-	public function removeRemote( Remote $remote ) {
+	public function removeRemote( Remote $remote ) : bool {
 		return false;
 	}
 
@@ -143,5 +143,13 @@ class NullDataModel implements DataModel {
 	 */
 	public function config() : config\Config {
 		return new config\NullConfig();
+	}
+
+	/**
+	 * Returns a Hash Query object
+	 * @return HashQuery a new query for fetching hashes
+	 */
+	public function newQuery() : HashQuery {
+		return new NullHashQuery();
 	}
 }
