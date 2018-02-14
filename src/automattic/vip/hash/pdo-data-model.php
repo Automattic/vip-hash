@@ -110,36 +110,6 @@ class Pdo_Data_Model extends NullDataModel {
 	}
 
 	/**
-	 * @param $hash
-	 * @param $username
-	 *
-	 * @return array
-	 * @throws \Exception
-	 */
-	public function getHashStatusByUser( $hash, $username ) {
-		$query = $this->newQuery();
-		$query->fetch([
-			'user' => $username,
-			'hash' => $hash
-		]);
-		return $query->hashes();
-	}
-
-	/**
-	 * @param $hash
-	 *
-	 * @throws \Exception
-	 * @return array
-	 */
-	public function getHashStatusAllUsers( $hash ) {
-		$query = $this->newQuery();
-		$query->fetch([
-			'hash' => $hash
-		]);
-		return $query->hashes();
-	}
-
-	/**
 	 * @return string the folder containing hash records with a trailing slash
 	 */
 	public function getDBDir() : string {
@@ -206,26 +176,6 @@ class Pdo_Data_Model extends NullDataModel {
 			return $row;
 		}
 		return $output_data;
-	}
-
-	public function getHashesAfter( $date ) {
-		$query = $this->newQuery();
-		$query->fetch([
-			'date' => [
-				'after' => intval( $date )
-			]
-		]);
-		return $query->hashes();
-	}
-
-	public function getHashesSeenAfter( $date ) {
-		$query = $this->newQuery();
-		$query->fetch([
-			'seen' => [
-				'after' => intval( $date )
-			]
-		]);
-		return $query->hashes();
 	}
 
 

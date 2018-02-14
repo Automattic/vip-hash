@@ -62,7 +62,12 @@ class NullDataModel implements DataModel {
 	 * @throws \Exception
 	 */
 	public function getHashStatusByUser( $hash, $username ) {
-		return [];
+		$query = $this->newQuery();
+		$query->fetch([
+			'user' => $username,
+			'hash' => $hash
+		]);
+		return $query->hashes();
 	}
 
 	/**
@@ -72,57 +77,69 @@ class NullDataModel implements DataModel {
 	 * @return array
 	 */
 	public function getHashStatusAllUsers( $hash ) {
-		return [];
+		$query = $this->newQuery();
+		$query->fetch([
+			'hash' => $hash
+		]);
+		return $query->hashes();
 	}
 
+	/**
+	 * @inherit
+	 */
 	public function getNewestSeenHash() {
 		return [];
 	}
 
+	/**
+	 * @inherit
+	 */
 	public function getHashesAfter( $date ) {
-		return [];
-	}
-
-	public function getHashesSeenAfter( $date ) {
-		return [];
+		$query = $this->newQuery();
+		$query->fetch([
+			'date' => [
+				'after' => intval( $date )
+			]
+		]);
+		return $query->hashes();
 	}
 
 	/**
-	 * @param Remote $remote
-	 *
-	 * @return bool
-	 * @internal param $name
-	 * @internal param $uri
-	 * @internal param int $latest_seen
-	 * @internal param int $last_sent
-	 *
+	 * @inherit
+	 */
+	public function getHashesSeenAfter( $date ) {
+		$query = $this->newQuery();
+		$query->fetch([
+			'seen' => [
+				'after' => intval( $date )
+			]
+		]);
+		return $query->hashes();
+	}
+
+	/**
+	 * @inherit
 	 */
 	public function addRemote( Remote $remote ) : bool {
 		return false;
 	}
 
 	/**
-	 * @param Remote $remote
-	 *
-	 * @return bool
-	 * @internal param $id
-	 * @internal param $name
-	 * @internal param $uri
-	 * @internal param int $latest_seen
-	 * @internal param int $last_sent
-	 *
+	 * @inherit
 	 */
 	public function updateRemote( Remote $remote ) : bool {
 		return false;
 	}
 
+	/**
+	 * @inherit
+	 */
 	public function removeRemote( Remote $remote ) : bool {
 		return false;
 	}
 
 	/**
-	 * @return Remote[]
-	 * @throws \Exception
+	 * @inherit
 	 */
 	public function getRemotes() {
 		return [];
