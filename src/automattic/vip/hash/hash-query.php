@@ -33,4 +33,11 @@ interface HashQuery {
 	 * @return int Number of hashes fetched
 	 */
 	public function hashCount() : int;
+
+	/**
+	 * How many hashes there are in total
+	 * 
+	 * @return int Number of hashes in the data store
+	 */
+	public function totalHashCount() : int;
 }

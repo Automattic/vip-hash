@@ -2,7 +2,7 @@
 
 namespace automattic\vip\hash\pdo;
 
-class PDOHashQuery implements \automattic\vip\hash\HashQuery {
+class PDOHashQuery extends \automattic\vip\hash\NullHashQuery {
 
 	/**
 	 * PDO
@@ -13,7 +13,7 @@ class PDOHashQuery implements \automattic\vip\hash\HashQuery {
 	private $hashes;
 	private $arguments;
 	private $pageCount;
-
+	private $totalHashCount;
 
 	public function __construct( \PDO $pdo ) {
 		$this->pdo = $pdo;
@@ -120,7 +120,8 @@ class PDOHashQuery implements \automattic\vip\hash\HashQuery {
 		$hash_query = 'SELECT * FROM wpcom_vip_hashes '.$query;
 
 		$sth = $this->executeStatement( $count_query, $parameters );
-		$this->pageCount = intval( $sth->fetch( \PDO::FETCH_NUM)[0] );
+		$this->totalHashCount = intval( $sth->fetch( \PDO::FETCH_NUM)[0] );
+		$this->pageCount = ( $this->totalHashCount + $per_page - 1)/$per_page;
 
 		$sth = $this->executeStatement( $hash_query, $parameters );
 		$this->hashes = $sth->fetchAll( \PDO::FETCH_ASSOC);

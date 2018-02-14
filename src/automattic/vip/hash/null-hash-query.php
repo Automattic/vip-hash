@@ -31,4 +31,11 @@ class NullHashQuery implements HashQuery {
 	public function hashCount() : int {
 		return 0;
 	}
+
+	/**
+	 * @inherit
+	 */
+	public function totalHashCount() : int {
+		return 0;
+	}
 }
