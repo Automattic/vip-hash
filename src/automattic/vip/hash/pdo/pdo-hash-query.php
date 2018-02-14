@@ -114,10 +114,9 @@ class PDOHashQuery extends \automattic\vip\hash\NullHashQuery {
 			$parameters[':offset'] = $offset;
 			$parameters[':limit'] = $per_page;
 		}
-		$query .= $limits;
 
-		$count_query = 'SELECT count( * ) FROM wpcom_vip_hashes '.$query;
-		$hash_query = 'SELECT * FROM wpcom_vip_hashes '.$query;
+		$count_query = 'SELECT count( * ) FROM wpcom_vip_hashes '.$query ;
+		$hash_query = 'SELECT * FROM wpcom_vip_hashes '.$query. $limits;
 
 		$sth = $this->executeStatement( $count_query, $parameters );
 		$this->totalHashCount = intval( $sth->fetch( \PDO::FETCH_NUM)[0] );
