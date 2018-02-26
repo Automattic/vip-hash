@@ -146,7 +146,7 @@ class Remote {
 				$response->throw_for_status();
 				return false;
 			}
-			$max_page = $response0->headers->offsetGet( 'X-WP-TotalPages' );
+			$max_page = $response->headers->offsetGet( 'X-WP-TotalPages' );
 			if ( $max_page === null ) {
 				$max_page = 1;
 			}
