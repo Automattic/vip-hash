@@ -52,7 +52,18 @@ Usage:
 
 ## scan
 
-This command takes a folder as its parameter and outputs a json object showing data about the files and folders inside, e.g. at the time of writing, this is the output for this project:
+With the `format` parameter this can be used to auto-generate feedback. For example:
+
+```shell
+php bin/viphash.php scan . --format="markdown" > feedback.md
+```
+
+Will generate a markdown file with every issue in codeblocks with descriptions, ordered and separated by filenames in headings. It also adds some client friendly copy, and some prompts to make general notes. Great for attaching to Zendesk tickets, or copy pasting into github issues
+
+
+This command takes a folder as its parameter.
+
+Alternatively, passing `--format="json"` or ommitting the parameter will output a json object showing data about the files and folders inside, e.g. at the time of writing, this is the output for this project:
 
 
 ```
