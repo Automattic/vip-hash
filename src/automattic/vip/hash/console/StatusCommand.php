@@ -103,13 +103,16 @@ class StatusCommand extends FileSystemCommand {
 			$output->write( '<error>Nothing found</error>' );
 			return;
 		}
-		$tree = new Tree;
+		$tree = new Tree();
 		$tree->setData( $this->prettify_tree( $data ) );
-		$tree->setRenderer( new Markdown( 4 ) );
+		$markdown_renderer = new Markdown( 4 );
+		$tree->setRenderer( $markdown_renderer );
 		$output->write( $tree->render() );
 	}
 
 	/**
+	 * Displays the summaries at the end of a status tree with the legend etc
+	 * 
 	 * @param OutputInterface $output
 	 * @param array           $data
 	 */
@@ -134,11 +137,12 @@ class StatusCommand extends FileSystemCommand {
 		$output->writeln( '<bold>Legend:</bold> '.$legend );
 		$parts = [];
 		foreach ( $statuses as $status => $count ) {
-			if ( $count > 0 ) {
-				$part = $status.': '.$count. ' ('.number_format( ( $count / $total ) * 100, 1 ).'%)';
-				$part = sprintf( $this->status_markup[ $status ], $part );
-				$parts[] = $part;
+			if ( $count == 0 ) {
+				continue;
 			}
+			$part = $status.': '.$count. ' ('.number_format( ( $count / $total ) * 100, 1 ).'%)';
+			$part = sprintf( $this->status_markup[ $status ], $part );
+			$parts[] = $part;
 		}
 
 		$final = implode( $parts, ', ' );
@@ -148,13 +152,15 @@ class StatusCommand extends FileSystemCommand {
 
 	
 	/**
+	 * Writes out the review status to a JSON file
+	 * 
 	 * @param array           $data
 	 */
 	function save_status( array $data ) {
 	
 		$file   = 'viphash-status.json';
-		$handle = fopen($file, 'w+');
-		$output = new StreamOutput($handle);
+		$handle = fopen( $file, 'w+' );
+		$output = new StreamOutput( $handle );
 		
 		$statuses = $this->count_tree( $data );
 		$total = array_sum( $statuses );
@@ -166,7 +172,7 @@ class StatusCommand extends FileSystemCommand {
 
 		$json = json_encode( $statuses );
 		$output->write( $json );
-		fclose($handle);
+		fclose( $handle );
 	
 	}
 
@@ -213,18 +219,12 @@ class StatusCommand extends FileSystemCommand {
 	function prettify_tree( array $data ) {
 		if ( ! empty( $data['folder'] ) ) {
 			if ( empty( $data['contents'] ) ) {
-				return array();
+				return [];
 			}
 			$contents = array();
 			foreach ( $data['contents'] as $item ) {
 				if ( ! empty( $item['file'] ) ) {
-					$status = '?';
-					if ( ! empty( $item['hashes'] ) ) {
-						$status = $this->hash_status( $item['hashes'] );
-					}
-					$key = explode( '/', $item['file'] );
-					$str = end( $key ).' '. $status;
-					$str = sprintf( $this->status_markup[ $status ], $str );
+					$str = $this->prettify_tree_file_node( $item );
 					$contents[] = $str;
 					continue;
 				}
@@ -234,11 +234,22 @@ class StatusCommand extends FileSystemCommand {
 				}
 			}
 			if ( empty( $contents ) ) {
-				return array();
+				return [];
 			}
 			return $contents;
 		}
-		return array();
+		return [];
+	}
+
+	public function prettify_tree_file_node( array $item ) {
+		$status = '?';
+		if ( ! empty( $item['hashes'] ) ) {
+			$status = $this->hash_status( $item['hashes'] );
+		}
+		$key = explode( '/', $item['file'] );
+		$str = end( $key ).' '. $status;
+		$str = sprintf( $this->status_markup[ $status ], $str );
+		return $str;
 	}
 
 	/**

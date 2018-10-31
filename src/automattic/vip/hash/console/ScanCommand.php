@@ -37,7 +37,7 @@ class ScanCommand extends FileSystemCommand {
 			$folder = dirname( getcwd() );
 		}
 		if ( empty( $format ) ) {
-			$format = 'json';
+			$format = 'markdown';
 		}
 		if ( ! in_array( $format, array( 'json', 'markdown' ) ) ) {
 			throw new \Exception( 'Unknown format' );
