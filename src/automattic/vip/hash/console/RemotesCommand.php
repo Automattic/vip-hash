@@ -68,17 +68,30 @@ class RemotesCommand extends Command {
 
 	public function add_remote( OutputInterface $output, InputInterface $input, DataModel $data ) {
 		$output->writeln( '<info>Beta, add remote method for OAuth1</info>' );
+
 		$name = $input->getArgument( 'name' );
+		if ( empty( $name ) ) {
+			throw new \Exception( 'Missing name parameter' );
+		}
+
 		$uri = $input->getArgument( 'uri' );
+		if ( empty( $uri ) ) {
+			throw new \Exception( 'Missing uri parameter' );
+		}
 		$api_url = '';
+
+		if ( empty( $uri ) ) {
+			throw new \Exception( 'Missing uri parameter' );
+		}
+
 		$secret = $input->getArgument( 'secret' );
 		$key = $input->getArgument( 'key' );
+		if ( empty( $key ) || empty( $secret ) ) {
+			throw new \Exception( 'OAuth1 secret/key pair not passed, these are needed to authenticate' );
+		}
+
 		$output->writeln( 'key: ' . $key );
 		$output->writeln( 'secret: ' . $secret );
-
-		if ( empty( $key ) || empty( $secret ) ) {
-			$output->writeln( 'Warning: OAuth1 secret/key pair not passed, you may receive a 401 error' );
-		}
 
 		$consumer = new \OAuthConsumer( $key, $secret, null );
 		$token = null;
@@ -132,10 +145,10 @@ class RemotesCommand extends Command {
 			$authorization .= 'oauth_token=' . urlencode( $token_args['oauth_token'] );
 
 
-			$output->writeln( '<question>In order to continue, a verification token will be needed, Please visit <info>' . $authorization . '</info></question>' );
+			$output->writeln( '<question>In order to continue, a verification token will be needed, Please visit <info>' . $authorization . '</info> and follow the steps</question>' );
 			$helper = $this->getHelper( 'question' );
 
-			$question = new Question( "What did the site say? ( it should look like a verification token )\n", '' );
+			$question = new Question( "What was the verification token? It should look similar to this: 'A1bcDeFghIjOkLMnOPQRstUV'\n", '' );
 			$code = $helper->ask( $input, $output, $question );
 
 			$output->writeln( 'Response:' );
@@ -151,10 +164,9 @@ class RemotesCommand extends Command {
 
 			$output->writeln( 'Token assembled, preparing to save new remote data source' );
 
-			$remote = new Remote( [
-				'name' => $name,
-				'uri' => $api_url
-			]);
+			$remote = new Remote();
+			$remote->setName( $name );
+			$remote->setUri( $api_url );
 			$remote->setOauthDetails( $auth );
 			$output->writeln( 'Saving to data store' );
 			$result = $data->addRemote( $remote );
