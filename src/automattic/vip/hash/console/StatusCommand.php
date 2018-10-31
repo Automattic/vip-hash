@@ -54,7 +54,7 @@ class StatusCommand extends FileSystemCommand {
 				null,
 				InputOption::VALUE_OPTIONAL,
 				'Add this flag to create viphash-status.json file. False by default.',
-				true
+				false
 			);
 	}
 
