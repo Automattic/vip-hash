@@ -119,21 +119,21 @@ class Pdo_Data_Model extends NullDataModel {
 		}
 		$folders = $this->searchDBFolders();
 
-		$folder = '';
-		if ( ! empty( $folders ) ) {
-			foreach ( $folders as $f ) {
-				if ( ! is_writable( $f ) ) {
-					continue;
-				}
-				if ( ( ! file_exists( $f ) ) && ( ! mkdir( $f, 0777, true ) ) ) {
-					continue;
-				}
-				$folder = $f;
-				break;
-			}
+		if ( empty( $folders ) ) {
+			throw new \Exception( 'Could not locate a place to put the PDO/SQLite database' );
 		}
-		$this->dbdir = $folder;
-		return $folder;
+		foreach ( $folders as $f ) {
+			if ( ! is_writable( $f ) ) {
+				continue;
+			}
+			if ( ( ! file_exists( $f ) ) && ( ! mkdir( $f, 0777, true ) ) ) {
+				continue;
+			}
+			$this->dbdir = $f;
+			return $f;
+		}
+		
+		throw new \Exception( 'PDO/SQLite Database locations were found, but for whatever reason they were neither writable, or the folders could not be created' );
 	}
 
 	/**
@@ -156,6 +156,7 @@ class Pdo_Data_Model extends NullDataModel {
 		if ( ! empty( $_SERVER['HOMEDRIVE'] ) && ! empty( $_SERVER['HOMEPATH'] ) ) {
 			$folders[] = $_SERVER['HOMEDRIVE'] . $_SERVER['HOMEPATH'] . DIRECTORY_SEPARATOR . '.viphash' . DIRECTORY_SEPARATOR;
 		}
+		$folders[] = '~' . DIRECTORY_SEPARATOR . '.viphash' . DIRECTORY_SEPARATOR;
 		$folders[] = '.viphash' . DIRECTORY_SEPARATOR;
 		return $folders;
 	}
