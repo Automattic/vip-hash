@@ -27,7 +27,7 @@ class Application extends BaseApplication {
 	 * {@inheritDoc}
 	 */
 	function __construct() {
-		parent::__construct( 'viphash', self::VERSION );
+		parent::__construct( 'viphash', self::VERSION.' '.self::RELEASE_DATE );
 	}
 
 	/**
