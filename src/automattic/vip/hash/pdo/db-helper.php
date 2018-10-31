@@ -17,7 +17,7 @@ class DB_Helper {
 		if ( true === $conditional ) {
 			$not_exists = 'IF NOT EXISTS ';
 		}
-		$this->pdo->query( 'CREATE TABLE '.$not_exists.$prefix.'vip_hashes (
+		$this->pdo->query( "CREATE TABLE ${not_exists} ${prefix}vip_hashes (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			identifier CHAR(100) NOT NULL UNIQUE,
 			user CHAR(50) NOT NULL,
@@ -27,16 +27,18 @@ class DB_Helper {
 			status CHAR(30) NOT NULL,
 			notes TEXT,
 			human_note TEXT
-		)' );
+		)" );
 
-		$this->pdo->query( 'CREATE TABLE '.$not_exists.$prefix.'vip_hash_remotes (
+		$this->pdo->query( "CREATE TABLE ${not_exists} ${prefix}vip_hash_remotes (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			name CHAR(60) NOT NULL UNIQUE,
 			uri CHAR(255) NOT NULL,
 			latest_seen INT NOT NULL,
 			last_sent INT NOT NULL,
 			oauth_details TEXT
-		)' );
+		)" );
+		$this->pdo->query( "CREATE INDEX ${not_exists} ${prefix}vip_hash_status ON ${prefix}vip_hashes (hash,status);" );
+		$this->pdo->query( "CREATE INDEX ${not_exists} ${prefix}vip_hash_seen ON ${prefix}vip_hashes (hash,seen);" );
 	}
 
 	/**
