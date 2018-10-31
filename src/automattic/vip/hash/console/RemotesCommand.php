@@ -22,7 +22,7 @@ class RemotesCommand extends Command {
 			->addArgument(
 				'subcommand',
 				InputArgument::REQUIRED,
-				'add, list or rm'
+				'add, ls, list, rm, remove, or delete'
 			)->addArgument(
 				'name',
 				InputArgument::OPTIONAL,
@@ -52,12 +52,12 @@ class RemotesCommand extends Command {
 			$this->add_remote( $output, $input, $data );
 			return;
 		}
-		if ( 'list' === $sub_command ) {
+		if ( in_array( $sub_command, [ 'ls', 'list' ] ) ) {
 			$this->list_remotes( $output, $data );
 			return;
 		}
 
-		if ( 'rm' == $sub_command ) {
+		if ( in_array( $sub_command, [ 'rm', 'delete', 'remove' ] ) ) {
 			// remove a remote
 			$this->remove_remote( $input, $output, $data );
 			return;
@@ -67,7 +67,7 @@ class RemotesCommand extends Command {
 	}
 
 	public function add_remote( OutputInterface $output, InputInterface $input, DataModel $data ) {
-		$output->writeln( '<info>Very experimental add remote method for oauth testing</info>' );
+		$output->writeln( '<info>Beta, add remote method for OAuth1</info>' );
 		$name = $input->getArgument( 'name' );
 		$uri = $input->getArgument( 'uri' );
 		$api_url = '';
@@ -89,13 +89,12 @@ class RemotesCommand extends Command {
 			'token' => $token,
 		) );
 
+		$output->writeln( 'Interesting information! Lets see if we can find the API' );
+
 		try {
-
-			$output->writeln( 'Interesting information! Lets see if we can find the API' );
-
 			// First, locate the API
 			$api_url = $this->locate_url( $uri );
-			$output->writeln( '<info>Success! Found an API at ' . $api_url . '</info>' );
+			$output->writeln( '<info>Success! Found an API at ' . $api_url . ', grabbing OAuth information</info>' );
 
 			$session = new \Requests_Session( $api_url . '/', [],[], ['verify'=>false] );
 
@@ -109,18 +108,18 @@ class RemotesCommand extends Command {
 			// Add authenticator
 			$session->auth = $auth;
 
-			$output->writeln( 'Enquiring about a request token' );
+			$output->writeln( 'Enquiring about a request token...' );
 
 			// Retrieve the request token
 			$response = $auth->get_request_token( $session, $index_data->authentication->oauth1->request );
 			parse_str( $response->body, $token_args );
 
-			$output->writeln( 'Interesting response, wrangling...' );
+			$output->writeln( 'Response recieved, assembling token...' );
 
 			$token = new \OAuthToken( $token_args['oauth_token'], $token_args['oauth_token_secret'] );
 			$auth->set_token( $token );
 
-			$output->writeln( 'Building the auth URL' );
+			$output->writeln( 'Building the authorization URL...' );
 
 			// Build the authorization URL
 			$authorization = $index_data->authentication->oauth1->authorize;
@@ -133,15 +132,15 @@ class RemotesCommand extends Command {
 			$authorization .= 'oauth_token=' . urlencode( $token_args['oauth_token'] );
 
 
-			$output->writeln( '<question>Interesting! Perhaps you should visit ' . $authorization . ' and let me know what it said</question>' );
+			$output->writeln( '<question>In order to continue, a verification token will be needed, Please visit <info>' . $authorization . '</info></question>' );
 			$helper = $this->getHelper( 'question' );
 
 			$question = new Question( "What did the site say? ( it should look like a verification token )\n", '' );
 			$code = $helper->ask( $input, $output, $question );
 
-			$output->writeln( 'Really it said this?' );
+			$output->writeln( 'Response:' );
 			$output->writeln( $code );
-			$output->writeln( 'FASCINATING' );
+			$output->writeln( 'Converting code into an access token' );
 
 			// Convert request token to access token
 			$response = $auth->get_access_token( $session, $index_data->authentication->oauth1->access, $code );
@@ -150,11 +149,14 @@ class RemotesCommand extends Command {
 			$token = new \OAuthToken( $token_args['oauth_token'], $token_args['oauth_token_secret'] );
 			$auth->set_token( $token );
 
-			$remote = new Remote();
-			$remote->setName( $name );
-			$remote->setUri( $api_url );
+			$output->writeln( 'Token assembled, preparing to save new remote data source' );
+
+			$remote = new Remote( [
+				'name' => $name,
+				'uri' => $api_url
+			]);
 			$remote->setOauthDetails( $auth );
-			$output->writeln( 'Saving remote to data store' );
+			$output->writeln( 'Saving to data store' );
 			$result = $data->addRemote( $remote );
 
 			if ( ! $result ) {
@@ -176,7 +178,7 @@ class RemotesCommand extends Command {
 			$output->writeln( '<info>Most unfortunate! See you soon :)</info>' );
 			return;
 		}
-		$output->writeln( '<info>End of experimental add remote method</info>' );
+		$output->writeln( '<info>End of add remote method</info>' );
 	}
 
 	public function list_remotes( OutputInterface $output, DataModel $data ) {
