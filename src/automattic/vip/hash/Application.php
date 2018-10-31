@@ -19,15 +19,15 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
 
 class Application extends BaseApplication {
 
-    const VERSION = '@package_version@';
-    const BRANCH_ALIAS_VERSION = '@package_branch_alias_version@';
-    const RELEASE_DATE = '@release_date@';
+	const VERSION = '@package_version@';
+	const BRANCH_ALIAS_VERSION = '@package_branch_alias_version@';
+	const RELEASE_DATE = '@release_date@';
 
 	/**
 	 * {@inheritDoc}
 	 */
 	function __construct() {
-		parent::__construct( 'viphash', self::VERSION.' '.self::RELEASE_DATE );
+		parent::__construct( 'viphash', self::VERSION );
 	}
 
 	/**
@@ -40,6 +40,28 @@ class Application extends BaseApplication {
 		}
 
 		return parent::run( $input, $output );
+	}
+
+	/**
+	 * Returns the long version of the application.
+	 *
+	 * @return string The long application version
+	 */
+	public function getLongVersion() {
+		if ( 'UNKNOWN' !== $this->getName() ) {
+			if ( 'UNKNOWN' !== $this->getVersion() ) {
+				return sprintf(
+					'<info>%s</info> version <comment>%s</comment> released <comment>%s</comment>',
+					$this->getName(),
+					$this->getVersion(),
+					self::RELEASE_DATE
+				);
+			}
+
+			return sprintf( '<info>%s</info>', $this->getName() );
+		}
+
+		return '<info>Console Tool</info>';
 	}
 
 	/**
