@@ -10,11 +10,13 @@ TLDR:
 
 ```
 git clone git@github.com:Automattic/vip-hash.git
-cd vip-hash
-php bin/compile
-chmod +x viphash.phar
-mv viphash.phar /usr/local/bin/viphash
+cd vip-hash/bin
+./install.sh
 ```
+
+Note that the hash tool will try to store an SQLite database and config in the `.viphash` folder of your home directory, and store its information in that location.
+
+If you encounter a message similar to `Failed to compile phar:`, you will need to set `phar.readonly = Off` in `php.ini`, you can locate `php.ini` by running `php --ini`. This only needs doing once
 
 ## Commands
 
@@ -38,7 +40,7 @@ This command takes 3 parameters:
  
 Usage:
 
-    php bin/viphash.php mark file.php tarendai true
+    viphash mark file.php tarendai true
 
  
 ## get
@@ -47,27 +49,33 @@ This command takes a hash and returns its status. Optionally it takes a WordPres
 
 Usage:
 
+```shell
     php bin/viphash.php get file.php tarendai
+```
 
+Or if installed to path:
+
+```shell
+    viphash get file.php tarendai
+```
 
 ## scan
 
 With the `format` parameter this can be used to auto-generate feedback. For example:
 
 ```shell
-php bin/viphash.php scan . --format="markdown" > feedback.md
+viphash scan . --format="markdown" > feedback.md
 ```
 
 Will generate a markdown file with every issue in codeblocks with descriptions, ordered and separated by filenames in headings. It also adds some client friendly copy, and some prompts to make general notes. Great for attaching to Zendesk tickets, or copy pasting into github issues
 
-
 This command takes a folder as its parameter.
 
-Alternatively, passing `--format="json"` or ommitting the parameter will output a json object showing data about the files and folders inside, e.g. at the time of writing, this is the output for this project:
+Alternatively, passing `--format="json"`will output a json object showing data about the files and folders inside, e.g. at the time of writing, this is the output for this project:
 
 
-```
-❯ php bin/viphash.php scan .
+```shell
+❯ viphash scan --format="json" .
 {
     "folder": ".",
     "contents": [
@@ -148,4 +156,13 @@ Alternatively, passing `--format="json"` or ommitting the parameter will output 
         }
     ]
 }
+```
+
+### Syncing Data
+
+For sending and recieving data from a remote source, the hash tool tries to follow the `git` model of remotes that you add then sync to. The hash tool can add remote hosts using OAuth1, e.g.
+
+```shell
+viphash remote add origin https://example.com secret key
+viphash sync origin
 ```
