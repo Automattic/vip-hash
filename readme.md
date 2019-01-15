@@ -16,7 +16,7 @@ cd vip-hash/bin
 
 Note that the hash tool will try to store an SQLite database and config in the `.viphash` folder of your home directory, and store its information in that location.
 
-If you encounter a message similar to `Failed to compile phar:`, you will need to set `phar.readonly = Off` in `php.ini` ( you can locate `php.ini` by running `php --ini`) -- this only needs doing once. Make sure to have the `curl` and `pdo` addons installed to PHP as well.
+If you encounter a message similar to `Failed to compile phar:`, you will need to set `phar.readonly = Off` in `php.ini` ( you can locate `php.ini` by running `php --ini`) -- this only needs doing once. Make sure to have the `curl`, `pdo` and `pdo-sqlite` addons installed to PHP as well.
 
 ## Commands
 
