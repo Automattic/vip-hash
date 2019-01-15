@@ -10,6 +10,7 @@ TLDR:
 
 ```
 git clone git@github.com:Automattic/vip-hash.git
+composer install
 cd vip-hash/bin
 ./install.sh
 ```
