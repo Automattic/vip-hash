@@ -38,8 +38,8 @@ This command marks a file as passing or failing. It uses the username from your 
 
 This command takes 2 parameters:
 
- - A hash to mark, or a file to hash and mark
  - Does this file meet VIP standards? true or false
+ - A hash to mark, or a file to hash and mark
 
 You can also pass 2 optional parameters, as either a string or a path to a file:
 
@@ -49,7 +49,7 @@ You can also pass 2 optional parameters, as either a string or a path to a file:
 Usage:
 
 ```shell
-viphash mark file.php true
+viphash mark true file.php
 ```
 
  
