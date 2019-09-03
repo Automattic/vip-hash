@@ -34,15 +34,23 @@ Usage:
 
 ## mark
 
-This command takes 3 parameters:
+This command marks a file as passing or failing. It uses the username from your configuration, so you may need to run `viphash config set username` first.
 
- - A hash to mark, or a file to hash and mark
- - A WordPress.com username
+This command takes 2 parameters:
+
  - Does this file meet VIP standards? true or false
- 
+ - A hash to mark, or a file to hash and mark
+
+You can also pass 2 optional parameters, as either a string or a path to a file:
+
+ - Offending item if marked as bad
+ - Explanation in a human-readable format
+
 Usage:
 
-    viphash mark file.php tarendai true
+```shell
+viphash mark true file.php
+```
 
  
 ## get
