@@ -91,7 +91,7 @@ class StatusCommand extends FileSystemCommand {
 		if($input->getOption( 'status-file' ) === true || $input->getOption( 'status-file' ) === "1" || $input->getOption( 'status-file' ) === "true"){
 			$this->save_status( $data );
 		}
-		
+
 	}
 
 	/**
@@ -112,7 +112,7 @@ class StatusCommand extends FileSystemCommand {
 
 	/**
 	 * Displays the summaries at the end of a status tree with the legend etc
-	 * 
+	 *
 	 * @param OutputInterface $output
 	 * @param array           $data
 	 */
@@ -133,7 +133,7 @@ class StatusCommand extends FileSystemCommand {
 			return;
 		}
 		$output->writeln( '' );
-		$legend = implode( $parts, ', ' );
+		$legend = implode( ', ', $parts );
 		$output->writeln( '<bold>Legend:</bold> '.$legend );
 		$parts = [];
 		foreach ( $statuses as $status => $count ) {
@@ -145,23 +145,23 @@ class StatusCommand extends FileSystemCommand {
 			$parts[] = $part;
 		}
 
-		$final = implode( $parts, ', ' );
+		$final = implode( ', ', $parts );
 		$output->writeln( '<bold>Results:</bold> '.$final );
 		$output->writeln( '<bold>Seen:</bold> '.( $total - $statuses['?'] ).'/'.$total.' files ( '.number_format( ( $total - $statuses['?'] ) / $total * 100, 1 ).'% )' );
 	}
 
-	
+
 	/**
 	 * Writes out the review status to a JSON file
-	 * 
+	 *
 	 * @param array           $data
 	 */
 	function save_status( array $data ) {
-	
+
 		$file   = 'viphash-status.json';
 		$handle = fopen( $file, 'w+' );
 		$output = new StreamOutput( $handle );
-		
+
 		$statuses = $this->count_tree( $data );
 		$total = array_sum( $statuses );
 
@@ -173,7 +173,7 @@ class StatusCommand extends FileSystemCommand {
 		$json = json_encode( $statuses );
 		$output->write( $json );
 		fclose( $handle );
-	
+
 	}
 
 	/**
