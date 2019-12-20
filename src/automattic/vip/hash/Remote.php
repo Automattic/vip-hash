@@ -137,6 +137,7 @@ class Remote {
 			$options['auth'] = $oauth;
 		}
 		$options['verify'] = false;
+		$options['timeout'] = 300;
 		$final_items = [];
 		$page = 0;
 		$max_page = 1;
