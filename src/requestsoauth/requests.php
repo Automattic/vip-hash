@@ -32,7 +32,7 @@ class Requests_Auth_OAuth1 implements Requests_Auth {
 		return $this->consumer;
 	}
 
-	public function register(Requests_Hooks &$hooks) {
+	public function register(Requests_Hooks $hooks) {
 		$hooks->register( 'requests.before_request', array( $this, 'add_headers' ), 1000 );
 	}
 
