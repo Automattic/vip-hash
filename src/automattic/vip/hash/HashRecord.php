@@ -71,7 +71,7 @@ class HashRecord {
 	 * @param $date
 	 */
 	function setDate( $date ) {
-		if ( empty( $data ) ) {
+		if ( empty( $date ) ) {
 			$date = time();
 		}
 		$this->data['date'] = $date;
