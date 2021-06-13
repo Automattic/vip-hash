@@ -1,29 +1,31 @@
 {
-	"name"             : "automattic/viphash",
-	"description"      : "Hashing tool for helping with reviews",
-	"minimum-stability": "dev",
-	"license"          : "GPLV2",
-	"authors"          : [
+	"name": "automattic/viphash",
+	"description": "Hashing tool for helping with reviews",
+	"license": "GPL-2.0-only",
+	"authors": [
 		{
-			"name" : "Tom J Nowell",
+			"name": "Tom J Nowell",
 			"email": "contact@tomjn.com"
 		}
 	],
-	"require" : {
+	"require": {
 		"php": ">=7.0",
-		"symfony/console": "~2.5",
-		"symfony/finder": "~2.2",
-        "symfony/process": "~2.1",
+		"ext-curl": "*",
+		"ext-pdo": "*",
 		"ext-pdo_sqlite": "*",
-		"wp-cli/php-cli-tools": "*",
-		"rmccue/requests": "~1.6"
+		"rmccue/requests": "^1.6",
+		"symfony/console": "^2.5",
+		"symfony/finder": "^2.2",
+		"symfony/process": "^2.1",
+		"wp-cli/php-cli-tools": "^0.11"
 	},
-	"autoload"    : {
+	"require-dev": {
+		"seld/phar-utils": "~1.0"
+	},
+	"autoload": {
 		"classmap": [
 			""
 		]
 	},
-	"require-dev": {
-		"seld/phar-utils": "~1.0"
-	}
+	"minimum-stability": "dev"
 }
