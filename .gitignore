@@ -1,5 +1,7 @@
-vendor/
-.idea/
+/vendor
+.phpcs.xml
+.phpunit.result.cache
 composer.lock
-.DS_Store
+phpcs.xml
+phpunit.xml
 viphash.phar
